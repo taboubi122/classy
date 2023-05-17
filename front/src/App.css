@@ -1,38 +1,418 @@
-.App {
-  text-align: center;
+.ClientPhoto{
+  border-radius: 50%;
+  width: 15%;
+  height: 15%;
+   
 }
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.navLink{
+  text-decoration: none;
+  color: black;
 }
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
+  justify-content: center;
+  z-index: 1;
+  align-items: center;
+}
+.page-content {
+  background-color: #f2f2f2;
+  height: 100%;
+}
+.popup {
+  position: relative;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  width: 400px;
+  max-height: 80vh;
+  overflow-y: auto;
+  z-index: 1;
+}
+
+.popup h2 {
+  margin-top: 0;
+}
+
+.popup Stack {
+  width: 100%;
+}
+
+.popup TextField {
+  width: 100%;
+  margin-bottom: 10px;
+}
+.popup Select {
+  width: 100%;
+  margin-bottom: 10px;
+}
+.demandeProp{
+text-align: center;
+justify-content: center;
+padding-top: 20px;
+
+}
+.custom-card-body {
+display: flex;
+justify-content: center;
+align-items: center;
+}
+
+.inputFile{
+display: none;
+}
+.labelFile{
+display: inline-block;
+text-transform: uppercase;
+color: #fff;
+background-color: bisque;
+text-align: center;
+padding: 15px 40px;
+font-size: 18px;
+letter-spacing: 1.5px;
+user-select: none;
+cursor: pointer;
+box-shadow: 5px 15px 25px black;
+border-radius: 3px;
+}
+.i{
+font-size: 20px;
+margin-right: 10px;
+}
+:root {
+--PrimaryColor:rgb(97, 100, 75);
+--SecondaryColor:rgb(119, 122, 69);
+--gradientColor:linear-gradient(to right,#c9b38e,#f0ba5b);
+--whiteColor:hsl(0,0%,100%);
+--blackColor:hsl(201,33%,16%);
+--textColor:rgb(44, 51, 51);
+--whiteColorDeam:hsl(0,0%,93%);
+--greyText:rgb(190,190,190);
+--inputColor:rgb(239,239,239);
+--bodyColor:rgb(240,240,246);
+--cardBG:rgb(225,225,235);
+}
+
+.header {
+top: 0;
+position: fixed;
+display: flex;
+align-items: center;
+justify-content: space-between;
+background: var(--whiteColorDeam);
+width: 100%;
+height: 88px;
+padding: 1rem;
+z-index: 1000;
+box-shadow: 0 2px 4px rgba(2, 15, 29, 0.155);
+}
+.header .logo {
+color: #90784f;
+font-weight: 500;
+cursor: pointer;
+align-items: center;
+justify-content: center;
+font-size: 35px;
+}
+@media screen and (max-width: 768px) {
+.header .navBar {
+  position: absolute;
+  background: var(--whiteColorDeam);
+  height: -moz-max-content;
+  height: max-content;
+  width: 80%;
+  border-radius: 1rem;
+  top: -500rem;
+  left: 50%;
+  padding: 1rem;
+  transform: translate(-50%);
+  z-index: 2000;
+  box-shadow: 0 2px 4px rgba(92, 95, 99, 0.904);
+  transition: 0.5s ease-in-out;
+}
+.header .navBar .navLists {
   flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  margin: auto;
+  padding: 0.5rem 0;
+}
+.header .navBar .navLists .navItem {
+  padding: 0.5rem 0;
+}
+.header .navBar .navLists .navItem .navLink {
+  color: var(--textColor);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.header .navBar .navLists .navItem .navLink:hover {
+  color: var(--PrimaryColor);
+}
+.header .navBar .navLists .btn {
+  margin-top: 1rem;
+}
+.header .navBar .navLists .btn a {
+  font-weight: 600;
+  color: var(--whiteColor);
+}
+.header .navBar .closeNavbar {
+  position: absolute;
+  top: 1rem;
+  right: 1.5rem;
+  color: var(--PrimaryColor);
+}
+.header .navBar .closeNavbar:hover {
+  color: var(--gradientColor);
+}
+.header .activeNavbar {
+  top: 7rem;
+}
+}
+.header .toggleNavbar .icon {
+font-size: 25px;
+color: var(--PrimaryColor);
+}
+.header .toggleNavbar:hover.icon {
+color: var(--SecondaryColor);
+}
+
+@media screen and (min-width: 769px) {
+.toggleNavbar {
+  display: none;
+}
+.closeNavbar {
+  display: none;
+}
+.header {
+  padding: 1.2rem 2rem;
+}
+.header .navBar .navLists {
+  display: flex;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  flex-direction: row;
+}
+.header .navBar .navLists .navItem .navLink {
+  color: var(--textColor);
+  padding: 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+.header .navBar .navLists .navItem:hover {
+  color: var(--PrimaryColor);
+}
+}
+@media screen and (min-width: 960px) {
+.header .navBar .navLists .navItem {
+  padding: 0 0.7rem;
+}
+}
+@media screen and (min-width: 1240px) {
+.header .navBar .navLists .navItem {
+  padding: 0 0.7rem;
+}
+}/*# sourceMappingURL=navbar.css.map */
+.footer {
+bottom: 0;
+width: 100%;
+position: relative;
+padding: 2rem 0;
+display: flex;
+align-items: center;
+justify-content: center;
+margin: auto;
+background: #90784f;
+}
+.footer .imageDiv {
+position: absolute;
+height: 100%;
+width: 100%;
+}
+.footer .imageDiv img {
+height: 100%;
+-o-object-fit: cover;
+   object-fit: cover;
+}
+.footer .imageDiv::after {
+content: "";
+position: absolute;
+top: 0;
+bottom: 0;
+right: 0;
+left: 0;
+mix-blend-mode: multiply;
+}
+.footer .sesContent {
+width: 100%;
+height: -moz-max-content;
+height: max-content;
+padding: 2rem initial;
+display: flex;
+align-items: center;
+justify-content: center;
+flex-direction: column;
+margin: auto;
+row-gap: 2rem;
+z-index: 100;
+}
+.footer .sesContent .footerCard {
+position: relative;
+padding: 1rem 1rem 4rem;
+gap: 2rem;
+border-radius: 1rem;
+background: rgba(201, 179, 142, 0.3058823529);
+opacity: 60%;
+width: 100%;
+justify-content: center;
+flex-direction: column;
+align-items: flex-start;
+overflow: hidden;
+}
+.footer .sesContent .footerCard .footerIntro {
+flex-basis: 50%;
+justify-content: center;
+align-items: flex-start;
+flex-direction: column;
+row-gap: 0.5rem;
+}
+.footer .sesContent .footerCard .logoDiv .logo {
+color: var(--whiteColor);
+font-weight: 600;
+}
+.footer .sesContent .footerCard .logoDiv .logo .icon {
+font-size: 25px;
+color: var(--whiteColor);
+}
+.footer .sesContent .footerCard .footerParagraph {
+font-size: 13px;
+color: var(--whiteColor);
+}
+.footer .sesContent .footerCard .footerSocial {
+-moz-column-gap: 0.5rem;
+     column-gap: 0.5rem;
+color: var(--whiteColor);
+}
+.footer .sesContent .footerCard .footerSocial .icon {
+font-size: 20px;
+margin: 6px;
+}
+.footer .sesContent .footerCard .footerSocial .icon:hover {
+color: var(--whiteColor);
+}
+.footer .sesContent .footerCard .Links {
+grid-template-columns: repeat(3, 1fr);
+display: grid;
+gap: 1rem;
+}
+.footer .sesContent .footerCard .Links .footerLinks {
+flex-basis: 50%;
+width: 100%;
+gap: 1rem;
+grid-template-columns: repeat(2, 1fr);
+justify-content: space-between;
+}
+.footer .sesContent .footerCard .Links .footerLinks .linkGroup .groupTitle {
+display: block;
+font-weight: 600;
+color: var(--whiteColor);
+margin-bottom: 0.5rem;
+}
+.footer .sesContent .footerCard .Links .footerLinks .linkGroup .footerList {
+font-size: 15px;
+color: var(--whiteColor);
+transition: 0.3s ease-in-out;
+}
+.footer .sesContent .footerCard .Links .footerLinks .linkGroup .footerList .icon {
+font-size: 15px;
+}
+.footer .sesContent .footerCard .Links .footerLinks .linkGroup .footerList:hover {
+color: var(--blackColor);
+transform: translateX(7px);
+}
+.footer .sesContent .footerCard .Links .footerLinks .linkGroup .footerList:hover .icon {
+color: var(--blackColor);
+}
+.footer .sesContent .footerCard .footerDiv {
+flex-direction: column;
+position: absolute;
+bottom: 0;
+left: 0;
+right: 0;
+background-color: var(--inputColor);
+padding: 0.5rem 2rem;
+}
+.footer .sesContent .footerCard .footerDiv small {
+font-size: 10px;
+color: #3f2902;
+}/*# sourceMappingURL=footer.css.map */
+
+.color{
+background-color: #90784f;
+}
+.padding{
+padding: 20px;
+}
+.LabelColor{
+color: rgb(44, 51, 51);
+font-size: 15px;
 }
 
-.App-link {
-  color: #61dafb;
+
+.file-upload {
+text-align: center;
+border: 3px dashed #90784f;
+padding: 1.5rem;
+position: relative;
+cursor: pointer;
+}
+.p{
+width: 20px;
+height: 20px;
+}
+.TextField {
+display: block;
+position: absolute;
+top: 0;
+bottom: 0;
+left: 0;
+right: 0;
+opacity: 0;
+cursor: pointer;
+}
+@media screen and (max-width: 768px) {
+.selectProp{
+  width: 100%;
+  height: 45px;
+}
+.img{height: 100%;}
+}
+@media (min-width: 768px) and (max-width: 992px) {
+.selectProp{
+  width: 100%;
+  height: 45px;
+}
+.img{
+  height: 100%;
+  width: 100%;
+}
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+@media (min-width: 992px) {
+.selectProp{
+  width: 100%;
+  height: 45px;
+}
+.img{
+  width: 100%;
+  height: 100%;}
+}
+
+.err{
+  font-size: 12px;
+  color: red;
 }
