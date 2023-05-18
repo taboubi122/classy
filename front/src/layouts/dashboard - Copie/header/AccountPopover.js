@@ -1,25 +1,18 @@
-import { useState } from 'react';
+import React, {useState, useEffect} from "react";
 // @mui
 import { alpha } from '@mui/material/styles';
 import { Box, Divider, Typography, Stack, MenuItem, Avatar, IconButton, Popover } from '@mui/material';
 // mocks_
 import account from '../../../_mock/account';
-
+import { useParams } from "react-router-dom";
+import axios from "axios";
 // ----------------------------------------------------------------------
 
 const MENU_OPTIONS = [
   {
-    label: 'Home',
-    icon: 'eva:home-fill',
-  },
-  {
     label: 'Profile',
     icon: 'eva:person-fill',
-  },
-  {
-    label: 'Paramètre',
-    icon: 'eva:settings-2-fill',
-  },
+  }
 ];
 
 // ----------------------------------------------------------------------
@@ -34,7 +27,15 @@ export default function AccountPopover() {
   const handleClose = () => {
     setOpen(null);
   };
-
+  const params = useParams();
+  const idProp = params.id;
+  const [user, setUser] = useState([]);
+  useEffect(() => {
+    axios
+      .get(`http://localhost:5000/api/getProp/${idProp}`)
+      .then((res) => setUser(res.data));
+  }, []);
+  console.log(user)
   return (
     <>
       <IconButton
@@ -78,10 +79,10 @@ export default function AccountPopover() {
       >
         <Box sx={{ my: 1.5, px: 2.5 }}>
           <Typography variant="subtitle2" noWrap>
-            {account.displayName}
+          {user[0].nom} {user[0].prenom}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {account.email}
+          {user[0].email}
           </Typography>
         </Box>
 

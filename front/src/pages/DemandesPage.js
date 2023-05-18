@@ -137,7 +137,6 @@ export default function DemandesPage() {
 	const [rowsPerPage, setRowsPerPage] = useState(5);
 	const [setReference] = useState();
 	const [isOpenPopAdd, setIsOpenPopAdd] = useState(false);
-	console.log("demandes: ",demandes)
 
 	const togglePopup = () => {
 		setIsOpenPopAdd(!isOpenPopAdd);
@@ -155,23 +154,6 @@ export default function DemandesPage() {
 			return;
 		}
 		setSelected([]);
-	};
-	const handleClick = (event, nom) => {
-		const selectedIndex = selected.indexOf(nom);
-		let newSelected = [];
-		if (selectedIndex === -1) {
-			newSelected = newSelected.concat(selected, nom);
-		} else if (selectedIndex === 0) {
-			newSelected = newSelected.concat(selected.slice(1));
-		} else if (selectedIndex === selected.length - 1) {
-			newSelected = newSelected.concat(selected.slice(0, -1));
-		} else if (selectedIndex > 0) {
-			newSelected = newSelected.concat(
-				selected.slice(0, selectedIndex)
-				, selected.slice(selectedIndex + 1)
-			);
-		}
-		setSelected(newSelected);
 	};
 	const handleChangePage = (event, newPage) => {
 		setPage(newPage);
@@ -234,10 +216,13 @@ export default function DemandesPage() {
         console.error('Erreur lors du téléchargement du fichier PDF :', error);
       });
 	  }
+	  console.log(rowsPerPage)
+	  console.log(page)
+	  console.log("xx: ",emptyRows)
 	return (
 		<>
       <Helmet>
-        <title> Demandes | </title>
+        <title> CLASSY | LES DEMANDES</title>
       </Helmet>
       <Container>
         <Stack
@@ -259,7 +244,7 @@ export default function DemandesPage() {
           <Scrollbar>
             <TableContainer
               sx={{
-                minWidth: 800,
+                minWidth: 200,
               }}
             >
               <Table>
@@ -273,20 +258,13 @@ export default function DemandesPage() {
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  
                   {filteredUsers
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((row, index) => {
-                      const { reference, nom, prenom, email, tel, document,date } = row;
-                      const selectedUser = selected.indexOf(nom) !== -1;
-
+                      const { reference, nom, prenom, email, tel,date } = row;
                       return (
                         <TableRow
-                          hover
                           key={reference}
-                          tabIndex={-1}
-                          role="checkbox"
-                          selected={selectedUser}
                         >
                           <TableCell padding="checkbox">
                             <div/>
@@ -295,7 +273,6 @@ export default function DemandesPage() {
                             <Stack
                               direction="row"
                               alignItems="center"
-                              spacing={2}
                             >
                               <Typography variant="subtitle2" noWrap>
                                 {nom} {prenom}
@@ -314,7 +291,6 @@ export default function DemandesPage() {
 							}}
 							onClick={() => downloadPdf2(reference)}
 							>
-								
 							<Iconify
 								icon={"vscode-icons:file-type-pdf2"}
 								sx={{
@@ -324,7 +300,6 @@ export default function DemandesPage() {
 							</IconButton>
 						  </TableCell>
                           <TableCell align="left"> {currentTime(date)} </TableCell>
-                          
                           <TableCell align="right">
 						  <IconButton
 							sx={{
@@ -335,7 +310,6 @@ export default function DemandesPage() {
 							}}
 							onClick={() => Approuver(reference,nom,prenom,tel,email)}
 							>
-								
 							<Iconify
 								icon={"ph:check-circle-duotone"}
 								sx={{
@@ -356,7 +330,6 @@ export default function DemandesPage() {
 							}}
 							onClick={() => DesApprouver(reference)}
 							>
-								
 							<Iconify
 								icon={"ph:x-circle-duotone"}
 								sx={{
@@ -384,7 +357,7 @@ export default function DemandesPage() {
                     <TableRow>
                       <TableCell
                         align="center"
-                        colSpan={6}
+                        colSpan={3}
                         sx={{
                           py: 3,
                         }}

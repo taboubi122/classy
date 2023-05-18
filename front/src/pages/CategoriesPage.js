@@ -355,7 +355,7 @@ export default function CategoriesPage() {
 	return (
 		<>
       <Helmet>
-        <title> Categories | </title>
+        <title> Classy | LES CATEGORIES </title>
       </Helmet>
       <Container>
         <Stack
@@ -383,7 +383,6 @@ export default function CategoriesPage() {
                 </Button>
                 <h2> Ajouter un catégorie </h2>
                 <Stack spacing={3}>
-                  
                   <TextField
                     name="nom"
                     label="Nom"

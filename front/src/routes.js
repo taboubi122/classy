@@ -15,6 +15,9 @@ import HoraireProp from './pages/HoraireProp';
 import DemandesPage from './pages/DemandesPage';
 import EnvoyerDemandePage from './pages/EnvoyerDemandePage';
 import ConfirmationProp from './pages/ConfirmationProp';
+import DashboardAdmin from './pages/DashboardAdmin';
+import LoginAdmin from './pages/LoginAdmin';
+import PropLogin from './pages/PropLogin';
 
 // ----------------------------------------------------------------------
 
@@ -25,7 +28,7 @@ export default function Router() {
       element: <DashboardLayout />,
       children: [
         { element: <Navigate to="/dashboard/app" />, index: true },
-        { path: 'app', element: <DashboardAppPage /> },
+        { path: 'app', element: <DashboardAdmin /> },
         { path: 'demandes', element: <DemandesPage /> },
         { path: 'categories', element: <CategoriesPage /> },
         { path: 'services', element: <ServicesPage /> },
@@ -46,6 +49,14 @@ export default function Router() {
     {
       path: 'login',
       element: <EnvoyerDemandePage />,
+    },
+    {
+      path: 'loginAdmin',
+      element: <LoginAdmin />,
+    },
+    {
+      path: 'loginProp',
+      element: <PropLogin />,
     },
     {
       path: 'confirmation',

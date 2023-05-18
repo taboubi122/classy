@@ -262,7 +262,7 @@ export default function HoraireProp() {
 		}
 		  if(!test1 && !test2){
 			window.location.reload();
-		axios.put(`http://localhost:5000/api/UpdateHoraire/${referenceUpdate}`, {
+		    axios.put(`http://localhost:5000/api/UpdateHoraire/${referenceUpdate}`, {
 				ouvertureUpdate
 				, fermetureUpdate
 				, refselectedJourUpdate

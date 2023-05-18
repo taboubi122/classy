@@ -6,9 +6,6 @@ import axios from "axios";
 import Swal from "sweetalert2";
 // @mui
 import { Card, Table, Stack, Paper, Button, TableRow, TableBody, TableCell, Container, Typography, IconButton, TableContainer, TablePagination, TextField, Select, MenuItem, InputLabel } from "@mui/material";
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider, MobileDatePicker } from '@mui/lab';
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
 // components
 import Iconify from "../components/iconify";
 import Scrollbar from "../components/scrollbar";
@@ -575,7 +572,7 @@ export default function OffrePage() {
 	return (
 		<>
       <Helmet>
-        <title> Offres | </title>
+        <title> CLASSY | LES OFFRES </title>
       </Helmet>
       <Container>
         <Stack

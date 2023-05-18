@@ -589,7 +589,7 @@ export default function ServicesPage() {
 	return (
 		<>
       <Helmet>
-        <title> Services | </title>
+        <title> CLASSY | LES SERVICES</title>
       </Helmet>
       <Container>
         <Stack

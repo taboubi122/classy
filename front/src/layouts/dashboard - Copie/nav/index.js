@@ -44,7 +44,7 @@ export default function Nav({ openNav, onCloseNav }) {
 			.get(`http://localhost:5000/api/getProp/${idProp}`)
 			.then((res) => setUser(res.data));
 	}, []);
-  
+  console.log(user)
   const { pathname } = useLocation();
   const isDesktop = useResponsive('up', 'lg');
 
@@ -71,7 +71,7 @@ export default function Nav({ openNav, onCloseNav }) {
 
             <Box sx={{ ml: 2 }}>
               <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
-              xxx
+              {user[0].nom} {user[0].prenom}
               </Typography>
 
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
