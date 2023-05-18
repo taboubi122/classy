@@ -26,6 +26,20 @@ route.use(cors({
 route.get("/api/getAllDemandes", (req, res) => {
   getAllDEmandes(connection,res)
 });
+//get All Reservation
+route.get("/api/getAllReservation", (req, res) => {
+  getAllReservation(connection,res)
+});
+//get All Ville
+route.get("/api/getAllVille", (req, res) => {
+  getAllVille(connection,res)
+});
+
+//get All Centre By Ville
+route.get("/api/getAllVilleC", (req, res) => {
+  getAllVilleC(connection,res)
+});
+
 //get Prop
 route.get("/api/getProp/:reference", (req, res) => {
   id=req.params.reference;
@@ -51,7 +65,7 @@ const bcrypt = require('bcrypt');
 const { sendConfirmationEmail } = require('./nodemailer');
 const { getAllCateg, addCateg, updateCateg, deleteCateg } = require('../controllers/gestionCategories');
 const { getAllServ, addServ, updateServ, deleteServ, getServById, addServProp, updateServProp } = require('../controllers/gestionServices');
-const { getAllCentres } = require('../controllers/gestionCentres');
+const { getAllCentres, getAllVille, getAllVilleC } = require('../controllers/gestionCentres');
 const { getAllOffres, addOffre, updateOffre, deleteOffre, addOffreProp, updateOffreProp } = require('../controllers/gestionOffre');
 const { getAllHoraire, getAllJour, addHoraire, updateHoraire } = require('../controllers/gestionHoraire');
 route.post('/api/ApprouverDemande/:reference',(req,res) =>{
@@ -124,9 +138,42 @@ route.delete("/api/deleteCategories/:reference", (req, res) => {
 });
 //********************************** SERVICES ****************************************/
 const moment = require('moment');
+const { getAllClients } = require('../controllers/gestionClients');
+const { getAllReservation } = require('../controllers/reservation');
+const { getAllAvis } = require('../controllers/gestionAvis');
 // get All Services
 route.get("/api/getAllServices", (req, res) => {
   getAllServ(connection,res)
+});
+// get All Avis
+route.get("/api/getAllAvis", (req, res) => {
+  getAllAvis(connection,res)
+});
+// get Admin
+route.get("/api/LoginAdmin", (req, res) => {
+  var sql = "SELECT * FROM admin";
+  connection.query(sql, function (err, rows) {
+    if (err) {
+      console.error("Error executing query: " + err.stack);
+      return;
+    }
+    res.json(rows)
+  });
+});
+// get Prop
+route.get("/api/LoginProp", (req, res) => {
+  var sql = "SELECT * FROM proprietaire";
+  connection.query(sql, function (err, rows) {
+    if (err) {
+      console.error("Error executing query: " + err.stack);
+      return;
+    }
+    res.json(rows)
+  });
+});
+// get All Clients
+route.get("/api/getAllClients", (req, res) => {
+  getAllClients(connection,res)
 });
 // get All Centres
 route.get("/api/getCentres", (req, res) => {

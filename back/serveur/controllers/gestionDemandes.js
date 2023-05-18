@@ -11,6 +11,7 @@ module.exports.getProp=(connection,id,res)=>{
     var sql = "SELECT * FROM proprietaire WHERE cin ="+id;
     connection.query(sql, function (err, rows) {
     if (err) throw err;
+    console.log(rows)
     res.json(rows);
   });
 }
