@@ -3,7 +3,7 @@ import { SiGoogleanalytics } from "react-icons/si";
 import { FaUsers } from "react-icons/fa";
 import { GiSaloon } from "react-icons/gi";
 import { TbCategory } from "react-icons/tb";
-import { MdOutlineVilla } from "react-icons/md";
+import { MdOutlineVilla,MdAccessTime } from "react-icons/md";
 import { CgWorkAlt } from "react-icons/cg";
 import { useLocation } from "react-router-dom";
 import { ImGift } from "react-icons/im";
@@ -23,8 +23,8 @@ const NavConfig = () => {
     },
     {
       title: "Reservation",
-      path: `/dashboardCentre/${IdSalon}/clients`,
-      icon: <FaUsers />,
+      path: `/dashboardCentre/${IdSalon}/reservation`,
+      icon: <GiSaloon />,
     },
     {
       title: "Mes Centres",
@@ -34,7 +34,7 @@ const NavConfig = () => {
     {
       title: "Personnels",
       path: `/dashboardCentre/${IdSalon}/personnels`,
-      icon: <GiSaloon />,
+      icon: <FaUsers />,
     },
     {
       title: "Categories",
@@ -54,16 +54,12 @@ const NavConfig = () => {
     {
       title: "Horaires de travail",
       path: `/dashboardCentre/${IdSalon}/horaires`,
-      icon: <GoCalendar />,
+      icon: <MdAccessTime/>,
     },
+  
     {
       title: "Infos",
       path: `/dashboardCentre/${IdSalon}/info`,
-      icon: <MdOutlineVilla />,
-    },
-    {
-      title: "Retour au Menu",
-      path: "/dashboard/app",
       icon: <MdOutlineVilla />,
     },
   ];

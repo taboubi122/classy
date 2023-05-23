@@ -84,6 +84,13 @@ export default function Nav({ openNav, onCloseNav }) {
 
       
       <NavSection data={NavConfig()} />
+      <Box sx={{ px: 2.5, pb: 3, mt: 10 }}>
+      
+      <Button href="/dashboard/app" variant="contained">
+        Retourn au menu
+      </Button>
+
+  </Box>
     </Scrollbar>
   );
 
