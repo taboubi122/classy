@@ -3,10 +3,9 @@ const mysql = require("mysql2");
     host: "localhost",
     user: "root",
     password: "",
-    database: "classy",
-    port:"3308"
+    database: "classynew",
+    //port:"3308"
   });
-
 
 connection.connect((err) => {
   if (err) {

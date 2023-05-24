@@ -1,0 +1,118 @@
+.containerCoiFF{
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    .select{
+        margin: 2rem;
+    }
+    .liste{
+        background-color: white;
+        margin: 5px;
+    }
+    .divs{
+        display: grid;
+        grid-template-columns: repeat(2,1fr); 
+            padding: 0 2rem;
+            bottom:10%;
+            .forme{
+                border-radius:10px ;
+                height:200px;
+                width: 300px;
+                position: relative;
+                 cursor:pointer;
+                 margin: 0.01rem;
+              
+                }
+                .info{
+                    display: block;
+                    color: black;
+                   text-decoration: underline;
+                    font-size: 13px;
+                    font-weight: 500;
+                    margin: 0.009rem;
+                    cursor:pointer;
+                    bottom: 25%;
+                }
+                .icon{
+                    color: black;
+                    font-size: 20px;
+                    position: relative;
+                    bottom: 20%;
+                    left: 5%;
+                   
+                }
+                .iconStar{
+                    color: black;
+                    font-size: 20px;
+                    position: relative;
+                    bottom: 29%;
+                    right:37%;
+                   
+                   
+                }
+                .note{
+                    padding-inline-start: 0%;
+                 padding-block-start: 0%;
+                position: relative;
+                    color:black;
+                    bottom: 41%;
+                    right:30%;
+                    
+                    font-size: 15px;
+                    font-weight: 500;
+                    cursor:pointer;
+                }
+                h2{
+                    color:black;
+                    font-size:25px;
+                    align-items: left;
+                    align-self: left;
+                    display: block;
+                    align-content:left;
+                    cursor:pointer;
+                    margin: 0.9rem;
+                  padding-bottom: 10%;
+                    text-align-last: left;
+                  padding-inline-start: 0%;
+                 padding-block-start: 0%;
+                }
+                h4{
+                    padding-inline-start: 0%;
+                 padding-block-start: 0%;
+                position: relative;
+                    color:red;
+                   bottom: 29%;
+                   left: 12%;
+                    font-size: 15px;
+                    font-weight: 500;
+                    cursor:pointer;
+                }
+                button{
+                    position: relative;
+                    padding: .6rem 1.5rem;
+                    background: black;
+                    border-radius: 1rem;
+                    border:none;
+                    outline: none;
+                    font-size: 14px;
+                    color:var(--whiteColor);
+                    cursor:pointer;
+                    top: 20%;
+                    left: 65%;
+                }
+                button a {
+                    color:var(--whiteColor);
+                    font-weight: 500;
+                    font-family: 'Times New Roman', Times, serif;
+                }
+                button :hover{
+                    background: black;
+                }
+        }
+
+
+    
+
+
+
+
+    }

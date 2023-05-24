@@ -1,23 +1,30 @@
-const express = require('express');
+const express=require('express');
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload2 = multer({ storage: storage }); 
 const route = express.Router();
-const mysql = require("mysql2");
 const cors = require("cors");
+const bcrypt2 = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const connection = require("../db");
+const { format, startOfWeek, addDays, addMinutes  } = require('date-fns');
+const { fr } = require('date-fns/locale')
+const clientController = require("../controllers/clientController");
+const personnelController = require("../controllers/personnelController");
+const { sendConfirmationEmail } = require('../confirmerEmail');
+const { sendConfirmationEmail2 } = require('./nodemailer');
+const { getAllCateg, addCateg, updateCateg, deleteCateg } = require('../controllers/gestionCategories');
+const { getAllServ, addServ, updateServ, deleteServ, getServById, addServProp, updateServProp } = require('../controllers/gestionServices');
+const { getAllCentres, getAllVille, getAllVilleC } = require('../controllers/gestionCentres');
+const { getAllOffres, addOffre, updateOffre, deleteOffre, addOffreProp, updateOffreProp } = require('../controllers/gestionOffre');
+const { getAllHoraire, getAllJour, addHoraire, updateHoraire } = require('../controllers/gestionHoraire');
 const { getAllDEmandes, getDoc, UpdateDemande, addProp, ConfirmationProp, deleteDemande, EnvoyerDemande, getProp } = require('../controllers/gestionDemandes');
+route.use("uploads", express.static("uploads"))
 console.log("hello Classy")
-const connection = mysql.createConnection({
-  host: "localhost"
-  , user: "root"
-  , password: ""
-  , database: "classynew",
-  //port:"3308"
-});
-connection.connect(err => {
-  if (err) {
-    console.error("Error connecting to database: " + err.stack);
-    return;
-  }
-  console.log("Connected to database as id " + connection.threadId);
-});
+
+
+  route.use(cors({ origin: "http://localhost:3000" }));
 route.use(cors({
   origin: "http://localhost:3000"
 }));
@@ -51,23 +58,13 @@ route.get("/api/getDoc/:reference", (req, res) => {
   getDoc(connection,id,res)
 });
 //Envoyer Demande
-const multer = require('multer');
-const storage = multer.memoryStorage();
-const upload2 = multer({ storage: storage }); 
-route.use("uploads", express.static("uploads"))
 route.post('/api/enyoyerDemande', upload2.single('fichier'), async (req,res) =>{
   const file=req.file.buffer;
   const values = [req.body.nom,req.body.prenom,req.body.mail,req.body.tel,file,new Date()];
   EnvoyerDemande(connection,values)
 });
 //Approuver Demande
-const bcrypt = require('bcrypt');
-const { sendConfirmationEmail } = require('./nodemailer');
-const { getAllCateg, addCateg, updateCateg, deleteCateg } = require('../controllers/gestionCategories');
-const { getAllServ, addServ, updateServ, deleteServ, getServById, addServProp, updateServProp } = require('../controllers/gestionServices');
-const { getAllCentres, getAllVille, getAllVilleC } = require('../controllers/gestionCentres');
-const { getAllOffres, addOffre, updateOffre, deleteOffre, addOffreProp, updateOffreProp } = require('../controllers/gestionOffre');
-const { getAllHoraire, getAllJour, addHoraire, updateHoraire } = require('../controllers/gestionHoraire');
+
 route.post('/api/ApprouverDemande/:reference',(req,res) =>{
   const  id = req.params.reference;
   const { nom, prenom, tel, mail } = req.body;
@@ -516,20 +513,7 @@ route.put("/api/UpdateHoraire/:reference", (req, res) => {
     updateHoraire(connection,id,values)
   });
 });
-const express=require('express');
-const mysql = require("mysql2");
-const cors = require("cors");
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const { format, startOfWeek, addDays, addMinutes  } = require('date-fns');
-const { fr } = require('date-fns/locale');
 
-
-const clientController = require("../controllers/clientController");
-const personnelController = require("../controllers/personnelController");
-const { sendConfirmationEmail } = require('../confirmerEmail');
-  const connection = require("../db");
-  route.use(cors({ origin: "http://localhost:3000" }));
 
   
 //**********************************Authentification****************************************/
@@ -547,7 +531,7 @@ route.post('/api/signIn', (req, res) => {
     } else {
       const user = results[0];
       console.log('User type:', user.type);
-      bcrypt.compare(password, user.password, (error, isMatch) => {
+      bcrypt2.compare(password, user.password, (error, isMatch) => {
         if (error) {
           console.error(error);
           res.status(500).send('Internal server error');

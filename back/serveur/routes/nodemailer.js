@@ -6,7 +6,7 @@ const transport=nodemailer.createTransport({
         pass:"ohbeyivapbqwhdyv"
     },
 });
-module.exports.sendConfirmationEmail=(email,mdp)=>{
+module.exports.sendConfirmationEmail2=(email,mdp)=>{
     transport 
     .sendMail({
         from :"classy2023@gmail.com",
