@@ -9,12 +9,7 @@ import axios from "axios";
 
 // ----------------------------------------------------------------------
 
-const MENU_OPTIONS = [
-  {
-    label: 'Profile',
-    icon: 'eva:person-fill',
-  },
-];
+
 
 // ----------------------------------------------------------------------
 
@@ -30,20 +25,20 @@ export default function AccountPopover() {
   };
   const params = useParams();
   const idProp = params.id;
+  const MENU_OPTIONS = "/dashboardProp/"+idProp+"/info"
   const [user, setUser] = useState([]);
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/api/getAllPersonnel/${idProp}`)
+      .get(`http://localhost:5000/api/getAllPropriate/${idProp}`)
       .then((res) => setUser(res.data));
   }, []);
-  const centre={reference:idProp,nom:"",photo:"",email:"",prenom:""}
+  const centre={reference:idProp,nom:"",email:"",prenom:""}
   if(user.length===0){
     console.log("")
   }else{
      centre.email=user[0].email
      centre.prenom=user[0].prenom
      centre.nom=user[0].nom
-     centre.photo=user[0].photo
   }
 
   return (
@@ -65,7 +60,7 @@ export default function AccountPopover() {
           }),
         }}
       >
-        <Avatar src={centre.photo && `data:image/png;base64,${Buffer.from(centre.photo.data).toString('base64')}`} alt="photoURL" />
+        <Avatar  alt="..." />
       </IconButton>
 
       <Popover
@@ -97,13 +92,12 @@ export default function AccountPopover() {
         </Box>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
-
+        
         <Stack sx={{ p: 1 }}>
-          {MENU_OPTIONS.map((option) => (
-            <MenuItem key={option.label} onClick={handleClose}>
-              {option.label}
-            </MenuItem>
-          ))}
+        <a href={MENU_OPTIONS}>
+            <MenuItem key="Profile" onClick={handleClose}>
+            Profile
+            </MenuItem></a>
         </Stack>
 
         <Divider sx={{ borderStyle: 'dashed' }} />

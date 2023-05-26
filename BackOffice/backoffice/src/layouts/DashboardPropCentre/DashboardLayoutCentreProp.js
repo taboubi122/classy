@@ -32,7 +32,7 @@ const Main = styled('div')(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-export default function DashboardLayoutCentre() {
+export default function DashboardLayoutCentreProp() {
   const [open, setOpen] = useState(false);
 
   return (

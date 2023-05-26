@@ -15,6 +15,7 @@ import NavSection from '../../../components/nav-section';
 import NavConfig from "./config";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import { black } from 'material-ui/styles/colors';
 
 // ----------------------------------------------------------------------
 
@@ -37,16 +38,23 @@ Nav.propTypes = {
 
 export default function Nav({ openNav, onCloseNav }) {
   const params = useParams();
-	const idProp = params.id;
+  const idProp = params.id;
   const [user, setUser] = useState([]);
   useEffect(() => {
-		axios
-			.get(`http://localhost:5000/api/getProp/${idProp}`)
-			.then((res) => setUser(res.data));
-	}, []);
+    axios
+      .get(`http://localhost:5000/api/getCentreById/${idProp}`)
+      .then((res) => setUser(res.data));
+  }, []);
   console.log(user)
   const { pathname } = useLocation();
   const isDesktop = useResponsive('up', 'lg');
+  const centre={reference:idProp,nom:""}
+  if(user.length===0){
+    console.log("")
+  }else{
+     centre.nom=user[0].nom
+  }
+  
 
   useEffect(() => {
     if (openNav) {
@@ -67,15 +75,9 @@ export default function Nav({ openNav, onCloseNav }) {
       <Box sx={{ mb: 5, mx: 2.5 }}>
         <Link underline="none">
           <StyledAccount>
-            <Avatar src={account.photoURL} alt="photoURL" />
-
             <Box sx={{ ml: 2 }}>
               <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
-              {user[0].nom} {user[0].prenom}
-              </Typography>
-
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                {account.role}
+                {centre.nom}
               </Typography>
             </Box>
           </StyledAccount>
@@ -86,7 +88,7 @@ export default function Nav({ openNav, onCloseNav }) {
       <NavSection data={NavConfig()} />
       <Box sx={{ px: 2.5, pb: 3, mt: 10 }}>
       
-      <Button href="/dashboard/app" variant="contained">
+      <Button href="/dashboard/app" style={{backgroundColor:black}} variant="contained">
         Retourn au menu
       </Button>
 

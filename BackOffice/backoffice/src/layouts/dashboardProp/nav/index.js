@@ -52,7 +52,7 @@ export default function Nav({ openNav, onCloseNav }) {
   const [user, setUser] = useState([]);
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/api/getAllPersonnel/${idProp}`)
+      .get(`http://localhost:5000/api/getAllPropriate/${idProp}`)
       .then((res) => setUser(res.data));
   }, []);
   const centre={reference:idProp,nom:"",photo:"",email:"",prenom:""}

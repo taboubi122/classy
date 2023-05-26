@@ -6,26 +6,16 @@ import "react-big-calendar/lib/css/react-big-calendar.css"
 import "react-datepicker/dist/react-datepicker.css"
 import * as bootstrap from "bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css"
-import { DateTimePicker } from 'datetime-picker-reactjs'
+import 'moment/locale/fr';
 import 'datetime-picker-reactjs/dist/index.css'
 import axios from 'axios';
 // @mui
-import {
-  Card,
-  Stack,
-  Button,
-  Container,
-  Typography,Input ,FormControl,
-  FormControlLabel,
-  FormLabel,
-  
-  FormGroup,Radio,RadioGroup
-} from '@mui/material';
+import { Card, Stack, Button, Container, Typography,Input , FormControlLabel, Radio,RadioGroup } from '@mui/material';
 import { useLocation} from "react-router-dom";
 import Iconify from '../components/iconify';
 // sections
 export default function Reservation() {
- 
+  moment.locale('fr');
 const localizer = momentLocalizer(moment);
 const [Resv, setResv] = useState([]);
 const [PersoCalen, setPersoCalen] = useState([]);
@@ -155,7 +145,7 @@ return {
   return (
     <>
       <Helmet>
-        <title> User | Minimal UI </title>
+        <title> CLASSY | RESERVATION </title>
       </Helmet>
 
       <Container>
@@ -169,82 +159,29 @@ return {
       Calendrier
     </Typography>
   )}
-  {isOpenPopAdd ? null : (
-    <Button
-      variant="contained"
-      startIcon={<Iconify icon="eva:plus-fill" />}
-      onClick={togglePopup}
-    >
-      New Event
-    </Button>
-  )}
-  {isOpenPopAdd && (
-    <div className="popupEvent">
-      <Button variant="contained" onClick={togglePopup}>
-        X
-      </Button>
-      <h2>Ajouter un event</h2>
-      <DateTimePicker
-        placeholder="Select Start Date"
-        value={new Date(newEvent.start)}
-        onChange={(start) => setNewEvent({ ...newEvent, start })}
-        timePicker
-      />
-      <DateTimePicker
-        placeholder="Select End Date"
-        value={new Date(newEvent.end)}
-        onChange={(end) => setNewEvent({ ...newEvent, end })}
-        timePicker
-      />
-      <br />
-      <Input
-        type="text"
-        placeholder="Add Title"
-        value={newEvent.title}
-        onChange={(e) =>
-          setNewEvent({ ...newEvent, title: e.target.value })
-        }
-      />
-      <br />
-      <br />
-      <Button variant="contained" onClick={handleAddEvent}>
-        Ajouter
-      </Button>
-    </div>
-  )}
 </Stack>
-
            <Card>
-    
-<RadioGroup aria-label="sexe" name="personnels" style={{ display: 'flex', flexDirection: 'row' }}>
-  {PersoCalen.map((row) => (
-    <FormControlLabel
-      key={row.nom}
-      value={row.nom}
-      control={<Radio />}
-      label={row.nom}
-      selected={calendarView === row.CIN}
-      onChange={() => showCalendar(row.CIN)}
-    />
-  ))}
-</RadioGroup>
+            <Calendar
+                    localizer={localizer}
+                    events={calendarView === "global" ? events : Resv}
+                    startAccessor="start"
+                    endAccessor="end"
+                    style={{ height: 500, margin: "50px" }}
+                    onSelectEvent={handleSelectEvent}
+                    eventPropGetter={eventStyleGetter}
+                    messages={{
+                      today: 'Aujourd\'hui',
+                      previous: 'Précédent',
+                      next: 'Suivant',
+                      month: 'Mois',
+                      week: 'Semaine',
+                      day: 'Jour',
+                      agenda: 'Agenda',
+                    }}
+                  />
 
-
-
- <Calendar
-        localizer={localizer}
-        events={calendarView === "global" ? events : Resv}
-        startAccessor="start"
-        endAccessor="end"
-        style={{ height: 500, margin: "50px" }}
-        onSelectEvent={handleSelectEvent}
-        eventPropGetter={eventStyleGetter}
-      />
-
- </Card>
+          </Card>
       </Container>
-
-     
     </>
   );
 }

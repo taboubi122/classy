@@ -463,7 +463,7 @@ export default function OffrePageProp() {
 	// Get Name Centre
 	function getNameService(id) {
 		const svs = service.filter((sv) => sv.reference === id);
-		return svs.length > 0 ? svs[0].nom : 'Inconnu';
+		return svs.length > 0 ? svs[0].nomService : 'Inconnu';
 	}
 	// Get description
 	function getdesc(desc) {
@@ -625,7 +625,7 @@ export default function OffrePageProp() {
 	return (
 		<>
       <Helmet>
-        <title> Offres | </title>
+        <title> CLASSY | OFFRES</title>
       </Helmet>
       <Container>
         <Stack

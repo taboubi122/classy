@@ -41,19 +41,14 @@ export default function DetailsCentre() {
   return (
     <>
       <Helmet>
-        <title> Dashboard: Centres | </title>
+        <title> CLASSY | INFOS</title>
       </Helmet>
 
       <Container>
-        <Typography variant="h4" sx={{ mb: 5 }}>
-         Centres
-        </Typography>
-
+        
         <Grid item xs={12} md={6} lg={8}>
             <AppNewsUpdate list={newsList} />
          </Grid>
-
-
       </Container>
     </>
   );

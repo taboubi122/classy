@@ -9,38 +9,22 @@ import "react-big-calendar/lib/css/react-big-calendar.css"
 import "react-datepicker/dist/react-datepicker.css"
 import * as bootstrap from "bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css"
-import { DateTimePicker } from 'datetime-picker-reactjs'
+import 'moment/locale/fr';
 import 'datetime-picker-reactjs/dist/index.css'
 import {
     Container, 
     Typography,
     Grid,
     Card,
-    Table,
-    Stack,
-    Paper,
-    Input,
-    Button,
-    Popover,
-    Checkbox,
-    TableRow,
-    MenuItem,
-    TableBody,
-    TableCell,
-    IconButton,
-    TableContainer,
-    TablePagination,
-    CardMedia,CardContent,
-    Link,InputAdornment, TextField
+    Stack
   } from '@mui/material';
   
 import { useLocation} from "react-router-dom";
 import { makeStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
 import { blueGrey } from '@material-ui/core/colors';
-import {BiTrash}from "react-icons/bi"
-import Iconify from '../components/iconify';
-import {AppOrderTimeline ,AppNewsUpdate} from '../sections/@dashboard/app';
+import {AppOrderTimeline } from '../sections/@dashboard/app';
+import { white } from 'material-ui/styles/colors';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -91,11 +75,12 @@ const useStyles = makeStyles((theme) => ({
   }));
   
 export default function PersonnelDetails() {
-    
+  moment.locale('fr');
 const [nomService,setNomservice] = useState("");
 const [fonction, setFonction] = useState("");
 const classes = useStyles();
   const location = useLocation();
+  const idCentre= location.pathname.split("/")[2];
   const CINPerso= location.pathname.split("/")[4];
   console.log(`cinPersooooo${CINPerso}`);
 
@@ -115,7 +100,7 @@ const classes = useStyles();
         const localizer = momentLocalizer(moment);
         const [Resv, setResv] = useState([]);
          useEffect(() => {
-          axios.get(`http://localhost:5000/api/getResvPerso/${CINPerso}`)
+          axios.get(`http://localhost:5000/api/getResvPerso/${CINPerso}/${idCentre}`)
             .then(res => {
               const formattedData = res.data.map((reservation) => ({
                 ...reservation,
@@ -204,38 +189,25 @@ const classes = useStyles();
     return (
       <>
         <Helmet>
-          <title> Dashboard: Details PERSO | </title>
+          <title> CLASSY | DETAILS</title>
         </Helmet>
-  
         <Container>
-          <Typography variant="h4" sx={{ mb: 5 }}>
-           Consulter personnel
-          </Typography>
-
     
      <Stack spacing={3}>
      <Grid container spacing={3}>
 
 {selectedPerso.map((row,index)=>{ 
     return(   
-          <Grid item xs={12} md={6} lg={8}>
+          <Grid item xs={12} md={6} lg={12}>
 
 <Card className={classes.card}>
 <div className={classes.details} key={index}>
-<Avatar alt="Danny McLoan" src={`${Buffer.from(row.photo)}`} className={classes.avatar} />
+
+<Avatar style={{backgroundColor:white}} alt="Danny McLoan" src={row.photo && `data:image/png;base64,${Buffer.from(row.photo.data).toString('base64')}`} sx={{ width: 48, height: 48, borderRadius: 1.5, flexShrink: 0 }} className={classes.avatar} />
 <Typography variant="h5" component="h2" align="center">
 {row.nom} {row.prenom}
 </Typography>
-<Typography variant="subtitle1" color="textSecondary" align="center" gutterBottom>
-{row.email}
-</Typography>
 <div className={classes.stats}>
-<div>
-<Typography variant="body2" color="textSecondary">
-Sexe
-</Typography>
-<Typography variant="h6">{row.sexe}</Typography>
-</div>
 <div>
 <Typography variant="body2" color="textSecondary">
 Telephone
@@ -244,24 +216,24 @@ Telephone
 </div>
 <div>
 <Typography variant="body2" color="textSecondary">
-Password
+Email
 </Typography>
-<Typography variant="h6">{row.password}</Typography>
+<Typography variant="h6">{row.email}</Typography>
+</div>
+<div>
+<Typography variant="body2" color="textSecondary">
+Sexe
+</Typography>
+<Typography variant="h6">{row.sexe}</Typography>
 </div>
 </div>
 </div>
 </Card>
-
+<AppOrderTimeline list={newsList} />
 </Grid> )})}
 
-          <Grid item xs={12} md={6} lg={4}>
-           
-            <AppOrderTimeline list={newsList} />
-       
-          </Grid>
-
         </Grid>
-        <Grid item xs={12} md={6} lg={8}    >
+        <Grid item xs={12} md={6} lg={12}    >
        <Card>
            <Stack >
      
@@ -270,6 +242,15 @@ Password
    startAccessor="start" endAccessor="end" style={{height :500,margin:"50px"}}
    onSelectEvent={handleSelectEvent}
    eventPropGetter={eventStyleGetter}
+   messages={{
+    today: 'Aujourd\'hui',
+    previous: 'Précédent',
+    next: 'Suivant',
+    month: 'Mois',
+    week: 'Semaine',
+    day: 'Jour',
+    agenda: 'Agenda',
+  }}
  />
     </Stack>
    

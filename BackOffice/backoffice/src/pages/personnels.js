@@ -13,10 +13,7 @@ import {
   Table,
   Stack,
   Paper,
-  Input,
   Button,
-  Popover,
-  Checkbox,
   TableRow,
   MenuItem,
   TableBody,
@@ -31,7 +28,7 @@ import {
   FormControlLabel,
   FormLabel,
   FormHelperText,
-  FormGroup,Radio,RadioGroup
+  Radio,RadioGroup, Box
 } from '@mui/material';
 // components
 import { useLocation} from "react-router-dom";
@@ -49,6 +46,7 @@ import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
+  { id: '', label: '', alignRight: false },
   { id: 'nom', label: 'Nom', alignRight: false },
   { id: 'Cin', label: 'CIN', alignRight: false },
   { id: 'telephone', label: 'Telephone', alignRight: false },
@@ -162,9 +160,6 @@ export default function PersonnelPage() {
          
     }
         
-          
-  const [showPassword, setShowPassword] = useState(false);
-
   const [client,setClient] = useState([]);
 
   const [page, setPage] = useState(0);
@@ -412,7 +407,7 @@ const onSubmit = (data) => Insert(data.CIN,data.nom,data.prenom,data.tel,data.se
   return (
     <>
       <Helmet>
-        <title> Users | </title>
+        <title> CLASSY | PERSONNELS</title>
       </Helmet>
 
       <Container>
@@ -421,11 +416,11 @@ const onSubmit = (data) => Insert(data.CIN,data.nom,data.prenom,data.tel,data.se
            Personnels
           </Typography>
           <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={togglePopup}>
-            New personnel
+            Nouveau personnel
           </Button>
           {isOpenPopAdd && (
 
- <div  className="popup-overlay">
+        <div  className="popup-overlay">
           <div className="popup">
             <Button variant="contained" onClick={togglePopup}>X</Button>
             <h2>Ajouter un personnel</h2>
@@ -596,14 +591,13 @@ const onSubmit = (data) => Insert(data.CIN,data.nom,data.prenom,data.tel,data.se
                    
                     return (
                       <TableRow hover key={row.CIN} tabIndex={-1} role="checkbox" selected={selectedUser}>
-                        <TableCell padding="checkbox">
-                          <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, nom)} />
-                        </TableCell>
-
                         <TableCell component="th" scope="row" padding="none">
                           <Stack direction="row" alignItems="center" spacing={2}>
-                          {photo && <img className='PersoPhoto' alt={id} src={`${Buffer.from(row.photo.data)}`}  />}
-                          
+                          <Box component="img" alt="..." src={row.photo && `data:image/png;base64,${Buffer.from(row.photo.data).toString('base64')}`} sx={{ width: 48, height: 48, borderRadius: 1.5, flexShrink: 0 }} />
+                          </Stack>
+                        </TableCell>
+                        <TableCell component="th" scope="row" padding="none">
+                          <Stack direction="row" alignItems="center" spacing={2}>                          
                             <Typography variant="subtitle2" noWrap>
                               {nom} {prenom}
                             </Typography>  
@@ -636,7 +630,10 @@ const onSubmit = (data) => Insert(data.CIN,data.nom,data.prenom,data.tel,data.se
                                       </TableCell>
                       <TableCell align="right">
                                             
-                            <IconButton size="large"onClick={() => togglePopup2(row)} >
+                            <IconButton size="large" onClick={() => togglePopup2(row)}
+                            sx={{
+                              color: "success.main",
+                            }}>
                               <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
                             </IconButton>
                       </TableCell>
@@ -726,7 +723,9 @@ const onSubmit = (data) => Insert(data.CIN,data.nom,data.prenom,data.tel,data.se
      )}
                         <TableCell align="right">
                           
-                          <IconButton size="large"  onClick={() => onDelete(CIN)}>
+                          <IconButton size="large" sx={{
+                                color: "error.main",
+                              }}  onClick={() => onDelete(CIN)}>
                             <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
                       
                           </IconButton>

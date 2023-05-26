@@ -71,7 +71,6 @@ function getVilleC(){
                 v.push({label: row.nom, value: centres.filter((ele) => ele.refVille === row.code).length});
             })
               const chartData =v.sort((a, b) => a.value - b.value);
-              console.log(chartData)
                 return chartData
               
               
@@ -106,25 +105,16 @@ function getCentreRes() {
   function getData (id){
     const d=generateWeekDates()
     const res=[]
-    for (let i = 0; i < d.length; i++) {
-        res[i]=reservation.filter((ele) => ele.dateResv.substring(0, 10) === d[i] && ele.refService===id).length 
-    }
+    res[0]=reservation.filter((ele) => ele.dateResv.substring(0, 10) === d[0] && ele.refService===id).length 
+    res[1]=reservation.filter((ele) => ele.dateResv.substring(0, 10) === d[1] && ele.refService===id).length 
+    res[2]=reservation.filter((ele) => ele.dateResv.substring(0, 10) === d[2] && ele.refService===id).length 
+    res[3]=reservation.filter((ele) => ele.dateResv.substring(0, 10) === d[3] && ele.refService===id).length 
+    res[4]=reservation.filter((ele) => ele.dateResv.substring(0, 10) === d[4] && ele.refService===id).length 
+    res[5]=reservation.filter((ele) => ele.dateResv.substring(0, 10) === d[5] && ele.refService===id).length 
+    res[6]=reservation.filter((ele) => ele.dateResv.substring(0, 10) === d[6] && ele.refService===id).length 
    return res
   }
 
-  function getCentreRes() {
-    const x = [];
-    const result=[{label:'',value:0},{label:'',value:0},{label:'',value:0},{label:'',value:0}]
-    if(centres===0 || reservation.length===0){
-        return result
-    }
-    centres.map((row, index) => {
-       x.push({ label: row.nom, value: reservation.filter((ele) => ele.refCentre === row.reference).length });
-    });
-    const chart = x.sort((a, b) => a.value - b.value);
-    const res = [chart[chart.length - 1], chart[chart.length - 2], chart[chart.length - 3], chart[chart.length - 4]];
-      return res;
-  }
   function getTitre(){
     const t= generateWeekDates()
     const res="De "+t[0]+" a "+t[6]
@@ -143,12 +133,24 @@ function getCentreRes() {
     }
     services.map((row, index) => {
       const d=getData(row.reference)
-      if (d.length===0)
-      {const dt=0;}else{
-       s.push({ name: row.nom, type: 'area', fill: 'gradient', data:getData(row.reference) });
-      }
+       s.push({ name: row.nomService, type: 'area', fill: 'gradient', data:getData(row.reference) });
     });
-    const res=s.filter((ele) => !ele.data===result[0].data)
+    const x=[0,0,0,0,0,0,0]
+    var j=0
+    var res=[]
+    for(var i=0;i<s.length;i++){
+      var test=false
+      var f=false;
+      for(var e=0;e<7;e++){
+        if(s[i].data[e]===0){
+          test=false
+        }else{f=true}
+      }
+      if(f===true){
+        res[j]=s[i]
+        j++
+      }
+    }
       return res;
   }
 
@@ -173,7 +175,7 @@ function getCentreRes() {
 
       <Container maxWidth="xl">
         <Typography variant="h4" sx={{ mb: 5 }}>
-          Tableau de bord
+          Tableau de bord |
         </Typography>
 
         <Grid container spacing={3}>

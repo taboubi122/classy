@@ -3,19 +3,21 @@ import axios from 'axios';
 import {useState, useEffect } from 'react';
 import { Buffer } from 'buffer';
 // @mui
+import { useParams } from "react-router-dom";
 import { Container, Typography,Grid } from '@mui/material';
 // components
 // sections
 import { AppNewsUpdate} from '../sections/@dashboard/app';
 // ----------------------------------------------------------------------
 
-export default function ProductsPage() {
+export default function CentresPageProp() {
 
-
+    const params = useParams();
+    const idProp = params.id;
   const [rows,setCentre]=useState([]);
 
   useEffect(()=>{
-    axios.get('http://localhost:5000/api/getNamesEtab')
+    axios.get(`http://localhost:5000/api/getCentresProp/${idProp}`)
     .then(res=>setCentre(res.data)
     );
      },[]);
@@ -36,7 +38,7 @@ export default function ProductsPage() {
 
       <Container>
         <Typography variant="h4" sx={{ mb: 5 }}>
-         Centres |
+         Mes Centres |
         </Typography>
 
         <Grid item xs={12} md={6} lg={8}>

@@ -15,44 +15,44 @@ const NavConfig = () => {
 
   const navConfig = [
     {
-      title: "Dashboard",
-      path: `/dashboardCentre/${IdSalon}/appCentre`,
+      title: "Tableau de bord",
+      path: `/dashboardCentreProp/${IdSalon}/appCentreProp`,
       icon: <SiGoogleanalytics />,
     },
     {
-      title: "Reservation",
-      path: `/dashboardCentre/${IdSalon}/reservation`,
+      title: "Réservation",
+      path: `/dashboardCentreProp/${IdSalon}/reservationProp`,
       icon: <GoCalendar />,
     },
     {
       title: "Personnels",
-      path: `/dashboardCentre/${IdSalon}/personnels`,
+      path: `/dashboardCentreProp/${IdSalon}/personnelsProp`,
       icon: <FaUsers />,
     },
     {
       title: "Categories",
-      path: `/dashboardCentre/${IdSalon}/categories`,
+      path: `/dashboardCentreProp/${IdSalon}/categoriesProp`,
       icon: <TbCategory />,
     },
     {
       title: "Services",
-      path: `/dashboardCentre/${IdSalon}/services`,
+      path: `/dashboardCentreProp/${IdSalon}/servicesProp`,
       icon: <CgWorkAlt />,
     },
     {
       title: "Offres",
-      path: `/dashboardCentre/${IdSalon}/offres`,
+      path: `/dashboardCentreProp/${IdSalon}/offresProp`,
       icon: <ImGift />,
     },
     {
       title: "Horaires de travail",
-      path: `/dashboardCentre/${IdSalon}/horaires`,
+      path: `/dashboardCentreProp/${IdSalon}/horairesProp`,
       icon: <MdAccessTime/>,
     },
   
     {
       title: "Informations",
-      path: `/dashboardCentre/${IdSalon}/info`,
+      path: `/dashboardCentreProp/${IdSalon}/infoProp`,
       icon: <MdOutlineVilla />,
     },
   ];

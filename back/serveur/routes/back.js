@@ -362,45 +362,14 @@ route.delete("/api/deleteOffres/:reference", (req, res) => {
 });
 //  get offres By ID
 route.get("/api/getAllOffresByID/:reference", (req, res) => {
-  var sql = "SELECT s.* FROM service s INNER JOIN offre o ON s.reference = o.refService WHERE s.refCentre = " + req.params.reference;
+  var sql = "SELECT offre.* FROM offre INNER JOIN servicecentre ON offre.refService = servicecentre.refService WHERE servicecentre.refCentre =" + req.params.reference;
   connection.query(sql, function (err, rows) {
     if (err) {
       console.error("Error executing query: " + err.stack);
       return;
     }
-    var tabserv = []
-    var eleserv = 0
-    for (let i = 0; i < rows.length; i++) {
-      tabserv[eleserv] = rows[i].reference
-      eleserv++
-    }
-    let r = Array.from(new Set(tabserv));
-    console.log(r);
-    var offre = [];
-    var queryCount = 0;
-    for (let j = 0; j < r.length; j++) {
-      var sql2 = "SELECT * FROM offre WHERE refService =" + r[j];
-      connection.query(sql2, function (err, row) {
-        if (err) {
-          console.error("Error executing query: " + err.stack);
-          return;
-        }
-        if (row.length > 1) {
-          for (let x = 0; x < row.length; x++) {
-            offre[queryCount] = row[x];
-            queryCount++;
-          }
-        } else {
-          offre[queryCount] = row[0];
-          queryCount++;
-        }
-        if (queryCount === rows.length) {
-          console.log(offre);
-          res.json(offre);
-        }
-      });
-    }
-  });
+    res.json(rows);
+})
 });
 
 // add OFFRES
@@ -710,9 +679,69 @@ route.get("/api/getHoraireCentre/:nomCentre",(req,res)=>{
     res.json( rows);
   });
 })
+route.get("/api/personnel/:nomCentre",(req,res)=>{
+    const nomCentre = req.params.nomCentre;
+    const query = "SELECT * FROM personnel WHERE refCentre=?"
+    connection.query(query,nomCentre, (err, rows) => {
+      if (err) {
+        console.error("Error executing query: " + err.stack);
+        return;
+      }
+      console.log("Result rows:", rows);
+      res.json( rows);
+    });
+  })
+  route.get("/api/reservation/:nomCentre",(req,res)=>{
+    const nomCentre = req.params.nomCentre;
+    const query = "SELECT * FROM avis WHERE refCentre=?"
+    connection.query(query,nomCentre, (err, rows) => {
+      if (err) {
+        console.error("Error executing query: " + err.stack);
+        return;
+      }
+      console.log("Result rows:", rows);
+      res.json( rows);
+    });
+  })
+  route.get("/api/getCentreById/:nomCentre",(req,res)=>{
+    const nomCentre = req.params.nomCentre;
+    const query = "SELECT * FROM centre WHERE reference=?"
+    connection.query(query,nomCentre, (err, rows) => {
+      if (err) {
+        console.error("Error executing query: " + err.stack);
+        return;
+      }
+      console.log("Result rows:", rows);
+      res.json( rows);
+    });
+  })
+  route.get("/api/getReservationCentre/:nomCentre",(req,res)=>{
+    const nomCentre = req.params.nomCentre;
+    const query = "SELECT * FROM reservation WHERE refCentre=?"
+    connection.query(query,nomCentre, (err, rows) => {
+      if (err) {
+        console.error("Error executing query: " + err.stack);
+        return;
+      }
+      console.log("Result rows:", rows);
+      res.json( rows);
+    });
+  })
 
 route.get("/api/get",(req,res)=>{
     const query = "SELECT * FROM ville";
+    connection.query(query, (err, rows) => {
+      if (err) {
+        console.error("Error executing query: " + err.stack);
+        return;
+      }
+      console.log("Result rows:", rows);
+      res.json( rows);
+    });
+  })
+  route.get("/api/getAllPersonnel/:refenence",(req,res)=>{
+    const id=req.params.refenence;
+    const query = "SELECT * FROM personnel WHERE CIN="+id;
     connection.query(query, (err, rows) => {
       if (err) {
         console.error("Error executing query: " + err.stack);
@@ -1030,6 +1059,113 @@ route.get("/api/getResvPerso/:CIN",(req,res)=>{
         return;
       }
       console.log("Result rows:", rows);
+      res.json( rows);
+    });
+  })
+  route.get("/api/getResvP/:CIN",(req,res)=>{
+    const id = req.params.CIN;
+    const query =  "SELECT * FROM reservation WHERE CINPersonnel="+id;
+    connection.query(query,(err, rows) => {
+      if (err) {
+        console.error("Error executing query: " + err.stack);
+        return;
+      }
+      console.log("Result rows:", rows);
+      res.json( rows);
+    });
+  })
+  route.get("/api/getAllPropriate/:CIN",(req,res)=>{
+    const id = req.params.CIN;
+    const query =  "SELECT * FROM proprietaire WHERE CIN="+id;
+    connection.query(query,(err, rows) => {
+      if (err) {
+        console.error("Error executing query: " + err.stack);
+        return;
+      }
+      console.log("Result rows:", rows);
+      res.json( rows);
+    });
+  })
+  route.get("/api/getPropriates",(req,res)=>{
+    const query =  "SELECT * FROM proprietaire";
+    connection.query(query,(err, rows) => {
+      if (err) {
+        console.error("Error executing query: " + err.stack);
+        return;
+      }
+      console.log("Result rows:", rows);
+      res.json( rows);
+    });
+  })
+  route.get("/api/getCentresPtop/:CIN",(req,res)=>{
+    const id = req.params.CIN;
+    const query =  "SELECT * FROM centre WHERE CINProp="+id;
+    connection.query(query,(err, rows) => {
+      if (err) {
+        console.error("Error executing query: " + err.stack);
+        return;
+      }
+      console.log("Result rows:", rows);
+      res.json( rows);
+    });
+  })
+  route.get("/api/getCentresProp/:CIN",(req,res)=>{
+    const id = req.params.CIN;
+    const query =  "SELECT centre.reference, image.src, centre.nom, centre.type FROM centre INNER JOIN image ON centre.reference = image.refCentre AND couverture = 1 WHERE centre.Cinprop ="+id;
+    connection.query(query,(err, rows) => {
+      if (err) {
+        console.error("Error executing query: " + err.stack);
+        return;
+      }
+      console.log("Result rows:", rows);
+      res.json( rows);
+    });
+  })
+  route.get("/api/personnelProp/:CIN",(req,res)=>{
+    const id = req.params.CIN;
+    const query =  "SELECT personnel.* FROM personnel INNER JOIN centre ON personnel.refCentre = centre.reference WHERE centre.CINProp ="+id;
+    connection.query(query,(err, rows) => {
+      if (err) {
+        console.error("Error executing query: " + err.stack);
+        return;
+      }
+      console.log("Result rows:", rows);
+      res.json( rows);
+    });
+  })
+  route.get("/api/reservationProp/:CIN",(req,res)=>{
+    const id = req.params.CIN;
+    const query =  "SELECT reservation.* FROM reservation INNER JOIN centre ON reservation.refCentre = centre.reference WHERE centre.CINProp ="+id;
+    connection.query(query,(err, rows) => {
+      if (err) {
+        console.error("Error executing query: " + err.stack);
+        return;
+      }
+      console.log("Result rows:", rows);
+      res.json( rows);
+    });
+  })
+  route.get("/api/servicesProp/:CIN",(req,res)=>{
+    const id = req.params.CIN;
+    const query =  "SELECT service.* FROM service INNER JOIN servicecentre ON service.reference = servicecentre.refService INNER JOIN centre ON servicecentre.refCentre = centre.reference WHERE centre.CINProp="+id;
+    connection.query(query,(err, rows) => {
+      if (err) {
+        console.error("Error executing query: " + err.stack);
+        return;
+      }
+      console.log("Result rows:", rows);
+      res.json( rows);
+    });
+  })
+  route.get("/api/avisProp/:CIN",(req,res)=>{
+    const id = req.params.CIN;
+    const query =  "SELECT * FROM avis WHERE refCentre IN ( SELECT reference FROM centre WHERE CinProp = ?)";
+    connection.query(query,id,(err, rows) => {
+      if (err) {
+        console.error("Error executing query: " + err.stack);
+        return;
+      }
+      console.log("Result rows avis:", rows);
       res.json( rows);
     });
   })
@@ -1379,4 +1515,33 @@ route.delete("/api/services/delete/:reference",(req,res) => {
       }
   });
 });
+require("dotenv").config();
+const stripe=require("stripe")(process.env.STRIPE_SECRET_TEST);
+const bodyParser=require('body-parser');
+route.use(bodyParser.urlencoded({ extended:true}));
+route.use(bodyParser.json());
+route.use(cors())
+route.post("/stripe/charge",cors(),async(req,res)=>{
+    let { amount, id} =req.body;
+    console.log("amount & id : ",amount," ",id);
+    try{
+        const payment = await stripe.paymentIntents.create({
+            amount:amount,
+            currency:"EUR",
+            description:"CLASSY Company",
+            payment_method:id,
+            confirm:true,
+        });
+        res.json({
+            message:"Payement réussi",
+            success:true,
+        })
+    }catch(error){
+        console.log("Erreur Paymenet....",error)
+        res.json({
+            message:"Le Payement à échoué",
+            success:false,
+        })
+    }
+})
 module.exports = route;

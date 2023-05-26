@@ -44,12 +44,14 @@ module.exports.deleteServ=(connection,id)=>{
 }
 
 module.exports.getServById=(connection,id,res)=>{
-    var sql = "SELECT * FROM service WHERE refCentre=" + id
-    connection.query(sql, function (err, rows) {
+  const query = "SELECT s.* FROM service s JOIN servicecentre sc ON s.reference = sc.refService WHERE sc.refCentre ="+id;
+
+    connection.query(query, function (err, rows) {
     if (err) {
       console.error("Error executing query: " + err.stack);
       return;
     }
+    console.log(rows)
     res.json(rows);
   });
 }
