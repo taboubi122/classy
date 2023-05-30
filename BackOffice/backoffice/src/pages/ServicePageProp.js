@@ -390,7 +390,7 @@ export default function ServicePageProp() {
 	// Get Name categorie
 	function getNameCateg(id) {
 		const categs = categories.filter((categ) => categ.reference === id);
-		return categs.length > 0 ? categs[0].nom : 'Inconnu';
+		return categs.length > 0 ? categs[0].nomCateg : 'Inconnu';
 	}
 	// Get description
 	function getdesc(desc) {
@@ -553,7 +553,7 @@ export default function ServicePageProp() {
 	return (
 		<>
       <Helmet>
-        <title> Services | </title>
+        <title> CLASSY | SERVICES</title>
       </Helmet>
       <Container>
         <Stack
@@ -563,7 +563,7 @@ export default function ServicePageProp() {
           mb={5}
         >
           <Typography variant="h4" gutterBottom>
-            Services
+            Services |
           </Typography>
           <br />
           <Button
@@ -682,7 +682,7 @@ export default function ServicePageProp() {
                   {filteredUsers
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((row, index) => {
-                      const { reference, nom, description, prix, duree, refCateg, refCentre } = row;
+                      const { reference, nomService, description, prix, duree, refCateg, refCentre } = row;
                       const selectedUser = selected.indexOf(nom) !== -1;
 
                       return (
@@ -703,7 +703,7 @@ export default function ServicePageProp() {
                               spacing={2}
                             >
                               <Typography variant="subtitle2" noWrap>
-                                {nom}
+                                {nomService}
                               </Typography>
                             </Stack>
                           </TableCell>

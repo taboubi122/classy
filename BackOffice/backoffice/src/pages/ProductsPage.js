@@ -10,15 +10,7 @@ import { AppNewsUpdate} from '../sections/@dashboard/app';
 // ----------------------------------------------------------------------
 
 export default function ProductsPage() {
-  const [openFilter, setOpenFilter] = useState(false);
 
-  const handleOpenFilter = () => {
-    setOpenFilter(true);
-  };
-
-  const handleCloseFilter = () => {
-    setOpenFilter(false);
-  };
 
   const [rows,setCentre]=useState([]);
 
@@ -36,16 +28,15 @@ export default function ProductsPage() {
     image: row.src && `data:image/png;base64,${Buffer.from(row.src.data).toString('base64')}`,
 
   }));
-  
   return (
     <>
       <Helmet>
-        <title> Dashboard: Centres | </title>
+        <title> CLASSY | CENTRES </title>
       </Helmet>
 
       <Container>
         <Typography variant="h4" sx={{ mb: 5 }}>
-         Centres
+         Centres |
         </Typography>
 
         <Grid item xs={12} md={6} lg={8}>

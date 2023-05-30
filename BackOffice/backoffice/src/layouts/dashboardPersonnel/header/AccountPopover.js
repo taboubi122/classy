@@ -1,24 +1,18 @@
-import { useState } from 'react';
+import React, {useState, useEffect} from "react";
 // @mui
 import { alpha } from '@mui/material/styles';
 import { Box, Divider, Typography, Stack, MenuItem, Avatar, IconButton, Popover } from '@mui/material';
 // mocks_
-import account from '../../../_mock/account';
+import { Buffer } from 'buffer';
+import { useParams } from "react-router-dom";
+import axios from "axios";
 
 // ----------------------------------------------------------------------
 
 const MENU_OPTIONS = [
   {
-    label: 'Home',
-    icon: 'eva:home-fill',
-  },
-  {
     label: 'Profile',
     icon: 'eva:person-fill',
-  },
-  {
-    label: 'Settings',
-    icon: 'eva:settings-2-fill',
   },
 ];
 
@@ -34,6 +28,23 @@ export default function AccountPopover() {
   const handleClose = () => {
     setOpen(null);
   };
+  const params = useParams();
+  const idProp = params.id;
+  const [user, setUser] = useState([]);
+  useEffect(() => {
+    axios
+      .get(`http://localhost:5000/api/getAllPersonnel/${idProp}`)
+      .then((res) => setUser(res.data));
+  }, []);
+  const centre={reference:idProp,nom:"",photo:"",email:"",prenom:""}
+  if(user.length===0){
+    console.log("")
+  }else{
+     centre.email=user[0].email
+     centre.prenom=user[0].prenom
+     centre.nom=user[0].nom
+     centre.photo=user[0].photo
+  }
 
   return (
     <>
@@ -54,7 +65,7 @@ export default function AccountPopover() {
           }),
         }}
       >
-        <Avatar src={account.photoURL} alt="photoURL" />
+        <Avatar src={centre.photo && `data:image/png;base64,${Buffer.from(centre.photo.data).toString('base64')}`} alt="photoURL" />
       </IconButton>
 
       <Popover
@@ -78,10 +89,10 @@ export default function AccountPopover() {
       >
         <Box sx={{ my: 1.5, px: 2.5 }}>
           <Typography variant="subtitle2" noWrap>
-            {account.displayName}
+            {centre.nom} {centre.prenom}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {account.email}
+            {centre.email}
           </Typography>
         </Box>
 
@@ -97,9 +108,9 @@ export default function AccountPopover() {
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
-        <MenuItem onClick={handleClose} sx={{ m: 1 }}>
-          Logout
-        </MenuItem>
+        <a href="/"><MenuItem onClick={handleClose} sx={{ m: 1 }}>
+           Se déconnecter
+        </MenuItem></a>
       </Popover>
     </>
   );

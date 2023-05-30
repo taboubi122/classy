@@ -28,7 +28,7 @@ const navConfig = [
   },
   {
     title: 'Proprietaires',
-    path: '/dashboard/blog',
+    path: '/dashboard/proprietaires',
     icon: <HiUserGroup/>,
   },
   {
@@ -50,11 +50,6 @@ const navConfig = [
     title: 'Offres',
     path: '/dashboard/offres',
     icon: <ImGift/>,
-  },
-  {
-    title: 'Villes',
-    path: '/404',
-    icon: <MdOutlineVilla/>,
   },
 
 ];

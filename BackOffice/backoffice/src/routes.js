@@ -16,7 +16,6 @@ import EnvoyerDemandePage from './pages/EnvoyerDemandePage';
 import ConfirmationProp from './pages/ConfirmationProp';
 import DashboardAdmin from './pages/DashboardAdmin';
 import LoginAdmin from './pages/LoginAdmin';
-import PropLogin from './pages/PropLogin';
 import {useState,React } from 'react';
 // layouts
 import UserPage from './pages/UserPage';
@@ -28,8 +27,20 @@ import Reservation from './pages/Reservation';
 import DashboardLayoutPersonnel from './layouts/dashboardPersonnel/DashboardLayoutPersonnel';
 import HomeApp from './pages/Home/HomeApp';
 import PersoLogin from './pages/PersoLogin';
+<<<<<<< HEAD
 import HorairePerso from './pages/HorairePerso';
 import ReservationPerso from './pages/ReservationPerso';
+=======
+import DashboardCentre from './pages/DashboardCentre';
+import DashboardPerso from './pages/DashboardPerso';
+import DashboardLayoutProp from './layouts/dashboardProp/DashboardLayoutProp';
+import DashboardProp from './pages/DashboardProp';
+import CentresPageProp from './pages/CentresPageProp';
+import DashboardLayoutCentreProp from './layouts/DashboardPropCentre/DashboardLayoutCentreProp';
+import PropProfil from './pages/PropProfil';
+import PropPage from './pages/PropPage';
+import StripeContainer from './pages/Stripe/StripeContainer'
+>>>>>>> a0d3df61f0fffe6a22be2f0e0b2ae5c772246f51
 
 // ----------------------------------------------------------------------
 
@@ -47,6 +58,7 @@ export default function Router() {
     localStorage.removeItem('isLoggedIn');
   };
   const routes = useRoutes([
+<<<<<<< HEAD
     {
       path: '/dashboard',
       element: <DashboardLayout />,
@@ -109,9 +121,16 @@ export default function Router() {
       path: '*',
       element: <Navigate to="/404" replace />,
     },
+=======
+    
+>>>>>>> a0d3df61f0fffe6a22be2f0e0b2ae5c772246f51
     {
       path: '/',
      element: <HomeApp/> ,index: true ,
+    },
+    {
+      path: '/payer',
+     element: <StripeContainer/> ,index: true ,
     },
     {
       path: '/admin',
@@ -125,6 +144,94 @@ export default function Router() {
       path: '/perso',
      element: <PersoLogin/> ,index: true ,
     },
+    {
+      path: '/login',
+      element: <EnvoyerDemandePage />,
+    },
+    {
+      path: '/confirmation',
+      element: <ConfirmationProp />,
+    },
+    {
+      path: '/dashboard',
+      element: <DashboardLayout />,
+      children: [
+        { element: <Navigate to="/dashboard/app" />, index: true },
+        { path: 'app', element: <DashboardAdmin /> },
+        { path: 'demandes', element: <DemandesPage /> },
+        { path: 'proprietaires', element: <PropPage /> },
+        { path: 'clients', element: <UserPage /> },
+        { path: 'centres', element: <ProductsPage /> },
+        { path: 'categories', element: <CategoriesPage /> },
+        { path: 'services', element: <ServicesPage /> },
+        { path: 'offres', element: <OffrePage /> },
+      ],
+    },
+    {    
+      path: '/dashboardCentre/:id',
+      element:<DashboardLayoutCentre/> ,
+      children: [
+        { element: <Navigate to="/dashboardCentre/:id/appCentre" />, index: true },
+        { path: 'appCentre', element: <DashboardCentre/>},
+        { path: 'personnels', element: <PersonnelPage/> },
+        { path: 'reservation', element: <Reservation/> },
+        { path: 'categories', element: <CategoriesPage /> },
+        { path: 'services', element: <ServicePageProp /> },
+        { path: 'offres', element: <OffrePageProp /> }, 
+        { path: 'horaires', element: <HoraireProp /> },
+        { path: 'info', element: <DetailsCentre/> },
+        { path: 'detailPerso/:CIN', element: <PersonnelDetails/> },
+      ],
+    },
+    {    
+      path: '/dashboardCentreProp/:id',
+      element:<DashboardLayoutCentreProp/> ,
+      children: [
+        { element: <Navigate to="/dashboardCentreProp/:id/appCentreProp" />, index: true },
+        { path: 'appCentreProp', element: <DashboardCentre/>},
+        { path: 'personnelsProp', element: <PersonnelPage/> },
+        { path: 'reservationProp', element: <Reservation/> },
+        { path: 'categoriesProp', element: <CategoriesPage /> },
+        { path: 'servicesProp', element: <ServicePageProp /> },
+        { path: 'offresProp', element: <OffrePageProp /> }, 
+        { path: 'horairesProp', element: <HoraireProp /> },
+        { path: 'infoProp', element: <DetailsCentre/> },
+        { path: 'detailPersoProp/:CIN', element: <PersonnelDetails/> },
+      ],
+    },
+    {    
+      path: '/dashboardProp/:id',
+      element:<DashboardLayoutProp/> ,
+      children: [
+        { element: <Navigate to="/dashboardProp/:id/appProp" />, index: true },
+        { path: 'appProp', element: <DashboardProp/>},
+        { path: 'centres', element: <CentresPageProp/> },
+        { path: 'info', element: <PropProfil/> },
+      ],
+    },
+    {    
+      path: '/dashboardPerso/:id',
+      element:<DashboardLayoutPersonnel/> ,
+      children: [
+        { element: <Navigate to="/dashboardPerso/:id/reservation" />, index: true },
+        { path: 'reservation', element: <DashboardPerso/> },
+        { path: 'horaires', element: <DashboardPerso/> },
+        { path: 'profile', element: <DashboardPerso/> },
+      ],
+    },
+    {
+      element: <SimpleLayout />,
+      children: [
+        { element: <Navigate to="/dashboard/app" />},
+        { path: '404', element: <Page404 /> },
+        { path: '*', element: <Navigate to="/404" /> },
+      ],
+    },
+    {
+      path: '*',
+      element: <Navigate to="/404" replace />,
+    },
+    
   ]);
 
   return routes;

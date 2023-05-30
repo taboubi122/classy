@@ -75,7 +75,6 @@ export default function CategoriesPage() {
 			.get("http://localhost:5000/api/getAllCategories")
 			.then((categ) => setCategories(categ.data));
 	}, []);
-  console.log("categ: ",categories)
 	// Delete
 	function onDelete(reference) {
 		const swalWithBootstrapButtons = Swal.mixin({
@@ -263,7 +262,6 @@ export default function CategoriesPage() {
     if(nom===''){
       setErrorNom(true)
       setErrMessageNom('Le champ est obligatoire.')
-      console.log(errorNom)
     }else
     if(!messageNom){
       setErrorNom(true)
@@ -281,7 +279,6 @@ export default function CategoriesPage() {
     if(description===''){
       setErrorDesc(true)
       setErrMessageDesc('Le champ est obligatoire.')
-      console.log(errorDesc)
     }else
     if(!messageDesc){
       setErrorDesc(true)
@@ -440,7 +437,7 @@ export default function CategoriesPage() {
                   {filteredUsers
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((row, index) => {
-                      const { reference, nom, description } = row;
+                      const { reference, nomCateg, description } = row;
                       const selectedUser = selected.indexOf(nom) !== -1;
 
                       return (
@@ -462,7 +459,7 @@ export default function CategoriesPage() {
                             >
                               <Typography variant="subtitle2" noWrap>
                                 
-                                {nom}
+                                {nomCateg}
                               </Typography>
                             </Stack>
                           </TableCell>

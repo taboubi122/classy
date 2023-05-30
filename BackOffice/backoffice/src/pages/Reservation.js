@@ -6,26 +6,16 @@ import "react-big-calendar/lib/css/react-big-calendar.css"
 import "react-datepicker/dist/react-datepicker.css"
 import * as bootstrap from "bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css"
-import { DateTimePicker } from 'datetime-picker-reactjs'
+import 'moment/locale/fr';
 import 'datetime-picker-reactjs/dist/index.css'
 import axios from 'axios';
 // @mui
-import {
-  Card,
-  Stack,
-  Button,
-  Container,
-  Typography,Input ,FormControl,
-  FormControlLabel,
-  FormLabel,
-  
-  FormGroup,Radio,RadioGroup
-} from '@mui/material';
+import { Card, Stack, Button, Container, Typography,Input , FormControlLabel, Radio,RadioGroup } from '@mui/material';
 import { useLocation} from "react-router-dom";
 import Iconify from '../components/iconify';
 // sections
 export default function Reservation() {
- 
+  moment.locale('fr');
 const localizer = momentLocalizer(moment);
 const [Resv, setResv] = useState([]);
 const [PersoCalen, setPersoCalen] = useState([]);
@@ -197,7 +187,7 @@ return {
   return (
     <>
       <Helmet>
-        <title> User | Minimal UI </title>
+        <title> CLASSY | RESERVATION </title>
       </Helmet>
 
       <Container>
@@ -211,6 +201,7 @@ return {
       Calendrier
     </Typography>
   )}
+<<<<<<< HEAD
   {isOpenPopAdd ? null : (
     <Button
       variant="contained"
@@ -251,39 +242,31 @@ return {
       </Button>
     </div>
   )}
+=======
+>>>>>>> a0d3df61f0fffe6a22be2f0e0b2ae5c772246f51
 </Stack>
-
            <Card>
-    
-<RadioGroup aria-label="sexe" name="personnels" style={{ display: 'flex', flexDirection: 'row' }}>
-  {PersoCalen.map((row) => (
-    <FormControlLabel
-      key={row.nom}
-      value={row.nom}
-      control={<Radio />}
-      label={row.nom}
-      selected={calendarView === row.CIN}
-      onChange={() => showCalendar(row.CIN)}
-    />
-  ))}
-</RadioGroup>
+            <Calendar
+                    localizer={localizer}
+                    events={calendarView === "global" ? events : Resv}
+                    startAccessor="start"
+                    endAccessor="end"
+                    style={{ height: 500, margin: "50px" }}
+                    onSelectEvent={handleSelectEvent}
+                    eventPropGetter={eventStyleGetter}
+                    messages={{
+                      today: 'Aujourd\'hui',
+                      previous: 'Précédent',
+                      next: 'Suivant',
+                      month: 'Mois',
+                      week: 'Semaine',
+                      day: 'Jour',
+                      agenda: 'Agenda',
+                    }}
+                  />
 
-
-
- <Calendar
-        localizer={localizer}
-        events={calendarView === "global" ? events : Resv}
-        startAccessor="start"
-        endAccessor="end"
-        style={{ height: 500, margin: "50px" }}
-        onSelectEvent={handleSelectEvent}
-        eventPropGetter={eventStyleGetter}
-      />
-
- </Card>
+          </Card>
       </Container>
-
-     
     </>
   );
 }

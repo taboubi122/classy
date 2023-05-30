@@ -1,10 +1,9 @@
-  import { SiGoogleanalytics } from "react-icons/si";
-  import { FaUsers } from "react-icons/fa";
-  import { GiSaloon } from "react-icons/gi";
-  import { TbCategory } from "react-icons/tb";
+
   import {MdAccessTime} from "react-icons/md";
-  import { CgWorkAlt } from "react-icons/cg";
   import { useLocation } from "react-router-dom";
+  import { GoCalendar } from "react-icons/go";
+  import { CgProfile } from "react-icons/cg";
+
   
   const NavConfig = () => {
     const location = useLocation();
@@ -13,20 +12,21 @@
   
     const navConfig = [
       {
-        title: "Dashboard",
-        path: `/dashboardPerso/${CIN}`,
-        icon: <SiGoogleanalytics />,
-      },
-      {
-        title: "Reservation",
+        title: "Réservation",
         path: `/dashboardPerso/${CIN}/reservation`,
-        icon: <GiSaloon />,
+        icon: <GoCalendar />,
       },
     
       {
         title: "Horaires",
         path: `/dashboardPerso/${CIN}/horaires`,
         icon: <MdAccessTime />,
+      },
+
+      {
+        title: "Profile",
+        path: `/dashboardPerso/${CIN}/profile`,
+        icon: <CgProfile />,
       },
      
     ];

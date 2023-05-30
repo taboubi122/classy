@@ -42,11 +42,7 @@ const TABLE_HEAD = [
 		, label: "Categorie"
 		, alignRight: false
 	, }
-	, {
-		id: "centre"
-		, label: "Centre"
-		, alignRight: false
-	, },
+	, 
 	{
 		id: "valide"
 	, },
@@ -404,12 +400,14 @@ export default function ServicesPage() {
 	// Get Name Centre
 	function getNameCentre(id) {
 		const ctrs = centre.filter((ctr) => ctr.reference === id);
+    console.log("ctr!",centre.filter((ctr) => ctr.reference === id))
 		return ctrs.length > 0 ? ctrs[0].nom : 'Inconnu';
 	}
+  
 	// Get Name categorie
 	function getNameCateg(id) {
 		const categs = categories.filter((categ) => categ.reference === id);
-		return categs.length > 0 ? categs[0].nom : 'Inconnu';
+		return categs.length > 0 ? categs[0].nomCateg : 'Inconnu';
 	}
 	// Get description
 	function getdesc(desc) {
@@ -735,7 +733,7 @@ export default function ServicesPage() {
                   {filteredUsers
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((row, index) => {
-                      const { reference, nom, description, prix, duree, refCateg, refCentre } = row;
+                      const { reference, nomService, description, prix, duree, refCateg} = row;
                       const selectedUser = selected.indexOf(nom) !== -1;
 
                       return (
@@ -756,7 +754,7 @@ export default function ServicesPage() {
                               spacing={2}
                             >
                               <Typography variant="subtitle2" noWrap>
-                                {nom}
+                                {nomService}
                               </Typography>
                             </Stack>
                           </TableCell>
@@ -764,7 +762,6 @@ export default function ServicesPage() {
                           <TableCell align="left"> {currentTime(duree)} </TableCell>
                           <TableCell align="left"> {getdesc(description)} </TableCell>
                           <TableCell align="left"> {getNameCateg(refCateg)} </TableCell>
-                          <TableCell align="left"> {getNameCentre(refCentre)} </TableCell>
                           <TableCell align="right">
                             <IconButton
                               size="large"

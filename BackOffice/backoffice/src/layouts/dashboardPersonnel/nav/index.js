@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useEffect } from 'react';
+import React, {useState, useEffect} from "react";
 import { useLocation } from 'react-router-dom';
 // @mui
 import { styled, alpha } from '@mui/material/styles';
@@ -9,7 +9,9 @@ import account from '../../../_mock/account';
 // hooks
 import useResponsive from '../../../hooks/useResponsive';
 // components
-import Logo from '../../../components/logo';
+import { Buffer } from 'buffer';
+import { useParams } from "react-router-dom";
+import axios from "axios";
 import Scrollbar from '../../../components/scrollbar';
 import NavSection from '../../../components/nav-section';
 //
@@ -45,6 +47,24 @@ export default function Nav({ openNav, onCloseNav }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
+  const params = useParams();
+  const idProp = params.id;
+  const [user, setUser] = useState([]);
+  useEffect(() => {
+    axios
+      .get(`http://localhost:5000/api/getAllPersonnel/${idProp}`)
+      .then((res) => setUser(res.data));
+  }, []);
+  const centre={reference:idProp,nom:"",photo:"",email:"",prenom:""}
+  if(user.length===0){
+    console.log("")
+  }else{
+     centre.email=user[0].email
+     centre.nom=user[0].nom
+     centre.prenom=user[0].prenom
+     centre.photo=user[0].photo
+  }
+
 
   const renderContent = (
     <Scrollbar
@@ -54,21 +74,17 @@ export default function Nav({ openNav, onCloseNav }) {
       }}
     >
       <Box sx={{ px: 2.5, py: 3, display: 'inline-flex' }}>
-        <Logo />
+        <div />
       </Box>
 
       <Box sx={{ mb: 5, mx: 2.5 }}>
         <Link underline="none">
           <StyledAccount>
-            <Avatar src={account.photoURL} alt="photoURL" />
+            <Avatar src={centre.photo && `data:image/png;base64,${Buffer.from(centre.photo.data).toString('base64')}`} alt="photoURL" />
 
             <Box sx={{ ml: 2 }}>
               <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
-                {account.displayName}
-              </Typography>
-
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                {account.role}
+              {centre.nom} {centre.prenom}
               </Typography>
             </Box>
           </StyledAccount>

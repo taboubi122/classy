@@ -1,14 +1,12 @@
 
 import { SiGoogleanalytics } from "react-icons/si";
 import { FaUsers } from "react-icons/fa";
-import { GiSaloon } from "react-icons/gi";
 import { TbCategory } from "react-icons/tb";
 import { MdOutlineVilla,MdAccessTime } from "react-icons/md";
 import { CgWorkAlt } from "react-icons/cg";
 import { useLocation } from "react-router-dom";
 import { ImGift } from "react-icons/im";
 import { GoCalendar } from "react-icons/go";
-import { MdApartment } from "react-icons/md";
 
 const NavConfig = () => {
   const location = useLocation();
@@ -18,18 +16,13 @@ const NavConfig = () => {
   const navConfig = [
     {
       title: "Dashboard",
-      path: `/dashboardCentre/${IdSalon}/app`,
+      path: `/dashboardCentre/${IdSalon}/appCentre`,
       icon: <SiGoogleanalytics />,
     },
     {
       title: "Reservation",
       path: `/dashboardCentre/${IdSalon}/reservation`,
-      icon: <GiSaloon />,
-    },
-    {
-      title: "Mes Centres",
-      path: `/dashboardCentre/${IdSalon}/centres`,
-      icon: <MdApartment />,
+      icon: <GoCalendar />,
     },
     {
       title: "Personnels",
@@ -58,7 +51,7 @@ const NavConfig = () => {
     },
   
     {
-      title: "Infos",
+      title: "Informations",
       path: `/dashboardCentre/${IdSalon}/info`,
       icon: <MdOutlineVilla />,
     },

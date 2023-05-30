@@ -2,11 +2,8 @@
 import PropTypes from 'prop-types';
 import { Box, Stack, Link, Card, Button, Divider, Typography, CardHeader } from '@mui/material';
 import { NavLink } from 'react-router-dom';
-
 // utils
-import { fToNow } from '../../../utils/formatTime';
 // components
-import Iconify from '../../../components/iconify';
 import Scrollbar from '../../../components/scrollbar';
 // ----------------------------------------------------------------------
 
@@ -22,21 +19,19 @@ export default function AppNewsUpdate({ title, subheader, list, ...other }) {
     <Card {...other}>
           <CardHeader title={title} subheader={subheader} />
       
-      <Scrollbar>
-        <Stack spacing={3} sx={{ p: 3, pr: 0 }}>
-          {list.map((news) => (
-           <NavLink  to={`/dashboardCentre/${news.id}/app`}  className="navLink"> <NewsItem key={news.id} news={news}/>   </NavLink> 
-          ))}
-        </Stack>
-      </Scrollbar>
+          <Scrollbar>
+            <Stack spacing={3} sx={{ p: 3, pr: 0 }}>
+              {list.map((news) => (
+                <NavLink to={`/dashboardCentreProp/${news.id}/appCentreProp`} key={news.id} className="navLink">
+                  <div>
+                    <NewsItem key={news.id} news={news}/>
+                  </div>
+                </NavLink>
+              ))}
+            </Stack>
+          </Scrollbar>
 
       <Divider />
-
-      <Box sx={{ p: 2, textAlign: 'right' }}>
-       <a href='/dashboard/blog' className="navLink">  <Button size="small"  endIcon={<Iconify icon={'eva:arrow-ios-forward-fill'} />}>
-       View all
-        </Button></a>  
-      </Box>
     </Card>
   );
 }
@@ -53,7 +48,6 @@ NewsItem.propTypes = {
 
 function NewsItem({ news }) {
   const { image, title, description, postedAt } = news;
-
   return (
     <Stack direction="row" alignItems="center" spacing={2}>
       <Box component="img" alt={title} src={image} sx={{ width: 48, height: 48, borderRadius: 1.5, flexShrink: 0 }} />

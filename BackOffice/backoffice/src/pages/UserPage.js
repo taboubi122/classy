@@ -109,7 +109,6 @@ export default function UserPage() {
               window.location.reload()
               axios.delete(`http://localhost:5000/api/deleteClient/${CIN}`)
               .then(res => setCIN(res.data));
-              console.log(CIN)  
                swalWithBootstrapButtons.fire(
                  'Supprimé!',
                  'Votre client a été supprimé.',
@@ -192,7 +191,6 @@ export default function UserPage() {
       try {
         const res = await axios.get(`http://localhost:5000/api/clients/search/${val}`);
         setFilternom(res.data);
-        console.log(typeof val, val);
       } catch (err) {
         console.log("Registation Failed")
       }
@@ -202,9 +200,6 @@ export default function UserPage() {
   const handleFilterBynom = (event) => {
     const filterValue = event.target.value;
     setPage(0); 
-   
-    console.log(`filterValue ${event.target.value}`);
-    console.log(typeof filterValue, filterValue);
 
       setFilternom(filterValue);
   
@@ -218,13 +213,13 @@ export default function UserPage() {
   return (
     <>
       <Helmet>
-        <title> Users | </title>
+        <title> CLASSY | CLIENTS</title>
       </Helmet>
 
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            Users
+            Clients |
           </Typography>
         </Stack>
         <Card>
@@ -250,14 +245,9 @@ export default function UserPage() {
                    
                     return (
                       <TableRow hover key={index} tabIndex={-1} role="checkbox" selected={selectedUser}>
-                        <TableCell padding="checkbox">
-                          <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, nom)} />
-                        </TableCell>
-
                         <TableCell component="th" scope="row" padding="none">
                           <Stack direction="row" alignItems="center" spacing={2}>
                           {photo && <img className='ClientPhoto' alt={id} src={`data:image/png;base64,${Buffer.from(row.photo.data).toString('base64')}`} />}
-                            
                             <Typography variant="subtitle2" noWrap>
                               {nom} {prenom}
                             </Typography>  

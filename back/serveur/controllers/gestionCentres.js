@@ -23,13 +23,13 @@ connection.query(sql, function (err, rows) {
 }
 
 module.exports.getAllVilleC=(connection,res)=>{
-  var sql = "SELECT * FROM localisation ";
+  var sql = "SELECT * FROM succursale ";
 connection.query(sql, function (err, rows) {
   if (err) {
     console.error("Error executing query: " + err.stack);
     return;
   }
-  console.log("localisation: ",rows)
+  console.log("succursale: ",rows)
   res.json(rows)
 });
 }
