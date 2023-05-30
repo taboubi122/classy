@@ -3,8 +3,8 @@ const mysql = require("mysql2");
     host: "localhost",
     user: "root",
     password: "",
-    database: "classynew",
-    //port:"3308"
+    database: "classy",
+    port:"3308"
   });
 
 connection.connect((err) => {

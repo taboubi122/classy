@@ -10,13 +10,14 @@ import Footer from '../Footer';
 import Navbar from '../Navbar/navbar';
 
 
-const CoiffComponents= () =>{
+const CoiffComponents= ({ isLoggedIn}) =>{
     const location=useLocation()
     console.log(location.pathname.split('/'))
     const v=location.pathname.split('/')[2]
     const type=location.pathname.split('/')[1]
     const [ville,setVille]=useState([]);
     const [setNom]=useState([]);
+    var typ="";
     const handle= async(nom)=>{
       try{
         axios.get(`http://localhost:5000/api/getByName/${nom}`)
@@ -26,21 +27,43 @@ const CoiffComponents= () =>{
           console.log(err);
         }
       }
-    useEffect(()=>{
-        axios.get(`http://localhost:5000/api/getAll/${v}`)
-        .then(res=>setVille(res.data)
-        );
-         },[]);
+      if (type === "coiffure") {
+        typ = 'Coiffeur';
+      }else if(type === "manucure") {
+        typ = 'Manucure';
+      }else if(type === "barbier") {
+        typ = 'Barbier';
+      }else if(type === "Institut de beauté") {
+        typ = 'Manucure';
+      }
+         useEffect(() => {
+           
+            axios.get("http://localhost:5000/api/getAll", {
+              params: {
+              ville: v,
+               type: typ,
+              }
+            })
+            .then(res => {
+              setVille(res.data);
+            })
+            .catch(error => {
+              console.error("Error fetching data:", error);
+            });
+          }, []);
          const scrollThreshold = "header scroll";
     return(
         <>
-        <Navbar  change={scrollThreshold}/>
+        <Navbar  change={scrollThreshold} isLoggedIn={isLoggedIn}/>
         <div className='navBarLinks'/>
         <section className='Coiffeur'  >
         <br/> 
         <div className='select'><b>Sélectionnez un salon</b><br/> Les meilleurs salons et instituts aux alentours de {v} : Réservation en ligne </div>
         <br/>
          <div className='containerCoiFF'>
+          {ville.length === 0 ? (
+          <div className='noDataMessage'>Pas encore disponible</div>
+        ) : (<>
           <div className='salon'>
              <div className='liste'>
                 <br/>
@@ -63,15 +86,17 @@ const CoiffComponents= () =>{
                     </div>
               <br/>
                     </div>   
-                )}
+                 )}
                </div>
                 </div>
+                </> )}
                 <div className='maps'>
                
                 {maps()}
                 </div>
-            </div>
+            </div>  
         </section> 
+      
         <Footer/>
         </>
     )

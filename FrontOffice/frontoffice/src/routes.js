@@ -19,11 +19,7 @@ import DashboardAdmin from './pages/DashboardAdmin';
 import LoginAdmin from './pages/LoginAdmin';
 import PropLogin from './pages/PropLogin';
 import {useState,React } from 'react';
-// layouts
-//
-import BlogPage from './pages/BlogPage';
 import UserPage from './pages/UserPage';
-import LoginPage from './pages/LoginPage';
 import ProductsPage from './pages/ProductsPage';
 import DetailsCentre from './pages/DetailsCentre';
 import PersonnelPage from './pages/personnels';
@@ -42,10 +38,9 @@ import ReservationPage from './Front/ReservationPage';
 import DashboardLayoutPersonnel from './layouts/dashboardPersonnel/DashboardLayoutPersonnel';
 import ReservationPerso from './pages/ReservationPerso';
 
-// ----------------------------------------------------------------------
-
 export default function Router() {
   const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem('isLoggedIn') === 'true');
+  const [email] = useState(localStorage.getItem('email'));
   const navigate = useNavigate();
 
   const handleLogin = () => {
@@ -125,7 +120,7 @@ export default function Router() {
     },
     {
       path: '/',
-     element: <Home isLoggedIn={isLoggedIn} handleLogout={handleLogout} /> ,index: true ,
+     element: <Home isLoggedIn={isLoggedIn} email={email}/> ,index: true ,
     },
     {
       path: '/auth',
@@ -136,28 +131,32 @@ export default function Router() {
      element: <SignUp/> ,index: true ,
     },
     {
+      path: '/Profil',
+     element: <ProfilClient handleLogout={handleLogout} isLoggedIn={isLoggedIn}/>,index: true ,
+    },
+    {
       path: '/confirm/:activeCode',
      element: <ConfirmUser/>  ,
     },
     {
-      path: '/calendrier',
-     element: <Calendrier/>  ,
-    },
-    {
       path: '/:type',
-     element: <Coiffure/>  ,
+     element: <Coiffure isLoggedIn={isLoggedIn}/>  ,
     },
     {
       path: '/:type/:ville',
-     element: <CoiffComponents/>  ,
+     element: <CoiffComponents isLoggedIn={isLoggedIn}/>  ,
     },
     {
       path: '/:type/:ville/:nom',
-     element: <DetailsCoiff/>  ,
+     element: <DetailsCoiff isLoggedIn={isLoggedIn}/>  ,
     },
     {
       path: '/reservation/:centre/:service',
-     element: <ReservationPage/>  ,
+     element: <ReservationPage isLoggedIn={isLoggedIn}/>  ,
+    },
+    {
+      path: '/reservation/:centre/:service/:ref',
+     element: <ReservationPage isLoggedIn={isLoggedIn}/>  ,
     },
   ]);
 

@@ -293,21 +293,22 @@ const [nomService,setNomservice] = useState("");
   const Update = async (event) => {
     event.preventDefault();
     try {
-      await axios.put(`http://localhost:5000/api/updatePerso/${selectedPerso.CIN}`,
-       {nom:selectedPerso.nom,
-        prenom:selectedPerso.prenom,
-          email:selectedPerso.email,
-         password:selectedPerso.password,
-          tel:selectedPerso.tel,
-       photo:selectedPerso.photo});
+      await axios.put(`http://localhost:5000/api/updatePerso/${selectedPerso.CIN}`, {
+        nom: selectedPerso.nom,
+        prenom: selectedPerso.prenom,
+        email: selectedPerso.email,
+        password: selectedPerso.password,
+        tel: selectedPerso.tel,
+        photo: selectedPerso.photo
+      });
       console.log("perso Update success");
       setIsOpenPopUpd(false);
-      window.location.reload()
+      window.location.reload();
     } catch (err) {
       console.log(err);
       console.log("perso Update failed");
       setIsOpenPopUpd(false);
-      window.location.reload()
+      window.location.reload();
     }
   };
  
@@ -602,7 +603,7 @@ const onSubmit = (data) => Insert(data.CIN,data.nom,data.prenom,data.tel,data.se
 
                         <TableCell component="th" scope="row" padding="none">
                           <Stack direction="row" alignItems="center" spacing={2}>
-                          {photo && <img className='PersoPhoto' alt={id} src={`${Buffer.from(row.photo.data)}`}  />}
+                          {photo && <img className='ClientPhoto' alt={id} src={`${Buffer.from(row.photo.data)}`}  />}
                           
                             <Typography variant="subtitle2" noWrap>
                               {nom} {prenom}

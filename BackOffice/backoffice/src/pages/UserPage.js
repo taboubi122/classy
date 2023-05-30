@@ -41,7 +41,6 @@ const TABLE_HEAD = [
   { id: 'Cin', label: 'CIN', alignRight: false },
   { id: 'telephone', label: 'Telephone', alignRight: false },
   { id: 'email', label: 'Email', alignRight: false },
-  { id: 'password', label: 'Password', alignRight: false },
   { id: 'sexe', label: 'Sexe', alignRight: false },
   {id:'valide'},
   { id: '' },
@@ -244,8 +243,9 @@ export default function UserPage() {
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row,index) => {
-                    const { id, nom,prenom, tel, sexe, CIN, photo, email , password} = row;
+                  {filteredUsers.
+                  slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row,index) => {
+                    const { id, nom,prenom, tel, sexe, CIN, photo, email} = row;
                     const selectedUser = selected.indexOf(nom) !== -1;
                    
                     return (
@@ -270,7 +270,6 @@ export default function UserPage() {
 
                         <TableCell align="left">{email}</TableCell>
 
-                        <TableCell align="left">{password}</TableCell>
 
                         <TableCell align="left">
                           <Label>{sexe}</Label>

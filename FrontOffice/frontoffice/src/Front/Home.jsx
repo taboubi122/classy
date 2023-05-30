@@ -7,13 +7,11 @@ import Navbar from './Navbar/navbar';
 import BarRecherche from './BarRecherche/BarRechere';
 
 const Home = ({ isLoggedIn, handleLogout }) => {
-  console.log(`Home ${isLoggedIn}`);
- 
   const scrollThreshold = "header";
   return (
     <>
       <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} change={scrollThreshold}/>
-      <BarRecherche/>
+      <BarRecherche isLoggedIn={isLoggedIn}/>
       <div className='navBarLink1' />
       <Main />
       <Digitale />

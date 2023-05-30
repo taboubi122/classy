@@ -28,6 +28,8 @@ import Reservation from './pages/Reservation';
 import DashboardLayoutPersonnel from './layouts/dashboardPersonnel/DashboardLayoutPersonnel';
 import HomeApp from './pages/Home/HomeApp';
 import PersoLogin from './pages/PersoLogin';
+import HorairePerso from './pages/HorairePerso';
+import ReservationPerso from './pages/ReservationPerso';
 
 // ----------------------------------------------------------------------
 
@@ -74,13 +76,19 @@ export default function Router() {
         { path: 'detailPerso/:CIN', element: <PersonnelDetails/> },
       ],
     },
+
     {    
       path: '/dashboardPerso/:id',
       element:<DashboardLayoutPersonnel/> ,
       children: [
         { path: '/dashboardPerso/:id', element: <DashboardLayoutPersonnel/>,index: true },
+        { path: 'reservation', element: <ReservationPerso/> },
+        { path: 'horaires', element: <HorairePerso/> },  
       ],
     },
+
+
+
     {
       path: 'login',
       element: <EnvoyerDemandePage />,

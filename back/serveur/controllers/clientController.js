@@ -65,6 +65,26 @@ module.exports = {
       }
     });
   },
+ 
+  getInfosClient: (req, res) => {
+    const email = req.params.email;
+    client.getInfosClient(email, (err, client) => {
+      if (err) {
+        if (err.kind === "not_found") {
+          res.status(404).send({
+            message: `Utilisateur avec l'email ${email} non trouvé.`,
+          });
+        } else {
+          res.status(500).send({
+            message: "Une erreur s'est produite lors de la recherche du client.",
+          });
+        }
+      } else {
+        res.send(client);
+      }
+    });
+  },
+  
   searchClients: (req, res) => {
     const searchValue = req.params.value;
     client.search(searchValue, (err, clients) => {
@@ -78,7 +98,32 @@ module.exports = {
       }
     });
   },
+// Modifier un client existant
+updateClient : (req, res) => {
+  if (!req.body) {
+    res.status(400).send({
+      message: "Le contenu ne peut pas être vide!",
+    });
+  }
 
+  client.update(
+    req.params.email,
+    new client(req.body),
+    (err, data) => {
+      if (err) {
+        if (err.kind === "not_found") {
+          res.status(404).send({
+            message: `client non trouvé avec l'ID ${req.params.email}.`,
+          });
+        } else {
+          res.status(500).send({
+            message: "Erreur lors de la mise à jour du client avec l'ID " + req.params.email,
+          });
+        }
+      } else res.send(data);
+    }
+  );
+},
 verifyUser : (req, res) => {
   const activeCode = req.params.activeCode;
 

@@ -91,7 +91,7 @@ const useStyles = makeStyles((theme) => ({
   }));
   
 export default function PersonnelDetails() {
-    
+  const [Horaire,setHoraire]=useState([]);
 const [nomService,setNomservice] = useState("");
 const [fonction, setFonction] = useState("");
 const classes = useStyles();
@@ -109,6 +109,13 @@ const classes = useStyles();
         .then(res=>setSelectedPerso(res.data)
         );
          },[]);
+         useEffect(() => {
+    
+          axios.get(`http://localhost:5000/api/getHorairePerso/${CINPerso}`)
+            .then(res => {
+              setHoraire(res.data);
+            });
+      }, []);
          const [tachePerso, setTachePerso] = useState([]);
          const [selectedPerso, setSelectedPerso] = useState([]);
                 
@@ -243,15 +250,26 @@ Telephone
 <Typography variant="h6">{row.tel}</Typography>
 </div>
 <div>
-<Typography variant="body2" color="textSecondary">
-Password
-</Typography>
-<Typography variant="h6">{row.password}</Typography>
 </div>
 </div>
 </div>
 </Card>
-
+<Card style={{ width: '50%',height:'fit-content' }}>
+  {Horaire.map((donne, index) => (
+    <table>
+      <TableBody>
+        <TableRow key={index}>
+          <p>
+            <TableCell scope="col">{donne.jour} :</TableCell>
+            <TableCell scope="col">
+              {donne.ouverture ? `${donne.ouverture} - ${donne.fermeture}` : 'Fermé'}
+            </TableCell>
+          </p>
+        </TableRow>
+      </TableBody>
+    </table>
+  ))}
+</Card>
 </Grid> )})}
 
           <Grid item xs={12} md={6} lg={4}>

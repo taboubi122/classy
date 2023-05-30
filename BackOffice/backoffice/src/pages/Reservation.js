@@ -48,8 +48,6 @@ const [PersoCalen, setPersoCalen] = useState([]);
   }, [IdSalon]);
 
 
-
-
   useEffect(()=>{
     axios.get(`http://localhost:5000/api/getAllPersonnels/${IdSalon}`)
     .then(res=>setPersoCalen(res.data)
@@ -82,48 +80,92 @@ const [PersoCalen, setPersoCalen] = useState([]);
       localStorage.setItem("calendarView", calendarView);
     }, [calendarView]);
     
-  const createEvent = (reservation) => {
-    return {
-      title: `${reservation.nomService}`,
-      start: reservation.startDateResv,
-      end: reservation.endDateResv,
-      personnel: `${reservation.nomPerso} ${reservation.prenomPerso}`,
-      client: `${reservation.nom} ${reservation.prenom}`,
-      allDay: false,
+
+    const createEvent = (reservation) => {
+      const { nomService, startDateResv, endDateResv, nomPerso, prenomPerso, nom, prenom, titre } = reservation;
+      let personnel = '';
+      let client = '';
+      let service = '';
+    
+      if (nomPerso && prenomPerso) {
+        personnel = `${nomPerso} ${prenomPerso}`;
+      }
+      if (nom && prenom) {
+        client = `${nom} ${prenom}`;
+      }
+      if (nomService) {
+        service = nomService;
+      } else {
+        service = titre || 'Titre par défaut'; // Ajout d'un titre par défaut si le service et le titre sont tous les deux vides
+      }
+    
+      return {
+        title: service,
+        start: startDateResv,
+        end: endDateResv,
+        personnel: personnel,
+        client: client,
+        allDay: false,
+      };
     };
-  }
-  
+    
+    
   const [newEvent, setNewEvent] = useState({ title:"", start: new Date(), end:new Date(),nom:"",prenom:"",nomPerso:"",prenomPerso:"" });
  
   const events = Resv.map((reservation) => createEvent(reservation));
  console.log(events)
   const [allEvents,setAllEvents]=useState(events)
 
+  const handleAddEvent = async () => {
+    try {
+      await axios.post('http://localhost:5000/api/addResv', {
+        refCentre: IdSalon,
+        startDate: newEvent.start,
+        endDate: newEvent.end,
+        titre: newEvent.title
+      });
+      console.log('Reservation added');
+      window.location.reload();
+    } catch (error) {
+      console.error('Error adding reservation:', error);
+    }
+  
+    const { title, start, end, nom, prenom, nomPerso, prenomPerso } = newEvent;
+    const startTimestamp = Date.parse(start);
+    const endTimestamp = Date.parse(end);
+  
+    const newEventObject = {
+      title,
+      start: new Date(startTimestamp),
+      end: new Date(endTimestamp),
+      nom,
+      prenom,
+      nomPerso,
+      prenomPerso
+    };
+    setAllEvents([...allEvents, newEventObject]);
+    setNewEvent({ title: '', start: new Date(), end: new Date(), nom: '', prenom: '', nomPerso: '', prenomPerso: '' });
+  };
+  
+const handleSelectEvent = (event, e) => {
+  const popoverContent = `
+    <p>Start: ${event.start.toLocaleString()}</p>
+    <p>End: ${event.end.toLocaleString()}</p>
+    ${event.client ? `<p>Client: ${event.client}</p>` : ''}
+    ${event.personnel ? `<p>Personnel: ${event.personnel}</p>` : ''}
+  `;
 
-const handleAddEvent = () => {
-  const { title, start, end ,nom,prenom,nomPerso,prenomPerso} = newEvent;
-  const startTimestamp = Date.parse(start);
-  const endTimestamp = Date.parse(end);
-
-  const newEventObject = { title, start: new Date(startTimestamp), end: new Date(endTimestamp),nom,prenom,nomPerso,prenomPerso};
-  setAllEvents([...allEvents, newEventObject]);
-  setNewEvent({ title: '', start: new Date(), end: new Date(),nom:"",prenom:"",nomPerso:"",prenomPerso:"" });
-};
-  const handleSelectEvent = (event, e) => {
   const popover = new bootstrap.Popover(e.target, {
-      title: event.title,
-      content: `
-        <p>Start: ${event.start.toLocaleString()}</p>
-        <p>End: ${event.end.toLocaleString()}</p>
-        <p> Client: ${event.client}</p>
-        <p> Personnel: ${event.personnel}</p>`,
-      trigger: "hover",
-      placement: "auto",
-      html: true,
-      customClass: "popoverStyle",
+    title: event.title,
+    content: popoverContent,
+    trigger: "hover",
+    placement: "auto",
+    html: true,
+    customClass: "popoverStyle",
   });
   popover.show();
 };
+
 const eventStyleGetter = (event, start, end, isSelected) => {
 let backgroundColor = '';
 if (event.title === 'Coupe Coiffage cheveux') {
@@ -185,26 +227,23 @@ return {
       </Button>
       <h2>Ajouter un event</h2>
       <DateTimePicker
-        placeholder="Select Start Date"
-        value={new Date(newEvent.start)}
-        onChange={(start) => setNewEvent({ ...newEvent, start })}
-        timePicker
-      />
-      <DateTimePicker
-        placeholder="Select End Date"
-        value={new Date(newEvent.end)}
-        onChange={(end) => setNewEvent({ ...newEvent, end })}
-        timePicker
-      />
-      <br />
-      <Input
-        type="text"
-        placeholder="Add Title"
-        value={newEvent.title}
-        onChange={(e) =>
-          setNewEvent({ ...newEvent, title: e.target.value })
-        }
-      />
+  placeholder="Select Start Date"
+  value={newEvent.start}
+  onChange={(start) => setNewEvent({ ...newEvent, start })}
+  timePicker
+/>
+<DateTimePicker
+  placeholder="Select End Date"
+  value={newEvent.end}
+  onChange={(end) => setNewEvent({ ...newEvent, end })}
+  timePicker
+/>
+<Input
+  type="text"
+  placeholder="Add Title"
+  value={newEvent.title}
+  onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+/>
       <br />
       <br />
       <Button variant="contained" onClick={handleAddEvent}>

@@ -8,7 +8,7 @@
   
   const NavConfig = () => {
     const location = useLocation();
-    const CIN = 1;
+    const CIN = location.pathname.split("/")[2];
     console.log(CIN);
   
     const navConfig = [

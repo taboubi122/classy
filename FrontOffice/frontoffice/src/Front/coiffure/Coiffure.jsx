@@ -8,14 +8,14 @@ import Footer from '../Footer';
 import Navbar from '../Navbar/navbar';
 import img1 from '../../Assets/Photos/10.jpg';
 
-const Coiffure= () =>{
+const Coiffure= ({ isLoggedIn}) =>{
     const location = useLocation();
     const type = location.pathname.split("/")[1];
     const scrollThreshold = "header scroll";
 
     return(
         <>
-        <Navbar change={scrollThreshold} />
+        <Navbar change={scrollThreshold} isLoggedIn={isLoggedIn}/>
         <div className='navBarLinks'/>
         <section className='Coiffeur'  >
             <div className='container'>

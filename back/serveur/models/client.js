@@ -12,7 +12,7 @@ const client = function (client) {
 };
 
 client.getAll = (result) => {
-  sql.query("SELECT * FROM client", (err, res) => {
+  sql.query("SELECT * FROM client where isActive= 1", (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(null, err);
@@ -52,8 +52,8 @@ client.insert = (newclient, result) => {
         });
         };
         
-        client.getByCIN = (CIN, result) => {
-        sql.query("SELECT * FROM client WHERE CIN = ?", CIN, (err, res) => {
+        client.getInfosClient = (email, result) => {
+        sql.query("SELECT * FROM client WHERE email = ?", email, (err, res) => {
         if (err) {
         console.log("error: ", err);
         result(err, null);
@@ -68,7 +68,45 @@ client.insert = (newclient, result) => {
         result({ kind: "not_found" }, null);
         });
         };
+        client.update = ( email, client, result) => {
 
+          sql.query(
+            "UPDATE client SET nom = ?, prenom = ?, tel= ? , photo=? WHERE email = ?",
+            
+            [client.nom, client.prenom,client.tel,client.photo,email],
+            (err, res) => {
+              if (err) {
+                console.log("error: ", err);
+                result(null, err);
+                return;
+              }
+              if (res.affectedRows == 0) {
+                // Not found client with the  CIN
+                result({ kind: "not_found" }, null);
+                return;
+              }
+              console.log("updated client: ", {  email:  email, ...client });
+              result(null, {  email:  email, ...client });
+            }
+          );
+        };       
+        client.getByCIN = (CIN, result) => {
+          sql.query("SELECT * FROM client WHERE CIN = ?", CIN, (err, res) => {
+          if (err) {
+          console.log("error: ", err);
+          result(err, null);
+          return;
+          }
+          if (res.length) {
+          console.log("found client: ", res[0]);
+          result(null, res[0]);
+          return;
+          }
+          // Si le client n'est pas trouvé
+          result({ kind: "not_found" }, null);
+          });
+          };
+  
 
         client.update = (activeCode, client, result) => {
           sql.query(
