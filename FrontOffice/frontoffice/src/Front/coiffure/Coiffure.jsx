@@ -10,7 +10,7 @@ import img1 from '../../Assets/Photos/10.jpg';
 import { useNavigate } from 'react-router-dom';
 
 
-const Coiffure= () =>{
+const Coiffure= ({ isLoggedIn}) =>{
     const location = useLocation();
     const navigate = useNavigate();
     const type = location.pathname.split("/")[1];
@@ -25,7 +25,7 @@ const Coiffure= () =>{
     }
     return(
         <>
-        <Navbar change={scrollThreshold} />
+        <Navbar change={scrollThreshold} isLoggedIn={isLoggedIn}/>
         <div className='navBarLinks'/>
         <section className='Coiffeur'  >
             <div className='container'>

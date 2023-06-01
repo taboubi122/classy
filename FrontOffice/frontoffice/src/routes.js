@@ -8,6 +8,12 @@ import ConfirmationProp from './pages/ConfirmationProp';
 import {useState,React } from 'react';
 // layouts
 //
+import UserPage from './pages/UserPage';
+import ProductsPage from './pages/ProductsPage';
+import DetailsCentre from './pages/DetailsCentre';
+import PersonnelPage from './pages/personnels';
+import PersonnelDetails from './pages/PersonnelDetails';
+import Reservation from './pages/Reservation';
 import Home from './Front/Home';
 import Auth from './Front/Auth';
 import ConfirmUser from './Front/confirmUser';
@@ -19,10 +25,9 @@ import CoiffComponents from './Front/CoiffComponents/CoiffComponents';
 import ReservationPage from './Front/ReservationPage';
 import EnvDemande from './Front/EnvDemande';
 
-// ----------------------------------------------------------------------
-
 export default function Router() {
   const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem('isLoggedIn') === 'true');
+  const [email] = useState(localStorage.getItem('email'));
   const navigate = useNavigate();
 
   const handleLogin = () => {
@@ -53,7 +58,7 @@ export default function Router() {
     },
     {
       path: '/',
-     element: <Home isLoggedIn={isLoggedIn} handleLogout={handleLogout} /> ,index: true ,
+     element: <Home isLoggedIn={isLoggedIn} email={email}/> ,index: true ,
     },
     {
       path: '/auth',
@@ -64,20 +69,20 @@ export default function Router() {
      element: <SignUp/> ,index: true ,
     },
     {
+      path: '/Profil',
+     element: <ProfilClient handleLogout={handleLogout} isLoggedIn={isLoggedIn}/>,index: true ,
+    },
+    {
       path: '/confirm/:activeCode',
      element: <ConfirmUser/>  ,
     },
     {
-      path: '/calendrier',
-     element: <Calendrier/>  ,
-    },
-    {
       path: '/:type',
-     element: <Coiffure/>  ,
+     element: <Coiffure isLoggedIn={isLoggedIn}/>  ,
     },
     {
       path: '/:type/:ville',
-     element: <CoiffComponents/>  ,
+     element: <CoiffComponents isLoggedIn={isLoggedIn}/>  ,
     },
     {
       path: '/demande',
@@ -85,11 +90,15 @@ export default function Router() {
     },
     {
       path: '/:type/:ville/:nom',
-     element: <DetailsCoiff/>  ,
+     element: <DetailsCoiff isLoggedIn={isLoggedIn}/>  ,
     },
     {
       path: '/reservation/:centre/:service',
-     element: <ReservationPage/>  ,
+     element: <ReservationPage isLoggedIn={isLoggedIn}/>  ,
+    },
+    {
+      path: '/reservation/:centre/:service/:ref',
+     element: <ReservationPage isLoggedIn={isLoggedIn}/>  ,
     },
   ]);
 

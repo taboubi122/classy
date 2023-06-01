@@ -1,9 +1,8 @@
 import 'dart:typed_data';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import '../../../constants.dart';
 import '../../../salon.dart';
-import '../../../size_config.dart';
 
 final dio = Dio();
 
@@ -20,7 +19,7 @@ class ProductImages extends StatefulWidget {
 }
 
 class _ProductImagesState extends State<ProductImages> {
-  int selectedImage = 0;
+  int currentIndex = 0;
   List<dynamic> salonImages = [];
 
   @override
@@ -36,6 +35,7 @@ class _ProductImagesState extends State<ProductImages> {
       final items = data
           .map((itemJson) => salon.fromJson(itemJson as Map<String, dynamic>))
           .toList();
+      print(data);
       return items;
     } catch (e) {
       throw Exception('Failed to get items: $e');
@@ -61,70 +61,22 @@ class _ProductImagesState extends State<ProductImages> {
           );
         } else {
           final images = snapshot.data!;
-          return ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
+          return CarouselSlider.builder(
             itemCount: images.length,
-            itemBuilder: (context, index) => Images(
-              images[0],
-              index,
+            itemBuilder: (BuildContext context, int index, int realIndex) {
+              return Container(
+                child: MyImageWidget(imageBytes: images[index].src),
+              );
+            },
+            options: CarouselOptions(
+              enlargeCenterPage: true,
+              aspectRatio: 2.5,
+              enableInfiniteScroll: false,
+              onPageChanged: (index, reason) {},
             ),
-            separatorBuilder: (context, index) => const SizedBox(height: 10),
           );
         }
       },
-    );
-  }
-
-  Widget Images(salon salon, int index) {
-    return Column(
-      children: [
-        SizedBox(
-          width: getProportionateScreenWidth(238),
-          child: AspectRatio(
-            aspectRatio: 1,
-            child: Hero(
-              tag: salon.reference.toString(),
-              child: MyImageWidget(imageBytes: salon.src),
-            ),
-          ),
-        ),
-        SizedBox(height: getProportionateScreenWidth(20)),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ...List.generate(
-              salon.src.length,
-              (index) => buildSmallProductPreview(salon, index),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  GestureDetector buildSmallProductPreview(salon item, int index) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedImage = index;
-        });
-      },
-      child: AnimatedContainer(
-        duration: defaultDuration,
-        margin: EdgeInsets.only(right: 15),
-        padding: EdgeInsets.all(8),
-        height: getProportionateScreenWidth(48),
-        width: getProportionateScreenWidth(48),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: kPrimaryColor.withOpacity(selectedImage == index ? 1 : 0),
-          ),
-        ),
-        child: MyImageWidget(imageBytes: item.src),
-      ),
     );
   }
 }
@@ -136,11 +88,13 @@ class MyImageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return Image.memory(
       imageBytes,
       fit: BoxFit.cover,
       height: 193,
-      width: 140,
+      width: screenWidth,
     );
   }
 }

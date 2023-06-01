@@ -288,21 +288,22 @@ const [nomService,setNomservice] = useState("");
   const Update = async (event) => {
     event.preventDefault();
     try {
-      await axios.put(`http://localhost:5000/api/updatePerso/${selectedPerso.CIN}`,
-       {nom:selectedPerso.nom,
-        prenom:selectedPerso.prenom,
-          email:selectedPerso.email,
-         password:selectedPerso.password,
-          tel:selectedPerso.tel,
-       photo:selectedPerso.photo});
+      await axios.put(`http://localhost:5000/api/updatePerso/${selectedPerso.CIN}`, {
+        nom: selectedPerso.nom,
+        prenom: selectedPerso.prenom,
+        email: selectedPerso.email,
+        password: selectedPerso.password,
+        tel: selectedPerso.tel,
+        photo: selectedPerso.photo
+      });
       console.log("perso Update success");
       setIsOpenPopUpd(false);
-      window.location.reload()
+      window.location.reload();
     } catch (err) {
       console.log(err);
       console.log("perso Update failed");
       setIsOpenPopUpd(false);
-      window.location.reload()
+      window.location.reload();
     }
   };
  
@@ -593,11 +594,16 @@ const onSubmit = (data) => Insert(data.CIN,data.nom,data.prenom,data.tel,data.se
                       <TableRow hover key={row.CIN} tabIndex={-1} role="checkbox" selected={selectedUser}>
                         <TableCell component="th" scope="row" padding="none">
                           <Stack direction="row" alignItems="center" spacing={2}>
+<<<<<<< HEAD
+                          {photo && <img className='ClientPhoto' alt={id} src={`${Buffer.from(row.photo.data)}`}  />}
+                          
+=======
                           <Box component="img" alt="..." src={row.photo && `data:image/png;base64,${Buffer.from(row.photo.data).toString('base64')}`} sx={{ width: 48, height: 48, borderRadius: 1.5, flexShrink: 0 }} />
                           </Stack>
                         </TableCell>
                         <TableCell component="th" scope="row" padding="none">
                           <Stack direction="row" alignItems="center" spacing={2}>                          
+>>>>>>> a0d3df61f0fffe6a22be2f0e0b2ae5c772246f51
                             <Typography variant="subtitle2" noWrap>
                               {nom} {prenom}
                             </Typography>  

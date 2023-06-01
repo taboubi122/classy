@@ -36,8 +36,7 @@ const [PersoCalen, setPersoCalen] = useState([]);
       })
       .catch(error => console.error(error));
   }, [IdSalon]);
-
-
+  console.log(Resv)
   useEffect(()=>{
     axios.get(`http://localhost:5000/api/getAllPersonnels/${IdSalon}`)
     .then(res=>setPersoCalen(res.data)
@@ -70,7 +69,6 @@ const [PersoCalen, setPersoCalen] = useState([]);
       localStorage.setItem("calendarView", calendarView);
     }, [calendarView]);
     
-
     const createEvent = (reservation) => {
       const { nomService, startDateResv, endDateResv, nomPerso, prenomPerso, nom, prenom, titre } = reservation;
       let personnel = '';
@@ -145,6 +143,116 @@ const handleSelectEvent = (event, e) => {
     ${event.personnel ? `<p>Personnel: ${event.personnel}</p>` : ''}
   `;
 
+      console.log('Reservation added');
+      window.location.reload();
+    }
+  
+    const { title, start, end, nom, prenom, nomPerso, prenomPerso } = newEvent;
+    const startTimestamp = Date.parse(start);
+    const endTimestamp = Date.parse(end);
+  
+    const newEventObject = {
+      title,
+      start: new Date(startTimestamp),
+      end: new Date(endTimestamp),
+      nom,
+      prenom,
+      nomPerso,
+      prenomPerso
+    };
+    setAllEvents([...allEvents, newEventObject]);
+    setNewEvent({ title: '', start: new Date(), end: new Date(), nom: '', prenom: '', nomPerso: '', prenomPerso: '' });
+  };
+  
+const handleSelectEvent = (event, e) => {
+  const popoverContent = `
+    <p>Start: ${event.start.toLocaleString()}</p>
+    <p>End: ${event.end.toLocaleString()}</p>
+    ${event.client ? `<p>Client: ${event.client}</p>` : ''}
+    ${event.personnel ? `<p>Personnel: ${event.personnel}</p>` : ''}
+  `;
+
+const handleAddEvent = () => {
+  const { title, start, end ,nom,prenom,nomPerso,prenomPerso} = newEvent;
+  const startTimestamp = Date.parse(start);
+  const endTimestamp = Date.parse(end);
+
+  const newEventObject = { title, start: new Date(startTimestamp), end: new Date(endTimestamp),nom,prenom,nomPerso,prenomPerso};
+  setAllEvents([...allEvents, newEventObject]);
+  setNewEvent({ title: '', start: new Date(), end: new Date(),nom:"",prenom:"",nomPerso:"",prenomPerso:"" });
+};
+    function testDate(d){
+      const dateObject = new Date();
+      const day = dateObject.getDate();
+      const month = dateObject.getMonth() + 1;
+      const year = dateObject.getFullYear();
+      const formattedDate = `${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}/${year}`;
+      let duree = "";
+      const [hours, minutes] = d.split(":");
+      const date = new Date();
+      date.setHours(parseInt(hours, 10));
+      date.setMinutes(parseInt(minutes, 10));
+        duree = `${hours} : ${minutes} `;
+        const [x, t] = duree.split(',')
+        const trimmedTime = x.trim();
+        const [m, dd, y] = trimmedTime.split('/');
+        const formattedDate2 = `${m.padStart(2, '0')}/${dd.padStart(2, '0')}/${y}`;
+      if(formattedDate2===formattedDate){
+        return true
+      }
+      return false
+    }
+  const handleSelectEvent = (event, e) => {
+      const v=testDate(event.start.toLocaleString());
+      if(v){
+      const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+          confirmButton: 'btn btn-success'
+        },
+        buttonsStyling: false
+      , });
+      swalWithBootstrapButtons
+        .fire({
+          title: event.title
+          , text: `
+          Personnel ${event.personnel.length===null?'Sans':event.personnel}
+          De ${currentTime(event.start.toLocaleString())}
+          Jusqu'à ${currentTime(event.end.toLocaleString())}
+          Avec ${event.client}
+        `
+          , showCancelButton: false
+          , confirmButtonText: "Service terminé"
+          , reverseButtons: true
+        , })
+        .then((result) => {
+          if (result.isConfirmed) {
+            axios
+              .post(`http://localhost:5000/api/confirmerPresence/${event.refClient}/${event.centre}`)
+              axios
+              .put(`http://localhost:5000/api/updateResv/${event.ref}`)
+              window.location.reload();
+            swalWithBootstrapButtons.fire(
+              "Service terminé"
+              , "success"
+            );
+          }
+        });
+      }else{
+        const popover = new bootstrap.Popover(e.target, {
+          title: event.title,
+          content: `
+          <h5> Personnel :${event.personnel.length===null?'Sans':event.personnel}</h5>
+          <p>De ${currentTime(event.start.toLocaleString())}</p>
+          <p>Jusqu'à ${currentTime(event.end.toLocaleString())}</p>
+          <p>Avec ${event.client}</p>
+          `,
+          trigger: "hover",
+          placement: "auto",
+          html: true,
+          customClass: "popoverStyle",
+      });
+      popover.show();
+      }
   const popover = new bootstrap.Popover(e.target, {
     title: event.title,
     content: popoverContent,
@@ -201,7 +309,47 @@ return {
       Calendrier
     </Typography>
   )}
-</Stack>
+  {isOpenPopAdd ? null : (
+    <Button
+      variant="contained"
+      startIcon={<Iconify icon="eva:plus-fill" />}
+      onClick={togglePopup}
+    >
+      New Event
+    </Button>
+  )}
+  {isOpenPopAdd && (
+    <div className="popupEvent">
+      <Button variant="contained" onClick={togglePopup}>
+        X
+      </Button>
+      <h2>Ajouter un event</h2>
+      <DateTimePicker
+  placeholder="Select Start Date"
+  value={newEvent.start}
+  onChange={(start) => setNewEvent({ ...newEvent, start })}
+  timePicker
+/>
+<DateTimePicker
+  placeholder="Select End Date"
+  value={newEvent.end}
+  onChange={(end) => setNewEvent({ ...newEvent, end })}
+  timePicker
+/>
+<Input
+  type="text"
+  placeholder="Add Title"
+  value={newEvent.title}
+  onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+/>
+      <br />
+      <br />
+      <Button variant="contained" onClick={handleAddEvent}>
+        Ajouter
+      </Button>
+    </div>
+  )}
+  </Stack>
            <Card>
             <Calendar
                     localizer={localizer}
@@ -224,6 +372,8 @@ return {
 
           </Card>
       </Container>
-    </>
-  );
-}
+  </>
+  )}
+
+
+    

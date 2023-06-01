@@ -1,23 +1,24 @@
-import React, {useState, useEffect} from "react";
+import { useState } from 'react';
 // @mui
 import { alpha } from '@mui/material/styles';
 import { Box, Divider, Typography, Stack, MenuItem, Avatar, IconButton, Popover } from '@mui/material';
 // mocks_
-import account from '../../../_mock/account';
-import { useParams } from "react-router-dom";
-import axios from "axios";
+import img from '../../../Assets/logo2.png';
+import Swal from 'sweetalert2';
+import { Buffer } from 'buffer';
+
 // ----------------------------------------------------------------------
 
 const MENU_OPTIONS = [
   {
     label: 'Profile',
     icon: 'eva:person-fill',
-  }
+    path: '/profil',
+  },
 ];
-
 // ----------------------------------------------------------------------
 
-export default function AccountPopover() {
+export default function AccountPop({handleLogout,nom,prenom,email,photo}) {
   const [open, setOpen] = useState(null);
 
   const handleOpen = (event) => {
@@ -27,15 +28,44 @@ export default function AccountPopover() {
   const handleClose = () => {
     setOpen(null);
   };
-  const params = useParams();
-  const idProp = params.id;
-  const [user, setUser] = useState([]);
-  useEffect(() => {
-    axios
-      .get(`http://localhost:5000/api/getCentreById/${idProp}`)
-      .then((res) => setUser(res.data));
-  }, []);
-  console.log(user)
+  function Deconnecter()
+  {   
+       const swalWithBootstrapButtons = Swal.mixin({
+           customClass: {
+             confirmButton: 'btn btn-success',
+             cancelButton: 'btn btn-danger'
+           },
+           buttonsStyling: false
+         })
+         swalWithBootstrapButtons.fire({
+           title: 'Êtes-vous sûr?',
+           text: "Vous ne pourrez pas revenir en arrière!",
+           icon: 'warning',
+           showCancelButton: true,
+           confirmButtonText: 'Oui, Deconnecter!',
+           cancelButtonText: 'Non, annuler!',
+           reverseButtons: true
+         }).then((result) => {
+           if (result.isConfirmed) {
+            handleLogout();
+             swalWithBootstrapButtons.fire(
+               'Deconnecter!',
+               'success'
+             )
+            window.location.reload()
+           } else if (
+             result.dismiss === Swal.DismissReason.cancel
+           ) {
+             swalWithBootstrapButtons.fire(
+               'Annulé',
+               'Vous rester connecter :)',
+               'erreur'
+             )
+           }
+         })
+         
+       
+  }
   return (
     <>
       <IconButton
@@ -55,7 +85,11 @@ export default function AccountPopover() {
           }),
         }}
       >
-        <Avatar src={account.photoURL} alt="photoURL" />
+        {photo!==null ?(
+     <Avatar >    <img className="shadow" alt={1} src={`${Buffer.from(photo.data)}`}  />
+
+  </Avatar> ):
+  (<Avatar><img src={img} alt="1"/></Avatar>)}
       </IconButton>
 
       <Popover
@@ -79,14 +113,10 @@ export default function AccountPopover() {
       >
         <Box sx={{ my: 1.5, px: 2.5 }}>
           <Typography variant="subtitle2" noWrap>
-<<<<<<< HEAD
-centre
+            {nom} {prenom}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-          email
-=======
-            {user[0].nom}
->>>>>>> a0d3df61f0fffe6a22be2f0e0b2ae5c772246f51
+            {email}
           </Typography>
         </Box>
 
@@ -94,16 +124,16 @@ centre
 
         <Stack sx={{ p: 1 }}>
           {MENU_OPTIONS.map((option) => (
-            <MenuItem key={option.label} onClick={handleClose}>
-              {option.label}
-            </MenuItem>
+          <MenuItem key={option.label} onClick={handleClose}>
+          <a href={option.path} style={{ color: 'black' }}>{option.label}</a>
+        </MenuItem>
           ))}
         </Stack>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
-        <MenuItem onClick={handleClose} sx={{ m: 1 }}>
-          Logout
+        <MenuItem onClick={Deconnecter} sx={{ m: 1 }}>
+           Se déconnecter
         </MenuItem>
       </Popover>
     </>

@@ -30,17 +30,12 @@ class DetailsScreen extends StatelessWidget {
     }
 
     return Scaffold(
-        backgroundColor: Color(0xFFF5F6F9),
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(AppBar().preferredSize.height),
-          child: CustomAppBar(rating: 4),
-        ),
-        body: Body(reference: args.reference));
+        body: Body(reference: args.reference, nomCentre: args.nomCentre));
   }
 }
 
 class salonDetailsArguments {
   final int reference;
-
-  salonDetailsArguments({required this.reference});
+  final String nomCentre;
+  salonDetailsArguments({required this.reference, required this.nomCentre});
 }

@@ -27,6 +27,7 @@ const signIn = async (e) => {
       Navigate('/dashboard/app');
     } else if (type === 'client') {
       localStorage.setItem('isLoggedIn', true);
+      localStorage.setItem('email', email);
       setIsLoggedIn(true);
       Navigate('/'); 
     }
@@ -42,11 +43,10 @@ useEffect(() => {
       .then(res => setUser(res.data));
   }
 }, [email]);
-
 const scrollThreshold = "header scroll";
     return(
         <>
-         <Navbar change={scrollThreshold} />
+         <Navbar change={scrollThreshold}  />
         <div className='navBarLinks'/>
         <div><br/><p/><br/></div>
         <section className='Auth'  >
@@ -55,6 +55,7 @@ const scrollThreshold = "header scroll";
                 <img className="span-3 image-grid-row-2" alt="1" src={img1}/>
                    
                 <div>
+               
         <h2> Vous avez déja utilisé Classy ?</h2>
         {user.map((row)=>
           <h2>{row.nom}</h2>

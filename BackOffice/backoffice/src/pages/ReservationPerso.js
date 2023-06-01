@@ -30,12 +30,12 @@ const localizer = momentLocalizer(moment);
 const [Resv, setResv] = useState([]);
 const [PersoCalen, setPersoCalen] = useState([]);
     const location = useLocation();
-  const IdSalon= location.pathname.split("/")[2];
-  console.log(`${IdSalon}`);
+  const CINPerso= location.pathname.split("/")[2];
+  console.log(`${CINPerso}`);
 
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/getReservation/${IdSalon}`)
+    axios.get(`http://localhost:5000/api/getResvPerso/${CINPerso}`)
       .then(res => {
         const formattedData = res.data.map((reservation) => ({
           ...reservation,
@@ -45,16 +45,12 @@ const [PersoCalen, setPersoCalen] = useState([]);
         setResv(formattedData);
       })
       .catch(error => console.error(error));
-  }, [IdSalon]);
+  }, [CINPerso]);
+  
 
 
 
 
-  useEffect(()=>{
-    axios.get(`http://localhost:5000/api/getAllPersonnels/${IdSalon}`)
-    .then(res=>setPersoCalen(res.data)
-    );
-     },[]);
     
      const showCalendar=(CIN)=>{
       console.log(CIN)
@@ -215,19 +211,6 @@ return {
 </Stack>
 
            <Card>
-    
-<RadioGroup aria-label="sexe" name="personnels" style={{ display: 'flex', flexDirection: 'row' }}>
-  {PersoCalen.map((row) => (
-    <FormControlLabel
-      key={row.nom}
-      value={row.nom}
-      control={<Radio />}
-      label={row.nom}
-      selected={calendarView === row.CIN}
-      onChange={() => showCalendar(row.CIN)}
-    />
-  ))}
-</RadioGroup>
 
 
 

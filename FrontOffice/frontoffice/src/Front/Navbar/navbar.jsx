@@ -1,14 +1,35 @@
-import React,{useState}from 'react';
+import React,{useState,useEffect}from 'react';
 import './navbar.css';
 import {GrFormClose} from "react-icons/gr";
-import{TbGridDots} from "react-icons/tb";
-import Swal from 'sweetalert2';
-import NotificationsPopover from '../../layouts/dashboard/header/NotificationsPopover';
+import{TbGridDots, TbSpace} from "react-icons/tb";
+import axios from 'axios';
 
-const Navbar = ({ isLoggedIn, handleLogout, change }) => {
+import NotificationsPopover from '../../layouts/dashboard/header/NotificationsPopover';
+import AccountPop from '../../layouts/dashboard/header/AccountPop';
+
+
+const Navbar = ({ isLoggedIn, handleLogout, change}) => {
+  
   const [active, setActive] = useState('navBar');
   const [scroll, setScroll] = useState(false);
-  // function pour montrer la navbar
+  const [email, setEmail] = useState('');
+  const [client, setClient] = useState([]);
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    setEmail(localStorage.getItem('email'));
+  }, []);
+
+
+  useEffect(() => {
+    axios.get(`http://localhost:5000/api/getInfosClient/${email}`)
+      .then(res => {
+        setClient(res.data);
+        console.log(res.data);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  }, [email]);
   const showNav = () => {
     setActive('navBar activeNavbar');
   };
@@ -16,7 +37,6 @@ const Navbar = ({ isLoggedIn, handleLogout, change }) => {
   const barbier="barbier";
   const institut="institut";
   const manucure="manucure";
-  // function pour supprimer la navbar
   const removeNav = () => {
     setActive('navBar');
   };
@@ -30,44 +50,6 @@ const Navbar = ({ isLoggedIn, handleLogout, change }) => {
     }
   };
   
-  function Deconnecter()
-{   
-     const swalWithBootstrapButtons = Swal.mixin({
-         customClass: {
-           confirmButton: 'btn btn-success',
-           cancelButton: 'btn btn-danger'
-         },
-         buttonsStyling: false
-       })
-       swalWithBootstrapButtons.fire({
-         title: 'Êtes-vous sûr?',
-         text: "Vous ne pourrez pas revenir en arrière!",
-         icon: 'warning',
-         showCancelButton: true,
-         confirmButtonText: 'Oui, Deconnecter!',
-         cancelButtonText: 'Non, annuler!',
-         reverseButtons: true
-       }).then((result) => {
-         if (result.isConfirmed) {
-          handleLogout();
-           swalWithBootstrapButtons.fire(
-             'Deconnecter!',
-             'success'
-           )
-          window.location.reload()
-         } else if (
-           result.dismiss === Swal.DismissReason.cancel
-         ) {
-           swalWithBootstrapButtons.fire(
-             'Annulé',
-             'Vous rester connecter :)',
-             'erreur'
-           )
-         }
-       })
-       
-     
-}
   window.addEventListener('scroll', changeBackground);
 
 const navbarClass = scroll ? 'header scroll' :change ;
@@ -107,14 +89,21 @@ const navbarClass = scroll ? 'header scroll' :change ;
               </a>
             </li>
              {isLoggedIn ? (
-               <NotificationsPopover />
+              <>
+               
+                  </>
             ) : (
               <button className="btn1">
               <a href="/demande">Ajouter votre salon</a>
             </button>
             )}
             {isLoggedIn ? (
-              <button className="btnDeco" onClick={Deconnecter}>Se Deconnecter</button>
+               <> 
+               <NotificationsPopover />
+               {client.map((donne)=>    
+               <AccountPop nom={donne.nom} prenom={donne.prenom} email={donne.email} photo={donne.photo}  handleLogout={handleLogout}/>
+                       )} 
+                 </>
             ) : (
               <button className="btn">
                 <a href="/auth">Se connecter</a>

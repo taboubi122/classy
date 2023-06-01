@@ -128,7 +128,8 @@ class seeMoreCentre extends StatelessWidget {
                                 context,
                                 DetailsScreen.routeName,
                                 arguments: salonDetailsArguments(
-                                    reference: salons[index].reference),
+                                    reference: salons[index].reference,
+                                    nomCentre: salons[index].nom),
                               );
                             },
                           ),
