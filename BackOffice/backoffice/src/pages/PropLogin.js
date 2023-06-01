@@ -3,7 +3,7 @@ import { MDBBtn, MDBContainer, MDBCard, MDBCardBody, MDBCardImage, MDBRow, MDBCo
 import React, { useState, useEffect } from "react";
 import TextField from '@mui/material/TextField';
 import axios from "axios";
-import img from '../Assets/PropLogin.png';
+import img from '../Assets/PersoLogin.png';
 import { useNavigate } from 'react-router-dom';
 import { black } from "material-ui/styles/colors";
 import TopNavbarVide from "./Home/components/Nav/TopNavbarVide";
@@ -152,7 +152,7 @@ import TopNavbarVide from "./Home/components/Nav/TopNavbarVide";
             </MDBRow>
           </MDBCard>
         </MDBCol>
-      </MDBRow><br/>
+      </MDBRow><br/><br/>
     </MDBContainer>
     </div>
     </>

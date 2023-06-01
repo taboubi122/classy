@@ -10,8 +10,9 @@ const stripe = ()=> {
     return(
         <>        
         <Container>
-            <h1>Paymenet</h1>
-            <Elements stripe={stripeTestPromise}>
+            <br/><br/><br/>
+            <h2>Pour ouvrir une nouvelle espace pour votre centre, il faut payer l'espace du centre.</h2> <br/>
+            <Elements  options={{ locale: 'fr' }} stripe={stripeTestPromise}>
                 <Checkoutform />
             </Elements>
        </Container>

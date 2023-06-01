@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import axios from 'axios';
 import {useState, useEffect, React} from 'react';
 import { Buffer } from 'buffer';
-import { faker } from '@faker-js/faker';
+import Swal from "sweetalert2";
 import { Calendar, momentLocalizer  } from 'react-big-calendar';
 import moment from 'moment';
 import "react-big-calendar/lib/css/react-big-calendar.css"
@@ -83,6 +83,7 @@ export default function DashboardPerso() {
     const idCentre= location.pathname.split("/")[2];
 
     const [services, setServices] = useState([]);
+    const [client, setClient] = useState([]);
     useEffect(()=>{
       axios.get(`http://localhost:5000/api/getTachePerso/${idCentre}`)
       .then(res=>setTachePerso(res.data)
@@ -93,6 +94,11 @@ export default function DashboardPerso() {
           .get("http://localhost:5000/api/getAllServices")
           .then((res) => setServices(res.data));
       }, []);
+      useEffect(()=>{
+        axios.get(`http://localhost:5000/api/getClient`)
+        .then(res=>setClient(res.data)
+        );
+         },[]);
        useEffect(()=>{
           axios.get(`http://localhost:5000/api/getOnepersonnel/${idCentre}`)
           .then(res=>setSelectedPerso(res.data)
@@ -121,7 +127,11 @@ export default function DashboardPerso() {
             return {
               title: services.filter((ele)=>ele.reference===reservation.refService)[0].nomService,
               start: reservation.startDateResv,
+              refClient:reservation.CINClient,
+              client:client.filter((ele)=>ele.CIN===reservation.CINClient)[0].nom+" "+ client.filter((ele)=>ele.CIN===reservation.CINClient)[0].prenom,
               end: reservation.endDateResv,
+              centre:reservation.refCentre,
+              ref:reservation.reference,
               allDay: false,
             };
           }
@@ -130,14 +140,80 @@ export default function DashboardPerso() {
          
           const events = Resv.map((reservation) => createEvent(reservation));
          console.log(events)
-  
+         function currentTime(d) {
+          let duree = "";
+          const [hours, minutes] = d.split(":");
+          const date = new Date();
+          date.setHours(parseInt(hours, 10));
+          date.setMinutes(parseInt(minutes, 10));
+            duree = `${hours} : ${minutes} `;
+            const [x, t] = duree.split(',')
+            const trimmedTime = t.trim();
+          return trimmedTime;
+         }
+         function testDate(d){
+          const dateObject = new Date();
+          const day = dateObject.getDate();
+          const month = dateObject.getMonth() + 1;
+          const year = dateObject.getFullYear();
+          const formattedDate = `${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}/${year}`;
+          let duree = "";
+          const [hours, minutes] = d.split(":");
+          const date = new Date();
+          date.setHours(parseInt(hours, 10));
+          date.setMinutes(parseInt(minutes, 10));
+            duree = `${hours} : ${minutes} `;
+            const [x, t] = duree.split(',')
+            const trimmedTime = x.trim();
+            const [m, dd, y] = trimmedTime.split('/');
+            const formattedDate2 = `${m.padStart(2, '0')}/${dd.padStart(2, '0')}/${y}`;
+          if(formattedDate2===formattedDate){
+            return true
+          }
+          return false
+         }
           const [allEvents,setAllEvents]=useState(events)
-          const handleSelectEvent = (event, e) => {
-            const popover = new bootstrap.Popover(e.target, {
+          const handleSelectClick = (event,e)=>{
+            const v=testDate(event.start.toLocaleString());
+            if(v){
+            const swalWithBootstrapButtons = Swal.mixin({
+              customClass: {
+                confirmButton: 'btn btn-success'
+              },
+              buttonsStyling: false
+            , });
+            swalWithBootstrapButtons
+              .fire({
+                title: event.title
+                , text: `
+                De ${currentTime(event.start.toLocaleString())}
+                Jusqu'à ${currentTime(event.end.toLocaleString())}
+                Avec ${event.client}
+              `
+                , showCancelButton: false
+                , confirmButtonText: "Service terminé"
+                , reverseButtons: true
+              , })
+              .then((result) => {
+                if (result.isConfirmed) {
+                  axios
+                    .post(`http://localhost:5000/api/confirmerPresence/${event.refClient}/${event.centre}`)
+                    axios
+                    .put(`http://localhost:5000/api/updateResv/${event.ref}`)
+                    window.location.reload();
+                  swalWithBootstrapButtons.fire(
+                    "Service terminé"
+                    , "success"
+                  );
+                 
+                }
+              });
+            }else{
+              const popover = new bootstrap.Popover(e.target, {
                 title: event.title,
-                content: `
-                  <p>Start: ${event.start.toLocaleString()}</p>
-                  <p>End: ${event.end.toLocaleString()}</p>
+                content: `<p>De ${currentTime(event.start.toLocaleString())}</p>
+                <p>Jusqu'à ${currentTime(event.end.toLocaleString())}</p>
+                <p>Avec ${event.client}</p>
                 `,
                 trigger: "hover",
                 placement: "auto",
@@ -145,7 +221,8 @@ export default function DashboardPerso() {
                 customClass: "popoverStyle",
             });
             popover.show();
-          };
+            }
+        }
   
           const eventStyleGetter = (event, start, end, isSelected) => {
             let backgroundColor = '';
@@ -169,18 +246,6 @@ export default function DashboardPerso() {
               style,
             };
             };
-      const deletePersoTache = async (event,row) => {
-        console.log(row);
-            try {
-              await axios.get(`http://localhost:5000/api/deletePersoTache/${idCentre}`,{fonction,nomService});
-              console.log("tacheperso Registration success");
-             
-              window.location.reload()
-            } catch (err) {
-              console.log(err);
-              console.log("tacheperso Registration failed");
-            }
-          };
           const testDel=(row)=>{
             console.log(`rowwww${row}`);
           }
@@ -204,7 +269,7 @@ export default function DashboardPerso() {
            <Stack >
               <Calendar localizer={localizer} events={events} 
                 startAccessor="start" endAccessor="end" style={{height :500,margin:"50px"}}
-                onSelectEvent={handleSelectEvent}
+                onSelectEvent={handleSelectClick}
                 eventPropGetter={eventStyleGetter}
                 messages={{
                   today: 'Aujourd\'hui',

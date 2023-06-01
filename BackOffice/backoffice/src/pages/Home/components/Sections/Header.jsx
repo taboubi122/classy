@@ -15,8 +15,8 @@ export default function Header() {
           CLASSY c'est la plateforme N°1 de la réservation 
           de beauté en Tunisie.
           </HeaderP>
-          <BtnWrapper>
-            <FullButton title="Se connecter" />
+          <BtnWrapper><a href='/'>
+            <FullButton title="Accueil" /></a>
           </BtnWrapper>
         </div>
       </LeftSide>

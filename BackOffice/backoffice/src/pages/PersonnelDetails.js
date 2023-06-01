@@ -100,7 +100,7 @@ const classes = useStyles();
         const localizer = momentLocalizer(moment);
         const [Resv, setResv] = useState([]);
          useEffect(() => {
-          axios.get(`http://localhost:5000/api/getResvPerso/${CINPerso}/${idCentre}`)
+          axios.get(`http://localhost:5000/api/getResvPerso/${CINPerso}`)
             .then(res => {
               const formattedData = res.data.map((reservation) => ({
                 ...reservation,
@@ -185,7 +185,7 @@ const classes = useStyles();
           type: `order${index + 1}`,
           time: row.nomService,
         }));
-        
+        console.log(selectedPerso)
     return (
       <>
         <Helmet>

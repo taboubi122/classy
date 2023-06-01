@@ -44,7 +44,6 @@ const TABLE_HEAD = [
   { id: 'password', label: 'Password', alignRight: false },
   { id: 'sexe', label: 'Sexe', alignRight: false },
   {id:'valide'},
-  { id: '' },
 ];
 
   
@@ -109,7 +108,6 @@ export default function UserPage() {
              if (result.isConfirmed) {
               window.location.reload()
               axios.delete(`http://localhost:5000/api/deleteClient/${CIN}`)
-              .then(res => setCIN(res.data));
                swalWithBootstrapButtons.fire(
                  'Supprimé!',
                  'Votre client a été supprimé.',
@@ -260,15 +258,13 @@ export default function UserPage() {
 
                         <TableCell align="left">{email}</TableCell>
 
-                        <TableCell align="left">{password}</TableCell>
-
                         <TableCell align="left">
                           <Label>{sexe}</Label>
                         </TableCell>
 
-                        <TableCell align="right">
+                        <TableCell align="centre">
                           
-                          <IconButton size="large" sx={{ color: 'error.main' }} onClick={() => onDelete(CIN)}>
+                          <IconButton align="centre" size="large" sx={{ color: 'error.main' }} onClick={() => onDelete(CIN)}>
                             <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
                       
                           </IconButton>

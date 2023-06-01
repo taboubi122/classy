@@ -8,6 +8,8 @@ import { useLocation } from "react-router-dom";
 import { ImGift } from "react-icons/im";
 import { GoCalendar } from "react-icons/go";
 
+import { AiFillStar } from "react-icons/ai";
+
 const NavConfig = () => {
   const location = useLocation();
   const IdSalon = location.pathname.split("/")[2];
@@ -48,6 +50,11 @@ const NavConfig = () => {
       title: "Horaires de travail",
       path: `/dashboardCentre/${IdSalon}/horaires`,
       icon: <MdAccessTime/>,
+    },
+    {
+      title: "Avis Client",
+      path: `/dashboardCentre/${IdSalon}/comm`,
+      icon: <AiFillStar/>,
     },
   
     {

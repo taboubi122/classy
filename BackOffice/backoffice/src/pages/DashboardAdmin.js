@@ -86,10 +86,21 @@ function getCentreRes() {
        x.push({ label: row.nom, value: reservation.filter((ele) => ele.refCentre === row.reference).length });
     });
     const chart = x.sort((a, b) => a.value - b.value);
+    if(chart.length===0){
+        return result
+    }
+    if(chart.length===1){
+        return [{label:'',value:0}, {label:'',value:0}, {label:'',value:0}, chart[0]]
+    }
+    if(chart.length===2){
+        return [{label:'',value:0}, {label:'',value:0}, chart[1], chart[0]]
+    }
+    if(chart.length===3){
+        return [ {label:'',value:0},chart[2], chart[1], chart[0]]
+    }
     const res = [chart[chart.length - 1], chart[chart.length - 2], chart[chart.length - 3], chart[chart.length - 4]];
       return res;
   }
-  const a=getCentreRes()
   function generateWeekDates() {
     const startDate = moment().startOf('week');
     const weekDates = [];
@@ -105,13 +116,13 @@ function getCentreRes() {
   function getData (id){
     const d=generateWeekDates()
     const res=[]
-    res[0]=reservation.filter((ele) => ele.dateResv.substring(0, 10) === d[0] && ele.refService===id).length 
-    res[1]=reservation.filter((ele) => ele.dateResv.substring(0, 10) === d[1] && ele.refService===id).length 
-    res[2]=reservation.filter((ele) => ele.dateResv.substring(0, 10) === d[2] && ele.refService===id).length 
-    res[3]=reservation.filter((ele) => ele.dateResv.substring(0, 10) === d[3] && ele.refService===id).length 
-    res[4]=reservation.filter((ele) => ele.dateResv.substring(0, 10) === d[4] && ele.refService===id).length 
-    res[5]=reservation.filter((ele) => ele.dateResv.substring(0, 10) === d[5] && ele.refService===id).length 
-    res[6]=reservation.filter((ele) => ele.dateResv.substring(0, 10) === d[6] && ele.refService===id).length 
+    res[0]=reservation.filter((ele) => ele.startDateResv.substring(0, 10) === d[0] && ele.refService===id).length 
+    res[1]=reservation.filter((ele) => ele.startDateResv.substring(0, 10) === d[1] && ele.refService===id).length 
+    res[2]=reservation.filter((ele) => ele.startDateResv.substring(0, 10) === d[2] && ele.refService===id).length 
+    res[3]=reservation.filter((ele) => ele.startDateResv.substring(0, 10) === d[3] && ele.refService===id).length 
+    res[4]=reservation.filter((ele) => ele.startDateResv.substring(0, 10) === d[4] && ele.refService===id).length 
+    res[5]=reservation.filter((ele) => ele.startDateResv.substring(0, 10) === d[5] && ele.refService===id).length 
+    res[6]=reservation.filter((ele) => ele.startDateResv.substring(0, 10) === d[6] && ele.refService===id).length 
    return res
   }
 
@@ -164,6 +175,18 @@ function getCentreRes() {
        x.push({ label: row.nom, value: avis.filter((ele) => ele.refCentre === row.reference && ele.note===5).length });
     });
     const chart = x.sort((a, b) => a.value - b.value);
+    if(chart.length===0){
+        return result
+    }
+    if(chart.length===1){
+        return [{label:'',value:0}, {label:'',value:0}, {label:'',value:0}, chart[0]]
+    }
+    if(chart.length===2){
+        return [{label:'',value:0}, {label:'',value:0}, chart[1], chart[0]]
+    }
+    if(chart.length===3){
+        return [ {label:'',value:0},chart[2], chart[1], chart[0]]
+    }
     const res = [chart[chart.length - 1], chart[chart.length - 2], chart[chart.length - 3], chart[chart.length - 4]];
       return res;
   }

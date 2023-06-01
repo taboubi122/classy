@@ -437,7 +437,7 @@ export default function CategoriesPage() {
                   {filteredUsers
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((row, index) => {
-                      const { reference, nomCateg, description } = row;
+                      const { reference, nomCateg, descriptionCateg } = row;
                       const selectedUser = selected.indexOf(nom) !== -1;
 
                       return (
@@ -463,7 +463,7 @@ export default function CategoriesPage() {
                               </Typography>
                             </Stack>
                           </TableCell>
-                          <TableCell align="left"> {description} </TableCell>
+                          <TableCell align="left"> {descriptionCateg} </TableCell>
                           <TableCell align="right">
                             <IconButton
                               size="large"

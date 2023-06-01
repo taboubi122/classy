@@ -6,7 +6,7 @@ import { Buffer } from 'buffer';
 import { Container, Typography,Grid } from '@mui/material';
 // components
 // sections
-import { AppNewsUpdate} from '../sections/@dashboard/app';
+import AppNewsUpdateCopy from '../sections/@dashboard/app/AppNewsUpdateCopy';
 // ----------------------------------------------------------------------
 
 export default function ProductsPage() {
@@ -40,7 +40,7 @@ export default function ProductsPage() {
         </Typography>
 
         <Grid item xs={12} md={6} lg={8}>
-            <AppNewsUpdate list={newsList} />
+            <AppNewsUpdateCopy list={newsList} />
          </Grid>
 
 
