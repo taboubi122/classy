@@ -4,6 +4,7 @@ import { useNavigate ,useLocation} from "react-router-dom";
 import {CiLocationOn,CiStar} from 'react-icons/ci';
 import {
     Card,
+    Container,
     FormControl,
     FormControlLabel,
     FormLabel,Radio,RadioGroup
@@ -22,6 +23,8 @@ const [Perso, setPerso] = useState([]);
 const [name,setName]=useState([]);
 const [adresse,setAdresse]=useState([]);
 const [selectedPerso, setSelectedPerso] = useState('');
+const [avis,setAvis]=useState([]);
+
 
 const handlePersoChange = (event) => {
     setSelectedPerso(event.target.value);
@@ -46,7 +49,7 @@ useEffect(() => {
       console.error("Error fetching data:", error);
     });
   }, []);
-  
+  console.log(Perso)
 useEffect(()=>{
     axios.get(`http://localhost:5000/api/getAdresse/${nomSalon}`)
     .then(res=>setAdresse(res.data)
@@ -59,7 +62,13 @@ useEffect(()=>{
         );
         
          },[]);
-         
+         useEffect(() => {
+    
+          axios.get(`http://localhost:5000/api/getAvisCentre/${nomSalon}`)
+            .then(res => {
+              setAvis(res.data);
+            });
+      }, []);
 
          const Insert = async (dateTime) => {
             try {
@@ -75,14 +84,40 @@ useEffect(()=>{
             console.log(dateTime)
           Insert(dateTime);
           };
+          function currentTime(d) {
+            let duree = "";
+            const [hours, minutes] = d.split(":");
+            const date = new Date();
+            date.setHours(parseInt(hours, 10));
+            date.setMinutes(parseInt(minutes, 10));
+            if (hours === "00") {
+              duree = `${minutes} min`;
+            } else if (minutes === "00") {
+              duree = `${hours} h`;
+            } else {
+              duree = `${hours} h ${minutes} min`;
+            }
+            return duree;
+          }
+          function getAvis() {
+            if(avis.length===0){
+              return 0
+            }
+            var s=0
+            for(let i=0 ;i<avis.length;i++){
+              s=s+avis[i].note
+            }
+            s=s/avis.length
+            return s.toFixed(1)
+          }
           
 const scrollThreshold = "header scroll";
     return(
         <>
          <Navbar change={scrollThreshold} />
         <div className='navBarLinks'/>
-        <div><br/><p/><br/></div>
-        <section className='reservationPage'  >
+        <div style={{backgroundColor:"#F1F1F1"}} ><br/><p/><br/></div>
+        <section className='reservationPage' style={{backgroundColor:"#F1F1F1"}} >
             <div className='container'>
                   {name.map((donne) => (
                       <div key={donne.reference}>
@@ -96,39 +131,40 @@ const scrollThreshold = "header scroll";
                       </div>
                    ))}
                    <span className='h4'>
-                    <CiStar className='iconStar' /> 4.5 (185 avis)
+                    <CiStar className='iconStar' /> {getAvis()} ({avis.length} avis)
                    </span>
                    <h3>1.Prestation sélectionnée</h3>
                    <Card>
+                    <Container style={{paddingTop:"20px", paddingBottom:"20px"}}>
                    {service}
                    <br/>
                    {services.map((donne) => (
                       <div key={donne.reference}>
-                           <h5>{donne.duree}</h5>
-                           <h5>{donne.prix}D</h5>
+                           <h5>{currentTime(donne.duree)}</h5>
+                           <h5>{donne.prix} Dinar</h5>
                            </div>
                    ))}
                    <br/>
                    Avec qui ? 
                    <RadioGroup
-  aria-label="personnel"
-  name="personnel"
-  variant="outlined"
-  value={selectedPerso}
-  onChange={handlePersoChange}
->
-  <FormControlLabel value="Sans preferance" control={<Radio />} label="Sans preferance" />
+                      aria-label="personnel"
+                      name="personnel"
+                      variant="outlined"
+                      value={selectedPerso}
+                      onChange={handlePersoChange}
+                    >
+                    <FormControlLabel value="Sans preferance" control={<Radio />} label="Sans preferance" />
 
-  {Perso.map((donne) => (
-    <FormControlLabel
-      key={donne.CIN}
-      value={donne.CIN}
-      control={<Radio />}
-      label={donne.persoName}
-    />
-  ))}
-</RadioGroup>
-
+                    {Perso.map((donne) => (
+                      <FormControlLabel
+                        key={donne.CIN}
+                        value={donne.CIN}
+                        control={<Radio />}
+                        label={donne.persoName}
+                      />
+                    ))}
+                  </RadioGroup>
+                  </Container>
                    </Card>
                    <div><br/><p/><br/></div>
                    <h3>2.Choix de la date & heure</h3>

@@ -6,19 +6,22 @@ import { MdRemoveCircleOutline, MdLocationOn, MdAddCircleOutline } from 'react-i
 
 mapboxgl.accessToken = "pk.eyJ1IjoieW9zcmNoYXJlayIsImEiOiJjbGhtbm4wdmYwMGp4M2VwZWo1Mmd4aGUzIn0.MnRTZw6VNhrxhqX7pjJ7sQ";
 
-function Maps({ pointx, pointy }) {
+function MapsCentre({ localistation }) {
+
   const [mapx, setMapx] = useState({
-    latitude: pointx,
-    longitude: pointy,
+    latitude: localistation[0].x,
+    longitude: localistation[0].y,
     width: '100%',
     height: '700px',
-    zoom: 13,
+    zoom: 12,
   });
-
-  const markerPosition = {
-    latitude: pointx,
-    longitude: pointy,
-  };
+  const markerPosition=[{latitude:localistation[0].x,longitude: localistation[0].y}]
+  function marker(){
+    for (let i=1;i<localistation.length;i++){
+        markerPosition[i]={latitude:localistation[i].x,longitude: localistation[i].y}
+    }
+    return markerPosition
+  }
 
   const handleZoomIn = () => {
     setMapx(prevState => ({
@@ -54,12 +57,15 @@ function Maps({ pointx, pointy }) {
       </div>
 
       {/* Marqueur */}
-      <Marker {...markerPosition} offsetTop={-20} offsetLeft={-10}>
+      {marker().map(donne => 
+        <Marker {...donne} offsetTop={-20} offsetLeft={-10}>
         <div style={{ fontSize: "70px" }}>
           {/* Icône que vous souhaitez afficher */}
           <MdLocationOn />
         </div>
       </Marker>
+        )}
+      
     </ReactMapGL>
   );
 }
@@ -81,4 +87,4 @@ const buttonIconStyle = {
   fontSize: '20px',
 };
 
-export default Maps;
+export default MapsCentre;

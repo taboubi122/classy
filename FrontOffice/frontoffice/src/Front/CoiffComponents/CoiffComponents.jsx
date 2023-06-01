@@ -8,6 +8,8 @@ import './CoiffComponents.css'
 import maps from '../../hooks/maps';
 import Footer from '../Footer';
 import Navbar from '../Navbar/navbar';
+import { Container } from '@mui/material';
+import MapsCentre from '../../hooks/mapsCenter';
 
 
 const CoiffComponents= () =>{
@@ -16,6 +18,7 @@ const CoiffComponents= () =>{
     const v=location.pathname.split('/')[2]
     const type=location.pathname.split('/')[1]
     const [ville,setVille]=useState([]);
+    const [adresse,setAdresse]=useState([]);
     const [setNom]=useState([]);
     const handle= async(nom)=>{
       try{
@@ -26,15 +29,37 @@ const CoiffComponents= () =>{
           console.log(err);
         }
       }
+      
     useEffect(()=>{
         axios.get(`http://localhost:5000/api/getAll/${v}`)
         .then(res=>setVille(res.data)
         );
          },[]);
+    const [loc,setLoc]=useState([]);
+    const l=[]
+    let local=()=>{
+        for (let i=0;i<ville.length;i++){
+            axios.get(`http://localhost:5000/api/getAdresse/${ville[i].nom}`)
+        .then(res=>
+            setLoc(res.data),
+        )
+        if(loc.length>0){
+            l[i]={x:loc[0].localisation.x,y:loc[0].localisation.y}
+        }
+        }
+        if(l.length===0){
+            return [{x:0,y:0}]
+          
+        }else{
+            return l
+            
+        }
+    }
          const scrollThreshold = "header scroll";
     return(
         <>
         <Navbar  change={scrollThreshold}/>
+        
         <div className='navBarLinks'/>
         <section className='Coiffeur'  >
         <br/> 
@@ -55,23 +80,23 @@ const CoiffComponents= () =>{
                     </div>
                 <div className='div2'>
                 <a href={`/${type}/${v}/${data.nom}`}  ><h2 onClick={()=>handle(data.nom)}>{data.nom}</h2></a>
-                    <CiLocationOn className='icon'/>
+                    <CiLocationOn className='icon'/><br/>
                 <h4>  {data.adresse} </h4>
                 <a href={`/${type}/${v}/${data.nom}`}  > <button >Prendre RDV</button>  </a>
-                <CiStar className='iconStar'/>
-                <h4 className='note'>4.5 (185 avis)</h4>
+                <CiStar className='iconStar'/><br/>
+                <h4 className='note'>{data.adresse}</h4>
                     </div>
-              <br/>
+                    <br/>
                     </div>   
                 )}
                </div>
                 </div>
                 <div className='maps'>
-               
-                {maps()}
+                <MapsCentre localistation={local()}/>
                 </div>
             </div>
         </section> 
+        
         <Footer/>
         </>
     )

@@ -20,6 +20,17 @@ module.exports.sendConfirmationEmail2=(email,mdp)=>{
     })
     .catch((err)=>console.log(err));
 }
+module.exports.sendMAilClient=(cin,ctr,r,emailClient)=>{
+    transport 
+    .sendMail({
+        from :"classy2023@gmail.com",
+        to:emailClient,
+        subject:"Avis",
+        html:`<hp>Cher(e) client(e), votre satisfaction et votre avis nous intéressent. Merci de renseigner le formulaire d'évaluation via ce lien: </h2><br/>
+        <a href=http://localhost:3000/AvisClient/${cin}/${ctr}/${r}></a>`
+    })
+    .catch((err)=>console.log(err));
+}
 module.exports.sendConfirmation=(email,id)=>{
     transport 
     .sendMail({

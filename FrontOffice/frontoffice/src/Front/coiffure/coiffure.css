@@ -24,16 +24,16 @@
   color: white;
 }
 .Coiffeur .btn1:hover {
-  background: rgb(140, 18, 18);
+  background: #a6a6a6;
 }
 .Coiffeur .btn:hover {
-  background: rgb(140, 18, 18);
+  background: #a6a6a6;
 }
 .Coiffeur .navBar .navLists .navItem .navLink {
   color: rgba(0, 0, 0, 0.922);
 }
 .Coiffeur .navBar .navLists .navItem .navLink:hover {
-  color: rgb(140, 18, 18);
+  color: #a6a6a6;
 }
 .Coiffeur .logo {
   color: rgba(0, 0, 0, 0.922);
@@ -231,7 +231,7 @@
   cursor: pointer;
 }
 .Coiffeur .BarRechercheContent .cardDiv .searchOptions1:hover {
-  background: rgb(140, 18, 18);
+  background: #a6a6a6;
 }
 .Coiffeur .BarRechercheContent .cardDiv .searchOptions1 .navLink {
   color: var(--whiteColor);

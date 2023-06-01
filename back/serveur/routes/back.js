@@ -13,7 +13,7 @@ const { fr } = require('date-fns/locale')
 const clientController = require("../controllers/clientController");
 const personnelController = require("../controllers/personnelController");
 const { sendConfirmationEmail } = require('../confirmerEmail');
-const { sendConfirmationEmail2 } = require('./nodemailer');
+const { sendConfirmationEmail2, sendMAilClient } = require('./nodemailer');
 const { getAllCateg, addCateg, updateCateg, deleteCateg } = require('../controllers/gestionCategories');
 const { getAllServ, addServ, updateServ, deleteServ, getServById, addServProp, updateServProp } = require('../controllers/gestionServices');
 const { getAllCentres, getAllVille, getAllVilleC } = require('../controllers/gestionCentres');
@@ -172,6 +172,16 @@ route.get("/api/LoginProp", (req, res) => {
 route.get("/api/getAllClients", (req, res) => {
   getAllClients(connection,res)
 });
+route.get("/api/getclientav", (req, res) => {
+  var sql = "SELECT * FROM client";
+  connection.query(sql, function (err, rows) {
+    if (err) {
+      console.error("Error executing query: " + err.stack);
+      return;
+    }
+    res.json(rows)
+  });
+});
 // get All Centres
 route.get("/api/getCentres", (req, res) => {
   getAllCentres(connection,res)
@@ -180,8 +190,8 @@ route.get("/api/getCentres", (req, res) => {
 route.post("/api/addService",(req, res) => {
   const { nom, description, prix, duree, refselectedCentre, refselectedCateg } = req.body;
   const time = moment(duree, 'HH:mm').toDate();
-  const values = [nom, description, prix, time, refselectedCentre, refselectedCateg];
-  addServ(connection,values)
+  const values = [nom, description, prix, time, refselectedCateg];
+  addServ(connection,values,refselectedCentre)
 });
 // Update Service
 route.put("/api/UpdateServices/:reference", (req, res) => {
@@ -444,6 +454,39 @@ route.post("/api/addHoraires", (req, res) => {
   const values = [ouverture, fermeture, refselectedJour, idProp];
   addHoraire(connection,values)
 });
+route.post("/api/confirmerPresence/:client/:centre/:ref", (req, res) => {
+  const clt=req.params.client;
+  const r=req.params.ref;
+  const ctr=req.params.centre;
+  const query = "INSERT INTO avis (refCentre,CinClient) VALUES (?, ?)";
+    connection.query(query, [ctr,clt], (err, rows) => {
+        if (err) {
+        console.log("Error executing query: " + err);
+        return;
+        } else {
+          const query = "SELECT c.nom AS nomClient, c.email AS emailClient, c.prenom AS prenomClient, ce.nom AS nomCentre FROM client c INNER JOIN reservation r ON c.CIN = r.CINClient INNER JOIN centre ce ON r.refCentre = ce.reference WHERE c.CIN = ? AND ce.reference = ?";
+          connection.query(query,[clt,ctr], (err, rows) => {
+            if (err) {
+              console.error("Error executing query: " + err.stack);
+              return;
+            }
+            console.log("Result rows:", rows);
+            sendMAilClient(clt,ctr,r,rows[0].emailClient)
+                })
+        }
+    });
+});
+route.put("/api/updateResv/:reference",(req,res) => {
+  let sql = "UPDATE reservation SET etat=? WHERE reference=" +
+      req.params.reference;
+  let query = connection.query(sql,[1], (error,result) => {
+      if(error){
+          res.send({ status: false, message: "Categorie Deleted Failed"});
+      } else {
+          res.send({ status: true, message: "Categorie Deleted successfully"}); 
+      }
+  });
+});
 // Update Horaire
 route.put("/api/UpdateHoraire/:reference", (req, res) => {
   const id = req.params.reference;
@@ -606,7 +649,7 @@ route.post('/api/signIn', (req, res) => {
         return res.status(500).json({ error: "An error occurred" });
       }
       
-      console.log("Result rows:", rows);
+      console.log("Result rows perso res:", rows);
       res.json(rows);
     });
   });
@@ -671,6 +714,90 @@ route.get("/api/getHoraireCentre/:nomCentre",(req,res)=>{
   const nomCentre = req.params.nomCentre;
   const query = "SELECT heure.ouverture, heure.fermeture, horaire.jour FROM horaire INNER JOIN heure ON heure.refHoraire = horaire.reference INNER JOIN centre ON centre.reference=heure.refCentre WHERE centre.nom =?";
   connection.query(query,nomCentre, (err, rows) => {
+    if (err) {
+      console.error("Error executing query: " + err.stack);
+      return;
+    }
+    console.log("Result rows:", rows);
+    res.json( rows);
+  });
+})
+route.get("/api/getAvisCentre/:nomCentre",(req,res)=>{
+  const nomCentre = req.params.nomCentre;
+  const query = "SELECT * from avis WHERE refCentre=?";
+  connection.query(query,nomCentre, (err, rows) => {
+    if (err) {
+      console.error("Error executing query: " + err.stack);
+      return;
+    }
+    console.log("Result rows:", rows);
+    res.json( rows);
+  });
+})
+route.get("/api/getCentreByref/:ref",(req,res)=>{
+  const id = req.params.ref;
+  const query = "SELECT * FROM centre WHERE reference =?";
+  connection.query(query,id, (err, rows) => {
+    if (err) {
+      console.error("Error executing query: " + err.stack);
+      return;
+    }
+    console.log("Result rows:", rows);
+    res.json( rows);
+  });
+})
+route.get("/api/avis/:ref",(req,res)=>{
+  const id = req.params.ref;
+  const query = "SELECT * FROM avis WHERE etat=0 and CINClient =?";
+  connection.query(query,id, (err, rows) => {
+    if (err) {
+      console.error("Error executing query: " + err.stack);
+      return;
+    }
+    console.log("Result rows:", rows);
+    res.json( rows);
+  });
+})
+route.get("/api/getclientByref/:ref",(req,res)=>{
+  const id = req.params.ref;
+  const query = "SELECT * FROM client WHERE CIN =?";
+  connection.query(query,id, (err, rows) => {
+    if (err) {
+      console.error("Error executing query: " + err.stack);
+      return;
+    }
+    console.log("Result rows:", rows);
+    res.json( rows);
+  });
+})
+route.get("/api/getservByref/:ref",(req,res)=>{
+  const id = req.params.ref;
+  const query = "SELECT s.reference, s.nomService, s.prix FROM reservation r JOIN servicecentre sc ON r.refCentre = sc.refCentre AND r.refService = sc.refService JOIN service s ON sc.refService = s.reference WHERE r.reference = ?";
+  connection.query(query,id, (err, rows) => {
+    if (err) {
+      console.error("Error executing query: " + err.stack);
+      return;
+    }
+    console.log("Result rows:", rows);
+    res.json( rows);
+  });
+})
+route.get("/api/getresvByref/:ref",(req,res)=>{
+  const id = req.params.ref;
+  const query = "SELECT * FROM reservation WHERE reference =?";
+  connection.query(query,id, (err, rows) => {
+    if (err) {
+      console.error("Error executing query: " + err.stack);
+      return;
+    }
+    console.log("Result rows:", rows);
+    res.json( rows);
+  });
+})
+route.get("/api/getRev/:ref",(req,res)=>{
+  const id = req.params.ref;
+  const query = "SELECT * FROM reservation WHERE reference ="+id;
+  connection.query(query, (err, rows) => {
     if (err) {
       console.error("Error executing query: " + err.stack);
       return;
@@ -793,7 +920,7 @@ route.get("/api/get",(req,res)=>{
 
   route.get("/api/getAdresse/:nom",(req,res)=>{
     const nom=req.params.nom;
-    const query =  "SELECT adresse,MIN(centre.reference) FROM centre INNER JOIN succursale ON centre.reference = succursale.refCentre and centre.nom=?";
+    const query =  "SELECT adresse,localisation FROM succursale INNER JOIN centre ON centre.reference = succursale.refCentre and centre.nom=?";
     connection.query(query,nom,(err, rows) => {
       if (err) {
         console.error("Error executing query: " + err.stack);
@@ -1052,8 +1179,9 @@ route.get("/api/getChoixSalon",(req,res)=>{
   });
   
 route.get("/api/getResvPerso/:CIN",(req,res)=>{
+    id=req.params.CIN
     const query =  "SELECT client.nom,personnel.nom,service.nomService,startDateResv,endDateResv FROM reservation INNER JOIN client ON reservation.CINClient = client.CIN INNER JOIN service ON reservation.refService = service.reference INNER JOIN personnel ON reservation.CINPersonnel = personnel.CIN WHERE personnel.CIN= ? and reservation.refCentre=1;";
-    connection.query(query,CIN,(err, rows) => {
+    connection.query(query,id,(err, rows) => {
       if (err) {
         console.error("Error executing query: " + err.stack);
         return;
@@ -1064,7 +1192,42 @@ route.get("/api/getResvPerso/:CIN",(req,res)=>{
   })
   route.get("/api/getResvP/:CIN",(req,res)=>{
     const id = req.params.CIN;
-    const query =  "SELECT * FROM reservation WHERE CINPersonnel="+id;
+    const query =  "SELECT * FROM reservation WHERE etat=? and CINPersonnel=?";
+    connection.query(query,["0",id],(err, rows) => {
+      if (err) {
+        console.error("Error executing query: " + err.stack);
+        return;
+      }
+      console.log("Result rows:", rows);
+      res.json( rows);
+    });
+  })
+  route.get("/api/getResvC/:CIN",(req,res)=>{
+    const id = req.params.CIN;
+    const query =  "SELECT * FROM reservation WHERE etat=? and refCentre=?";
+    connection.query(query,["0",id],(err, rows) => {
+      if (err) {
+        console.error("Error executing query: " + err.stack);
+        return;
+      }
+      console.log("Result rows:", rows);
+      res.json( rows);
+    });
+  })
+  route.get("/api/getp",(req,res)=>{
+    const id = req.params.CIN;
+    const query =  "SELECT * FROM personnel";
+    connection.query(query,(err, rows) => {
+      if (err) {
+        console.error("Error executing query: " + err.stack);
+        return;
+      }
+      console.log("Result rows:", rows);
+      res.json( rows);
+    });
+  })
+  route.get("/api/getClient",(req,res)=>{
+    const query =  "SELECT * FROM client";
     connection.query(query,(err, rows) => {
       if (err) {
         console.error("Error executing query: " + err.stack);
@@ -1373,6 +1536,27 @@ route.put("/api/categories/update/:reference",(req,res) => {
       }
   });
 });
+route.put("/api/addAvis/:reference",(req,res) => {
+  const dateString = new Date();
+  const formattedDate = dateString.toISOString().split("T")[0];
+  let sql = "UPDATE avis SET commentaire='" +
+      req.body.comm +
+      "', note=" + 
+      req.body.rating +
+      ", etat=1" + 
+      ", dateAvis = '"+ formattedDate + "'" +
+      " WHERE reference=" +
+      req.params.reference;
+
+  let query = connection.query(sql, (error,result) => {
+      if(error){
+        console.log(error);
+          res.send({ status: false, message: "Categorie Updated Failed"});
+      } else {
+          res.send({ status: true, message: "Categorie Updated successfully"}); 
+      }
+  });
+});
 
 //Delete categories
 
@@ -1385,6 +1569,28 @@ route.delete("/api/categories/delete/:reference",(req,res) => {
           res.send({ status: false, message: "Categorie Deleted Failed"});
       } else {
           res.send({ status: true, message: "Categorie Deleted successfully"}); 
+      }
+  });
+});
+route.delete("/api/SupprimerProp/:reference",(req,res) => {
+  let sql = "DELETE FROM proprietaire WHERE CIN=" + req.params.reference;
+
+  let query = connection.query(sql, (error,result) => {
+      if(error){
+          res.send({ message: "Categorie Deleted Failed"});
+      } else {
+          res.send({ message: "Categorie Deleted successfully"}); 
+      }
+  });
+});
+route.delete("/api/deleteAvis/:reference",(req,res) => {
+  let sql = "DELETE FROM avis WHERE reference=" + req.params.reference;
+
+  let query = connection.query(sql, (error,result) => {
+      if(error){
+          res.send({ message: "Categorie Deleted Failed"});
+      } else {
+          res.send({ message: "Categorie Deleted successfully"}); 
       }
   });
 });
@@ -1521,27 +1727,223 @@ const bodyParser=require('body-parser');
 route.use(bodyParser.urlencoded({ extended:true}));
 route.use(bodyParser.json());
 route.use(cors())
-route.post("/stripe/charge",cors(),async(req,res)=>{
-    let { amount, id} =req.body;
-    console.log("amount & id : ",amount," ",id);
-    try{
-        const payment = await stripe.paymentIntents.create({
-            amount:amount,
-            currency:"EUR",
-            description:"CLASSY Company",
-            payment_method:id,
-            confirm:true,
+route.post("/stripe/charge/:reference",cors(),async(req,res)=>{
+  let ref= req.params.reference
+       let { amount, id} =req.body;
+  try{
+   const payment = await stripe.paymentIntents.create({
+              amount:amount,
+              currency:"EUR",
+              description:"CLASSY Company",
+              payment_method:id,
+              confirm:true,
+          });
+  const dateString = new Date();
+    const formattedDate = dateString.toISOString().split("T")[0];
+    let details = {
+        datePaiement: formattedDate
+    };
+        let sqlPaiment = "INSERT INTO paiement SET ?";
+  connection.query(sqlPaiment,details,(error) => {
+            if(error){
+                console.log(" not ok"+error)
+            } 
         });
-        res.json({
-            message:"Payement réussi",
-            success:true,
-        })
-    }catch(error){
-        console.log("Erreur Paymenet....",error)
-        res.json({
-            message:"Le Payement à échoué",
-            success:false,
-        })
-    }
-})
+   let selectPaiement = "SELECT max(reference) as ref FROM paiement";
+        connection.query(selectPaiement, function (error, result){
+  if(error) {
+                console.log("Error Connecting to DB2"+error);  
+            }else {
+  console.log(result)
+                const refpai=result[0].ref
+                let detailsCentre = {
+                  CinProp: ref,
+                  refPaiement:refpai
+              };
+   let sqlPaiment = "INSERT INTO centre SET ? ";
+                connection.query(sqlPaiment,detailsCentre,(error) => {
+   if(error){
+                        res.send({ status: false, message: "Service created Failed"});
+                        console.log(" not ok"+error)
+                    }
+  else {
+                      let selectC = "SELECT max(reference) as refCentre FROM centre";
+                        connection.query(selectC, function (error, result){
+                            if(error) {
+                                console.log("Error Connecting to DB2"+error);  
+                            }else {
+                              console.log(result)
+                                const refC=result[0].refCentre
+                                res.json({
+                                  message:"Payement réussi",
+                                  success:true,
+                                  reference:refC
+                              })
+                            }
+                              })
+                            }
+  })
+  }
+  
+  })
+  
+  }catch(error){
+          console.log("Erreur Paymenet....",error)
+          res.json({
+              message:"Le Payement à échoué",
+              success:false,
+          })
+        }
+  
+  })
+  route.put("/api/addCentre/:refCentre",(req,res) => {
+    const refCentre=req.params.refCentre;
+    let sql = "UPDATE centre SET nom='" +
+      req.body.nom +
+      "', description='" + 
+      req.body.description +
+      "' , type='" +
+      req.body.spec +
+      "' , email='" +
+      req.body.email +
+      "' WHERE reference=" +
+      refCentre;
+      let img=req.body.images
+    connection.query(sql,(error) => {
+        if(error){
+            res.send({ status: false, message: "Service created Failed"});
+            console.log(" not ok"+error)
+        } else {
+           let sql2="INSERT INTO image set ?"
+           const photo=img[0]
+           let details = {
+            refCentre:refCentre,
+            src:photo,
+            couverture:1
+        };
+           connection.query(sql2,details,(error) => {
+            if(error){
+                res.send({ status: false, message: "Service created Failed"});
+                console.log(" not ok"+error)
+            } else {
+              for(let i=1;i<img.length;i++){
+                let sql3="INSERT INTO image set ?"
+                let details2 = {
+                  refCentre:refCentre,
+                  src:img[i],
+                  couverture:0
+              };
+              connection.query(sql3,details2,(error) => {
+                if(error){
+                    res.send({ status: false, message: "Service created Failed"});
+                    console.log(" not ok"+error)
+                } else {
+                  let sql4="INSERT INTO succursale set ?"
+                  let details3 = {
+                    refCentre:refCentre,
+                    codeVille:req.body.ville,
+                    adresse:req.body.adresse,
+                    tel:req.body.tel,
+                };
+                connection.query(sql4,details3,(error) => {
+                  if(error){
+                      res.send({ status: false, message: "Service created Failed"});
+                      console.log(" not ok"+error)
+                  }else{
+                    console.log("centre add1")
+                  }
+                })
+                }})
+              }
+            }
+          })
+        }
+    });
+  });
+  route.post("/newHeure/:reference",cors(),async(req,res)=>{
+    let refCentre= req.params.reference
+    let sql5="INSERT INTO heure (refCentre,refHoraire) values (?,?)"
+                      
+    connection.query(sql5,[refCentre,1],(error) => {
+      if(error){
+          res.send({ status: false, message: "Service created Failed"});
+          console.log(" not ok"+error)
+      } else {
+        let sql5="INSERT INTO heure set ?"
+      let details4 = {
+        refCentre:refCentre,
+        refHoraire:2,
+    };
+    connection.query(sql5,details4,(error) => {
+      if(error){
+          res.send({ status: false, message: "Service created Failed"});
+          console.log(" not ok"+error)
+      } else {
+        let sql5="INSERT INTO heure set ?"
+      let details4 = {
+        refCentre:refCentre,
+        refHoraire:3,
+    };
+    connection.query(sql5,details4,(error) => {
+      if(error){
+          res.send({ status: false, message: "Service created Failed"});
+          console.log(" not ok"+error)
+      } else {
+        let sql5="INSERT INTO heure set ?"
+      let details4 = {
+        refCentre:refCentre,
+        refHoraire:4,
+    };
+    connection.query(sql5,details4,(error) => {
+      if(error){
+          res.send({ status: false, message: "Service created Failed"});
+          console.log(" not ok"+error)
+      } else {
+        let sql5="INSERT INTO heure set ?"
+      let details4 = {
+        refCentre:refCentre,
+        refHoraire:5,
+    };
+    connection.query(sql5,details4,(error) => {
+      if(error){
+          res.send({ status: false, message: "Service created Failed"});
+          console.log(" not ok"+error)
+      } else {
+        let sql5="INSERT INTO heure set ?"
+      let details4 = {
+        refCentre:refCentre,
+        refHoraire:6,
+    };
+    connection.query(sql5,details4,(error) => {
+      if(error){
+          res.send({ status: false, message: "Service created Failed"});
+          console.log(" not ok"+error)
+      } else {
+        let sql5="INSERT INTO heure set ?"
+      let details4 = {
+        refCentre:refCentre,
+        refHoraire:7,
+    };
+    connection.query(sql5,details4,(error) => {
+      if(error){
+          res.send({ status: false, message: "Service created Failed"});
+          console.log(" not ok"+error)
+      } else {
+        console.log("centre ajouter!!")
+      }
+    })
+      }
+    })
+      }
+    })
+      }
+    })
+      }
+    })
+      }
+    })
+      }
+    })
+    
+    })
 module.exports = route;

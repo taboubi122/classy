@@ -51,6 +51,9 @@
   width: 100%;
   margin-bottom: 10px;
 }
+.select{
+  padding-left: 30px;
+}
 .demandeProp{
 text-align: center;
 justify-content: center;
@@ -293,7 +296,7 @@ li{
   color: black;
 }
 .btnDeco:hover{
-  background: rgb(140, 18, 18);
+  background: #a6a6a6;
   color: white;
 }
 .btn1{
@@ -312,7 +315,7 @@ li{
 }
 
 .btn:hover{
-    background: rgb(140, 18, 18);
+    background: #a6a6a6
 }
 .btn :hover{
   color: white;
@@ -322,7 +325,7 @@ li{
   
 }
 .btn1:hover{
-  background: rgb(140, 18, 18);
+  background: #a6a6a6
 }
 .btn1 :hover{
   color: white;
@@ -614,6 +617,12 @@ font-size: 15px;
   padding: 1rem 0;
   grid-template-columns: repeat(2, 1fr);
 }
+.env-container {
+  display: grid;
+  position: relative;
+  gap: 1rem;
+  grid-template-columns: 2fr 2fr;
+}
 .Authimg-container h2 {
   color: rgb(70, 70, 68);
   font-weight: 500;
@@ -771,6 +780,7 @@ font-size: 15px;
   padding: 2rem 0;
 }
 .BarRecherche .BarRechercheContent .textDiv .smallText {
+  padding-left: 20px;
   font-size: 13px;
 }
 .BarRecherche .BarRechercheContent .textDiv .BarRechercheTitle {
@@ -786,6 +796,7 @@ font-size: 15px;
 .BarRecherche .BarRechercheContent .cardDiv .labelRech {
   display: block;
   color: var(--textColor);
+  padding-left: 18px;
   padding-bottom: 10px;
   font-size: 13px;
   font-weight: 500;
@@ -793,7 +804,7 @@ font-size: 15px;
 .BarRecherche .BarRechercheContent .cardDiv .input1 {
   height: 40px;
   padding: 0 1rem;
-  background: rgba(150, 154, 123, 0.482);
+  background: #D4D4D2;
   border-radius: 3rem;
 }
 .BarRecherche .BarRechercheContent .cardDiv .input1 .inputRech {
@@ -842,7 +853,7 @@ font-size: 15px;
   cursor: pointer;
 }
 .BarRecherche .BarRechercheContent .cardDiv .searchOption1:hover {
-  background: rgb(140, 18, 18);
+  background: #a6a6a6;
 }
 .BarRecherche .BarRechercheContent .cardDiv .searchOption1 .navLink {
   color: var(--whiteColor);
@@ -1016,15 +1027,15 @@ font-size: 15px;
   color: white;
 }
 .btn1:hover{
-  background: rgb(140, 18, 18);
+  background: #a6a6a6;
   color: white;
 }
 .btnDeco:hover{
-  background: rgb(140, 18, 18);
+  background: #a6a6a6;
   color: white;
 }
 .btn:hover{
-  background: rgb(140, 18, 18);
+  background: #a6a6a6;
   color: white;
 }
 .navBar .navLists .navItem .navLink {
@@ -1032,7 +1043,7 @@ font-size: 15px;
   
 }
 .navBar .navLists .navItem .navLink:hover {
-  color:rgb(140, 18, 18);
+  color:#a6a6a6;
 }
   .logo {
     color: rgba(0, 0, 0, 0.922);
@@ -1151,7 +1162,7 @@ font-size: 15px;
     font-weight: 500;
   }
   .header .navBar .navLists .navItem :hover {
-    color: rgb(140, 18, 18);
+    color: #a6a6a6;
   }
 }
 @media screen and (min-width: 960px) {
@@ -1803,7 +1814,7 @@ h2{
   text-align:center;
 }
 .main h3 {
-  color: rgb(140, 18, 18);
+  color: #a6a6a6;
   font-weight: 500;
   font-size: 30px;
   line-height: 65px;

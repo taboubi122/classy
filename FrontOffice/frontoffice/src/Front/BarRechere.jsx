@@ -1,4 +1,4 @@
-import React,{useEffect} from 'react';
+import React,{useEffect,useState} from 'react';
 import {GrLocation} from'react-icons/gr';
 import {GoSearch} from 'react-icons/go';
 import Aos from 'aos';
@@ -10,6 +10,18 @@ const BarRecherche= () =>{
   useEffect(()=>{
     Aos.init({duration:20000})
   },[])
+  const [ville,setVille]=useState('')
+  const [nom,setNom]=useState('')
+  function cher(){
+    console.log(nom.length!==0)
+    if(ville.length===0 && nom.length===0){
+        return
+    }else if (! nom===''){
+        navigate(`/${nom}`);
+    }else if(ville.length!==0 && !nom===0){
+      navigate(`/${nom}/${ville}`);
+    }
+}
     return(
       <section className='BarRecherche'>
         <div className='overlay'/>
@@ -29,7 +41,9 @@ const BarRecherche= () =>{
                 Que chercher-vous ?
                 </label>
                  <div className="input1 flex">
-                    <input className="inputRech" type="text" placeholder='Nom du salon, prestations (coupe...)'/>
+                    <input className="inputRech" type="text" placeholder='Nom du salon, prestations (coupe...)'
+                    value={nom}
+                    onChange={(e)=>setNom(e.target.value)}/>
                  </div>
                </div>
                <div className="CityInput">
@@ -37,15 +51,17 @@ const BarRecherche= () =>{
                  Où ?
                 </label>
                  <div className="input1 flex">
-                    <input  className="inputRech" type="text" placeholder='Adresse, ville...'/>
+                    <input  className="inputRech" type="text" placeholder='Adresse, ville...'
+                    value={ville}
+                    onChange={(e)=>setVille(e.target.value)}
+                    />
                  <GrLocation className='icon'/>
                  </div>
                </div>
                
-                <div className="searchOption1 flex">
-                <a href="/recherche" className='navLink'> <span>Rechercher</span></a>
-                
-                    <GoSearch className="icon"/>
+                <div className="searchOption1 flex" onClick={()=>cher()}>
+                <GoSearch className="icon"/>
+                <p className='navLink'> <span>Rechercher</span></p>
                     </div>           
             </div>
         </div>

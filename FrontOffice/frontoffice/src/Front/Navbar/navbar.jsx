@@ -110,7 +110,7 @@ const navbarClass = scroll ? 'header scroll' :change ;
                <NotificationsPopover />
             ) : (
               <button className="btn1">
-              <a href="/partenaire">Ajouter votre salon</a>
+              <a href="/demande">Ajouter votre salon</a>
             </button>
             )}
             {isLoggedIn ? (

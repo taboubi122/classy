@@ -7,7 +7,7 @@ module.exports.getAllCateg=(connection,res)=>{
 }
 
 module.exports.addCateg=(connection,values)=>{
-    const query = "INSERT INTO categorie (nom,description) VALUES (?, ?)";
+    const query = "INSERT INTO categorie (nomCateg,descriptionCateg) VALUES (?, ?)";
     connection.query(query, values, (err, rows) => {
         if (err) {
         console.error("Error executing query: " + err.stack);
@@ -17,7 +17,7 @@ module.exports.addCateg=(connection,values)=>{
 }
 
 module.exports.updateCateg=(connection,id,values)=>{
-    const sql = "UPDATE categorie SET nom=?, description=? WHERE reference=" + id;
+    const sql = "UPDATE categorie SET nomCateg=?, descriptionCateg=? WHERE reference=" + id;
     connection.query(sql, values, (err, rows) => {
       if (err) {
         console.log("Error executing query: " + err.stack);

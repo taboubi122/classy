@@ -1,10 +1,5 @@
-// @mui
 import PropTypes from 'prop-types';
 import { Box, Card, Paper, Typography, CardHeader, CardContent } from '@mui/material';
-// utils
-import { fShortenNumber } from '../../../utils/formatNumber';
-
-// ----------------------------------------------------------------------
 
 AppTrafficBySite.propTypes = {
   title: PropTypes.string,
@@ -13,6 +8,7 @@ AppTrafficBySite.propTypes = {
 };
 
 export default function AppTrafficBySite({ title, subheader, list, ...other }) {
+  console.log("perso: ",list)
   return (
     <Card {...other}>
       <CardHeader title={title} subheader={subheader} />
@@ -20,19 +16,47 @@ export default function AppTrafficBySite({ title, subheader, list, ...other }) {
       <CardContent>
         <Box
           sx={{
-            display: 'grid',
+            display: 'flex',
+            flexWrap: 'wrap',
             gap: 2,
-            gridTemplateColumns: 'repeat(2, 1fr)',
           }}
         >
           {list.map((site) => (
-            <Paper key={site.name} variant="outlined" sx={{ py: 2.5, textAlign: 'center' }}>
-              <Box sx={{ mb: 0.5 }}>{site.icon}</Box>
-
-              <Typography variant="h6">{fShortenNumber(site.value)}</Typography>
+            <Paper
+              key={site.name}
+              variant="outlined"
+              sx={{
+                py: 2.5,
+                textAlign: 'center',
+                position: 'relative',
+                flex: '1 0 15%',
+              }}
+              style={{
+                borderRadius: '10px',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+              }}
+            >
+              <div
+                style={{
+                  width: '35px',
+                  height: '35px',
+                  borderRadius: '50%',
+                  backgroundColor: 'black',
+                  color: 'white',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  position: 'absolute',
+                  top: '-15px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                }}
+              >
+                {site.name.charAt(0).toUpperCase()}
+              </div>
 
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                {site.name}
+                {site.name} {site.value}
               </Typography>
             </Paper>
           ))}

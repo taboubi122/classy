@@ -3,7 +3,7 @@ const mysql = require("mysql2");
     host: "localhost",
     user: "root",
     password: "",
-    database: "classynew",
+    database: "classy",
     //port:"3308"
   });
 
