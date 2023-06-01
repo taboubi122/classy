@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
 import {
   Table,
@@ -14,6 +14,12 @@ import { VscChevronUp ,VscChevronDown } from "react-icons/vsc";
 import { Label } from "@material-ui/icons";
 
 const ServiceChoix = ({ service,nomCentre }) => {
+  const location=useLocation()
+  const nomSalon =location.pathname.split('/')[2].split('%20').join(' ')
+  let servicePath = null;
+  if (location.pathname.split('/').length > 4) {
+    servicePath = location.pathname.split('/')[3].split('%20').join(' ')
+  }
   const [expandedList, setExpandedList] = useState(
     service.map(() => false)
   );

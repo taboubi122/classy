@@ -8,42 +8,67 @@ import { format, startOfWeek, addDays, addMonths } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import moment from 'moment';
 
-const Calendrier = ({ refCentre, onReservation }) => {
+const Calendrier = ({ refCentre, cinPersonnel, onReservation }) => {
   const [Time, setTime] = useState([]);
   const [page, setPage] = useState(0);
   const [selectedDateTime, setSelectedDateTime] = useState(null);
   const [formattedReservations, setFormattedReservations] = useState([]);
   const [Resv, setResv] = useState([]);
+const CIN = parseInt(cinPersonnel);
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:5000/api/getReservation/${refCentre}`)
-      .then((res) => {
-        const formattedData = res.data.map((reservation) => ({
-          startDateResv: moment(reservation.startDateResv).toDate(),
-          endDateResv: moment(reservation.endDateResv).toDate(),
-        }));
-        setResv(formattedData);
-        setFormattedReservations(formattedData);
-      })
-      .catch((error) => console.error(error));
-  }, [refCentre]);
-
+    if (CIN!== 0) {
+      axios.get(`http://localhost:5000/api/getResvPerso/${cinPersonnel}`)
+        .then(res => {
+          const formattedData = res.data.map((reservation) => ({
+            startDateResv: moment(reservation.startDateResv).toDate(),
+            endDateResv: moment(reservation.endDateResv).toDate(),
+          }));
+          setResv(formattedData);
+          setFormattedReservations(formattedData);
+        })
+        .catch(error => console.error(error));
+    } else {
+      axios.get(`http://localhost:5000/api/getReservation/${refCentre}`)
+        .then(res => {
+          const formattedData = res.data.map((reservation) => ({
+            startDateResv: moment(reservation.startDateResv).toDate(),
+            endDateResv: moment(reservation.endDateResv).toDate(),
+          }));
+          setResv(formattedData);
+          setFormattedReservations(formattedData);
+        })
+        .catch(error => console.error(error));
+    }
+  }, [refCentre, cinPersonnel]);
+  
   const currentDate = new Date();
-
+  
   useEffect(() => {
     const fetchCalendarData = () => {
       const endDate = addMonths(currentDate, 2); // Deux mois à partir de la date actuelle
       const formattedEndDate = format(endDate, 'yyyy-MM-dd');
-
-      axios.get(`http://localhost:5000/api/heureCalendrier/${refCentre}?endDate=${formattedEndDate}`)
-        .then(res => {
-          setTime(res.data);
-        });
+  
+      if (CIN !== 0) {
+        // Charger les données du calendrier personnel
+        axios.get(`http://localhost:5000/api/heureCalendrierPerso/${cinPersonnel}?endDate=${formattedEndDate}`)
+          .then(res => {
+            setTime(res.data);
+          })
+          .catch(error => console.error(error));
+      } else {
+        // Charger les données du calendrier du centre
+        axios.get(`http://localhost:5000/api/heureCalendrier/${refCentre}?endDate=${formattedEndDate}`)
+          .then(res => {
+            setTime(res.data);
+          })
+          .catch(error => console.error(error));
+      }
     };
-
+  
     fetchCalendarData();
-  }, []);
+  }, [refCentre, cinPersonnel]);
+  
 
   const renderDaysHeader = () => {
     const startDate = addDays(currentDate, page * 7);

@@ -26,12 +26,11 @@ personnel.getAll = (refCentre,result) => {
 };
 
   personnel.update = ( CIN, personnel, result) => {
-    const hashedPassword = bcrypt.hashSync(personnel.password, 10);
 
     sql.query(
       "UPDATE personnel SET nom = ?, prenom = ?, email = ?, password = ?, tel= ? , photo=? WHERE CIN = ?",
       
-      [personnel.nom, personnel.prenom, personnel.email,hashedPassword,personnel.tel,personnel.photo,  CIN],
+      [personnel.nom, personnel.prenom, personnel.email,personnel.password,personnel.tel,personnel.photo,  CIN],
       (err, res) => {
         if (err) {
           console.log("error: ", err);

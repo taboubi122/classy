@@ -4,6 +4,19 @@
   height: 15%;
    
 }
+.btnBlack{
+  padding: .6rem 1.5rem;
+  background: rgba(0, 0, 0, 0.922);;
+  border-radius: 1rem;
+  border:none;
+  outline: none;
+  font-size: 13px;
+  cursor:pointer;
+
+}
+.btnBlack a{
+color: white;
+}
 .navLink{
   text-decoration: none;
   color: black;
@@ -505,7 +518,100 @@ font-size: 15px;
   margin-top: 4px;
   padding: 8px;
 }
-  
+/**********************************Page reservation****************************************/
+
+.formControls input[type="radio"] {
+  transform: scale(1.2);
+}
+.infosResv{
+  margin-left: 15px;
+  white-space: 10px
+}
+.infos2Resv{
+  margin-left: 25px;
+  white-space: 10px
+}
+.titreResv{
+  font-size: 22px;
+  font-family:Arial, Helvetica, sans-serif;
+ font-weight: 540;
+ color: black;
+}
+.resvPhoto{
+  border-radius: 50%;
+  width: 35%;
+}
+.radioGroupItem {
+  display: flex;
+  align-items: center;
+  border: 1px solid black;
+  border-radius: 10px;
+  padding: 10px;
+  margin-right: 10px;
+}
+
+.radioGroupLabel {
+  margin-left: 10px;
+}
+
+input[type="radio"]:checked + span {
+  color: black;
+}
+
+
+/**********************************Page reservation****************************************/
+
+
+@import url("https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap");
+
+
+
+
+/**********************************Page profilClient****************************************/
+
+.profilClient{
+	background: #f9f9f9;
+	font-family: "Roboto", sans-serif;
+}
+
+.form-groupProfil{
+    margin-bottom: 1.5rem;
+}
+
+@import url("https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap");
+
+
+.shadow {
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+}
+
+.profile-tab-nav {
+	min-width: 250px;
+}
+
+.tab-content {
+	flex: 1;
+}
+
+.nav-pills a.nav-link {
+	padding: 15px 20px;
+	border-bottom: 1px solid #ddd;
+	border-radius: 0;
+	color: #333;
+}
+.nav-pills a.nav-link i {
+	width: 20px;
+}
+
+.img-circle img {
+	height: 100px;
+	width: 100px;
+	border-radius: 100%;
+	border: 5px solid #fff;
+}
+
+
+
   
 /**********************************Page Authhhhentif****************************************/
 

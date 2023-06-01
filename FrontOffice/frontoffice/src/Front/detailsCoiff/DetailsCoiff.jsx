@@ -16,7 +16,7 @@ import ServiceChoix from '../../hooks/ServiceChoix'
 import Footer from '../Footer';
 import Navbar from '../Navbar/navbar';
 
-const DetailsCoiff= () =>{
+const DetailsCoiff= ({ isLoggedIn}) =>{
     const location=useLocation()
     console.log(location.pathname.split('/')[3].split('%20').join(' '))
 
@@ -77,7 +77,7 @@ const DetailsCoiff= () =>{
   
      return (
        <>
-       <Navbar change={scrollThreshold} />
+       <Navbar change={scrollThreshold} isLoggedIn={isLoggedIn} />
           <div className='navBarLinks' />
               <section className='Coif'>
                  <div>

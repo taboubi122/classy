@@ -1,0 +1,116 @@
+Arguments: 
+  C:\Program Files\nodejs\node.exe C:\Users\yosry\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add @mobiscroll/react
+
+PATH: 
+  C:\src\flutter\bin\;C:\Python311\Scripts\;C:\Python311\;C:\Program Files\Java\jdk-11.0.16.1\bin;C:\oraclexe\app\oracle\product\11.2.0\server\bin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\windows\system32;C:\windows;C:\windows\System32\Wbem;C:\windows\System32\WindowsPowerShell\v1.0\;C:\windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files\Git\cmd;C:\xampp\php;C:\ProgramData\ComposerSetup\bin;C:\Program Files\OpenSSL-Win64\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\ProgramData\chocolatey\bin;C:\Users\yosry\AppData\Roaming\nvm;C:\Program Files\nodejs;C:\Program Files\Java\jdk-17;C:\Users\yosry\AppData\Local\Programs\Python\Python310\Scripts\;C:\Users\yosry\AppData\Local\Programs\Python\Python310\;C:\Program Files\MySQL\MySQL Shell 8.0\bin\;C:\Users\yosry\AppData\Local\Microsoft\WindowsApps;C:\Users\yosry\AppData\Local\Programs\Microsoft VS Code\bin;C:\src\flutter\bin;C:\Users\yosry\AppData\Roaming\Composer\vendor\bin;C:\Program Files\OpenSSL-Win64;C:\Users\yosry\AppData\Roaming\npm;C:\Users\yosry\AppData\Roaming\nvm;C:\Program Files\nodejs
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  18.14.0
+
+Platform: 
+  win32 x64
+
+Trace: 
+  Error: https://registry.yarnpkg.com/@mobiscroll%2freact: Not found
+      at params.callback [as _callback] (C:\Users\yosry\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:66145:18)
+      at self.callback (C:\Users\yosry\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:140890:22)
+      at Request.emit (node:events:513:28)
+      at Request.<anonymous> (C:\Users\yosry\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:141862:10)
+      at Request.emit (node:events:513:28)
+      at IncomingMessage.<anonymous> (C:\Users\yosry\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:141784:12)
+      at Object.onceWrapper (node:events:627:28)
+      at IncomingMessage.emit (node:events:525:35)
+      at endReadableNT (node:internal/streams/readable:1359:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
+
+npm manifest: 
+  {
+    "name": "front",
+    "version": "0.1.0",
+    "private": true,
+    "dependencies": {
+      "@emotion/react": "^11.11.0",
+      "@emotion/styled": "^11.11.0",
+      "@faker-js/faker": "^8.0.0",
+      "@fortawesome/fontawesome-free": "^6.4.0",
+      "@iconify/react": "^4.1.0",
+      "@material-ui/core": "^4.12.4",
+      "@material-ui/icons": "^4.11.3",
+      "@mui/lab": "^5.0.0-alpha.129",
+      "@mui/material": "^5.13.0",
+      "@mui/styled-engine": "^5.12.3",
+      "@mui/x-date-pickers": "^6.4.0",
+      "@testing-library/jest-dom": "^5.16.5",
+      "@testing-library/react": "^13.4.0",
+      "@testing-library/user-event": "^13.5.0",
+      "aos": "^2.3.4",
+      "apexcharts": "^3.40.0",
+      "axios": "^1.4.0",
+      "bootstrap": "^5.2.3",
+      "buffer": "^6.0.3",
+      "change-case": "^4.1.2",
+      "date-fns": "^2.30.0",
+      "datetime-picker-reactjs": "^1.0.3",
+      "formik": "^2.2.9",
+      "mapbox-gl": "^2.14.1",
+      "mdb-react-ui-kit": "^6.0.0",
+      "moment": "^2.29.4",
+      "numeral": "^2.0.6",
+      "react": "^18.2.0",
+      "react-apexcharts": "^1.4.0",
+      "react-big-calendar": "^1.6.9",
+      "react-bootstrap": "^2.7.4",
+      "react-datepicker": "^4.11.0",
+      "react-dom": "^18.2.0",
+      "react-helmet-async": "^1.3.0",
+      "react-hook-form": "^7.43.9",
+      "react-icons": "^4.8.0",
+      "react-modal": "^3.16.1",
+      "react-pdf": "^6.2.2",
+      "react-router-dom": "^6.11.1",
+      "react-scripts": "5.0.1",
+      "react-slideshow-image": "^4.2.1",
+      "simplebar-react": "^3.2.4",
+      "sweetalert2": "^11.7.5",
+      "web-vitals": "^2.1.4",
+      "yup": "^1.1.1"
+    },
+    "scripts": {
+      "start": "react-scripts start",
+      "build": "react-scripts build",
+      "test": "react-scripts test",
+      "eject": "react-scripts eject"
+    },
+    "eslintConfig": {
+      "extends": [
+        "react-app",
+        "react-app/jest"
+      ]
+    },
+    "browserslist": {
+      "production": [
+        ">0.2%",
+        "not dead",
+        "not op_mini all"
+      ],
+      "development": [
+        "last 1 chrome version",
+        "last 1 firefox version",
+        "last 1 safari version"
+      ]
+    },
+    "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
+    "main": "index.js",
+    "keywords": [],
+    "author": "",
+    "license": "ISC"
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

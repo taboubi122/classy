@@ -10,8 +10,8 @@ import 'custom_app_bar.dart';
 
 final dio = Dio();
 
-class ProductDescription extends StatelessWidget {
-  const ProductDescription({
+class head extends StatelessWidget {
+  const head({
     Key? key,
     required this.reference,
     required this.nomCentre,
@@ -21,21 +21,6 @@ class ProductDescription extends StatelessWidget {
   final GestureTapCallback? pressOnSeeMore;
   final int reference;
   final String nomCentre;
-  Future<List<dynamic>> getCateg() async {
-    try {
-      final response = await dio
-          .get('http://192.168.1.39:5000/api/servicesNomCentre/${nomCentre}');
-      final dynamic data = response.data;
-      print(data);
-      if (data != null) {
-        return data as List<dynamic>;
-      } else {
-        throw Exception('No data available.');
-      }
-    } catch (e) {
-      throw Exception('Failed to get item: $e');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,45 +63,29 @@ class ProductDescription extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
+          padding: EdgeInsets.symmetric(
+              horizontal: getProportionateScreenWidth(25),
+              vertical: getProportionateScreenWidth(6)),
+          child: Text(
+            salonItem['type'],
+          ),
+        ),
+        Padding(
           padding: EdgeInsets.only(
-            left: getProportionateScreenWidth(20),
-            top: getProportionateScreenWidth(20),
+            left: getProportionateScreenWidth(25),
             right: getProportionateScreenWidth(64),
           ),
           child: Text(
-            "Choix de la prestation",
-            style: Theme.of(context).textTheme.headline6,
+            salonItem['nom'],
+            style: TextStyle(fontSize: 12),
           ),
         ),
-        FutureBuilder<List<dynamic>>(
-          future: getCateg(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
-            } else if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return Text('No salon data available');
-            } else {
-              final categorie = snapshot.data!;
-              return Padding(
-                padding: EdgeInsets.symmetric(
-                  vertical: 10,
-                ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      for (var categItem in categorie)
-                        CategorieMenu(
-                          text: categItem['nomCateg'],
-                          ref: categItem['refCateg'],
-                        ),
-                    ],
-                  ),
-                ),
-              );
-            }
-          },
+        Padding(
+          padding: EdgeInsets.only(
+            left: getProportionateScreenWidth(9),
+            right: getProportionateScreenWidth(64),
+          ),
+          child: CustomAppBar(rating: 4.5),
         ),
       ],
     );

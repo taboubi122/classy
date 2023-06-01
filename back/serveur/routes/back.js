@@ -7,13 +7,13 @@ const cors = require("cors");
 const bcrypt2 = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const connection = require("../db");
 const { format, startOfWeek, addDays, addMinutes  } = require('date-fns');
 const { fr } = require('date-fns/locale')
 const clientController = require("../controllers/clientController");
 const personnelController = require("../controllers/personnelController");
 const { sendConfirmationEmail } = require('../confirmerEmail');
 const { sendConfirmationEmail2 } = require('./nodemailer');
+const  pushNotifController = require('../controllers/pushNotifController');
 const { getAllCateg, addCateg, updateCateg, deleteCateg } = require('../controllers/gestionCategories');
 const { getAllServ, addServ, updateServ, deleteServ, getServById, addServProp, updateServProp } = require('../controllers/gestionServices');
 const { getAllCentres, getAllVille, getAllVilleC } = require('../controllers/gestionCentres');
@@ -21,14 +21,38 @@ const { getAllOffres, addOffre, updateOffre, deleteOffre, addOffreProp, updateOf
 const { getAllHoraire, getAllJour, addHoraire, updateHoraire } = require('../controllers/gestionHoraire');
 const { getAllDEmandes, getDoc, UpdateDemande, addProp, ConfirmationProp, deleteDemande, EnvoyerDemande, getProp } = require('../controllers/gestionDemandes');
 route.use("uploads", express.static("uploads"))
-console.log("hello Classy")
+const mysql = require("mysql2");
+  const connection = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "classy",
+    port:"3308"
+  });
 
+connection.connect((err) => {
+  if (err) {
+    console.error("error connecting to database: " + err.stack);
+    return;
+  }
+  console.log("connected to database with id " + connection.threadId);
+});
 
-  route.use(cors({ origin: "http://localhost:3000" }));
-route.use(cors({
-  origin: "http://localhost:3000"
-}));
+module.exports = connection;
+
+route.use(cors({ origin: "http://localhost:3000" }));
 //*************************************** DEMANDE ******************************/
+route.post('/sendNotification', async (req, res) => {
+  const { playerIds, title, message } = req.body;
+
+  try {
+    await pushNotifController.sendNotification(playerIds, title, message);
+    res.status(200).json({ message: 'Notification sent successfully' });
+  } catch (error) {
+    console.error('Failed to send notification:', error);
+    res.status(500).json({ message: 'Failed to send notification' });
+  }
+});
 //get All Demandes
 route.get("/api/getAllDemandes", (req, res) => {
   getAllDEmandes(connection,res)
@@ -135,7 +159,6 @@ route.delete("/api/deleteCategories/:reference", (req, res) => {
 });
 //********************************** SERVICES ****************************************/
 const moment = require('moment');
-const { getAllClients } = require('../controllers/gestionClients');
 const { getAllReservation } = require('../controllers/reservation');
 const { getAllAvis } = require('../controllers/gestionAvis');
 // get All Services
@@ -167,10 +190,6 @@ route.get("/api/LoginProp", (req, res) => {
     }
     res.json(rows)
   });
-});
-// get All Clients
-route.get("/api/getAllClients", (req, res) => {
-  getAllClients(connection,res)
 });
 // get All Centres
 route.get("/api/getCentres", (req, res) => {
@@ -485,7 +504,7 @@ route.put("/api/UpdateHoraire/:reference", (req, res) => {
 
 
   
-//**********************************Authentification****************************************/
+//*********************************Authentification****************************************/
 
 
 route.post('/api/signIn', (req, res) => {
@@ -520,13 +539,37 @@ route.post('/api/signIn', (req, res) => {
 //**********************************Gestion des clients****************************************/
 
   route.get("/api/getAllClients", clientController.getAllClients);
+  route.put("/api/updateClient/:email",(req, res) => {
+    const email=req.params.email;
+    const {nom,prenom,tel ,photo}=req.body;
+    const query = "UPDATE client SET nom = ?, prenom = ?, tel= ? , photo=? WHERE email = ?";
+  connection.query(query,[nom, prenom,tel,photo,email],(err, rows) => {
+    if (err) {
+      console.error("Error executing query: " + err.stack);
+      return;
+    }
+    console.log("Result rows:", rows);
+    res.json( rows);
+  });
+    } );
   route.post("/api/SignUp", clientController.insertClient);
   route.put("/api/verifyUser/:activeCode", clientController.verifyUser);
-
   route.delete("/api/deleteClient/:CIN", clientController.deleteClient);
   route.get("/api/getClientbyCIN/:CIN", clientController.getClientbyCIN);
   route.get("/api/clients/search/:value", clientController.searchClients);
-  
+  route.get("/api/getInfosClient/:email",(req, res) => {
+    const email=req.params.email;
+    const query = "SELECT * FROM client where email=?";
+    connection.query(query,email ,(err, rows) => {
+  if (err) {
+    console.error("Error executing query: " + err.stack);
+    return;
+  }
+  console.log("Result rows:", rows);
+  res.json( rows);
+});
+  } );
+
 
    
 //**********************************Gestion des personnels****************************************/
@@ -728,6 +771,71 @@ route.get("/api/personnel/:nomCentre",(req,res)=>{
     });
   })
 
+route.get("/api/getHorairePerso/:CIN",(req,res)=>{
+  const CIN = req.params.CIN;
+  const query = "SELECT heure.ouverture, heure.fermeture, horaire.jour FROM horaire INNER JOIN heure ON heure.refHoraire = horaire.reference  INNER JOIN personnel ON personnel.CIN=heure.CinPersonnel WHERE personnel.CIN =?";
+  connection.query(query,CIN, (err, rows) => {
+    if (err) {
+      console.error("Error executing query: " + err.stack);
+      return;
+    }
+    console.log("Result rows:", rows);
+    res.json( rows);
+  });
+})
+route.get("/api/heureCalendrierPerso/:CIN", (req, res) => {
+  const CIN = req.params.CIN;
+  const currentDate = new Date();
+  const day = format(currentDate, "EEEE", { locale: fr });
+  
+    const query =
+      "SELECT heure.ouverture, heure.fermeture, horaire.jour FROM horaire INNER JOIN heure ON heure.refHoraire = horaire.reference WHERE heure.CinPersonnel = ?";
+    connection.query(query,CIN, (err, rows) => {
+      if (err) {
+        console.error("Error executing query: " + err.stack);
+        return;
+      }
+      console.log("Result rows:", rows);
+  
+      const joursSemaine = [
+        "Lundi",
+        "Mardi",
+        "Mercredi",
+        "Jeudi",
+        "Vendredi",
+        "Samedi",
+        "Dimanche",
+      ];
+  
+      const joursRowsMap = new Map();
+  
+      rows.forEach((row) => {
+        const lowercasedJour = row.jour.toLowerCase();
+        if (joursRowsMap.has(lowercasedJour)) {
+          const existingRow = joursRowsMap.get(lowercasedJour);
+          if (!existingRow.ouverture && !existingRow.fermeture) {
+            existingRow.ouverture = row.ouverture;
+            existingRow.fermeture = row.fermeture;
+          }
+        } else {
+          joursRowsMap.set(lowercasedJour, { ouverture: row.ouverture, fermeture: row.fermeture });
+        }
+      });
+  
+      const startIndex = joursSemaine.findIndex((jour) => jour.toLowerCase() === day);
+  
+      const filteredRows = joursSemaine.slice(startIndex).concat(joursSemaine.slice(0, startIndex)).map((jour) => {
+        const lowercasedJour = jour.toLowerCase();
+        if (joursRowsMap.has(lowercasedJour)) {
+          return { jour, ...joursRowsMap.get(lowercasedJour) };
+        } else {
+          return { jour, ouverture: null, fermeture: null };
+        }
+      });
+  
+      res.json(filteredRows);
+    });
+  });
 route.get("/api/get",(req,res)=>{
     const query = "SELECT * FROM ville";
     connection.query(query, (err, rows) => {
@@ -752,10 +860,11 @@ route.get("/api/get",(req,res)=>{
     });
   })
 
-  route.get("/api/getAll/:ville",(req,res)=>{
-    const ville=req.params.ville;
-    const query =  "SELECT image.src,succursale.adresse, centre.nom FROM centre INNER JOIN image ON centre.reference = image.refCentre INNER JOIN succursale ON centre.reference = succursale.refCentre INNER JOIN ville ON ville.code = succursale.codeVille  WHERE ville.nom = ? and couverture=1";
-    connection.query(query,ville,(err, rows) => {
+  route.get("/api/getAll",(req,res)=>{
+    const ville=req.query.ville;
+    const type=req.query.type;
+    const query =  "SELECT image.src,succursale.adresse, centre.nom FROM centre INNER JOIN image ON centre.reference = image.refCentre INNER JOIN succursale ON centre.reference = succursale.refCentre INNER JOIN ville ON ville.code = succursale.codeVille  WHERE ville.nom = ? and couverture=1 and centre.type=?";
+    connection.query(query,[ville,type],(err, rows) => {
       if (err) {
         console.error("Error executing query: " + err.stack);
         return;
@@ -1052,8 +1161,9 @@ route.get("/api/getChoixSalon",(req,res)=>{
   });
   
 route.get("/api/getResvPerso/:CIN",(req,res)=>{
-    const query =  "SELECT client.nom,personnel.nom,service.nomService,startDateResv,endDateResv FROM reservation INNER JOIN client ON reservation.CINClient = client.CIN INNER JOIN service ON reservation.refService = service.reference INNER JOIN personnel ON reservation.CINPersonnel = personnel.CIN WHERE personnel.CIN= ? and reservation.refCentre=1;";
-    connection.query(query,CIN,(err, rows) => {
+  const CIN = req.params.CIN;
+    const query =  "SELECT client.nom,personnel.nom,service.nomService,startDateResv,endDateResv FROM reservation INNER JOIN client ON reservation.CINClient = client.CIN INNER JOIN service ON reservation.refService = service.reference INNER JOIN personnel ON reservation.CINPersonnel = personnel.CIN WHERE personnel.CIN= ? ";
+    connection.query(query,CIN,(err,rows) => {
       if (err) {
         console.error("Error executing query: " + err.stack);
         return;
@@ -1062,6 +1172,10 @@ route.get("/api/getResvPerso/:CIN",(req,res)=>{
       res.json( rows);
     });
   })
+<<<<<<< HEAD
+ 
+
+=======
   route.get("/api/getResvP/:CIN",(req,res)=>{
     const id = req.params.CIN;
     const query =  "SELECT * FROM reservation WHERE CINPersonnel="+id;
@@ -1170,10 +1284,10 @@ route.get("/api/getResvPerso/:CIN",(req,res)=>{
     });
   })
   
+>>>>>>> a0d3df61f0fffe6a22be2f0e0b2ae5c772246f51
   route.post("/api/addResvPerso", (req, res) => {
-    const { cinPersonnel, nomSalon, nomService, selectedTime} = req.body;
-    console.log("avant"+cinPersonnel, nomSalon, nomService, selectedTime)
-    const CINClient = 5;
+    const { cinPersonnel,cinClient, nomSalon, nomService, selectedTime} = req.body;
+    console.log("avant"+cinPersonnel,cinClient, nomSalon, nomService, selectedTime)
     const query1 = "SELECT duree, reference FROM service WHERE nomService = ?";
     const query2 = "SELECT reference FROM centre WHERE nom = ?";
     const query = "INSERT INTO reservation(startDateResv, endDateResv, CINClient, refService, CinPersonnel, refCentre) VALUES (?, ?, ?, ?, ?, ?)";
@@ -1245,9 +1359,9 @@ const updatedDateTimeString = `${updatedDateTime.getFullYear()}-${(
 
 console.log(updatedDateTimeString);
       
-    console.log("apresss"+selectedTime,updatedDateTimeString, CINClient, refService, cinPersonnel, refCentre)
+    console.log("apresss"+selectedTime,updatedDateTimeString, cinClient, refService, cinPersonnel, refCentre)
         
-        const values3 = [selectedTime,updatedDateTimeString, CINClient, refService, cinPersonnel, refCentre];
+        const values3 = [selectedTime,updatedDateTimeString, cinClient, refService, cinPersonnel, refCentre];
     
 
 connection.query(query, values3, (err, rows3) => {
@@ -1271,32 +1385,150 @@ connection.query(query, values3, (err, rows3) => {
   })
 });
 
+ route.post("/api/addResv", (req, res) => {
+    const {refCentre, startDate, endDate,titre} = req.body;
+      const query = "INSERT INTO reservation(startDateResv, endDateResv, titre,refCentre) VALUES (?, ?, ?, ?)";
+      connection.query(query, [ startDate, endDate,titre,refCentre], (err, rows) => {
+        if (err) {
+          console.error("Error executing query: " + err.stack);
+          return;
+        }
+        console.log("Result rows:", rows);
+        res.json(rows);
+      });
+    })
   
-  
-  
-  
-  route.get("/api/getReservation/:refCentre",(req,res)=>{
-    const refCentre=req.params.refCentre;
-    const query =  "SELECT client.nom,client.prenom,client.photo,personnel.photo as photoPerso,personnel.nom as nomPerso,personnel.prenom as prenomPerso,service.nomService,startDateResv,endDateResv FROM reservation INNER JOIN client ON reservation.CINClient = client.CIN INNER JOIN service ON reservation.refService = service.reference INNER JOIN personnel ON reservation.CINPersonnel = personnel.CIN WHERE reservation.refCentre=?; ";
-    connection.query(query,refCentre,(err, rows) => {
-      if (err) {
-        console.error("Error executing query: " + err.stack);
-        return;
-      }
-      console.log("Result rows:", rows);
-      res.json( rows);
+    route.get("/api/getReservation/:refCentre", (req, res) => {
+      const refCentre = req.params.refCentre;
+      const query = `
+        SELECT
+          IFNULL(client.nom, NULL) AS nom,
+          IFNULL(client.prenom, NULL) AS prenom,
+          IFNULL(client.photo, NULL) AS photo,
+          IFNULL(personnel.photo, NULL) AS photoPerso,
+          IFNULL(personnel.nom, NULL) AS nomPerso,
+          IFNULL(personnel.prenom, NULL) AS prenomPerso,
+          IFNULL(service.nomService, NULL) AS nomService,
+          IFNULL(reservation.titre, NULL) AS titre,
+          startDateResv,
+          endDateResv
+        FROM
+          reservation
+          LEFT JOIN client ON reservation.CINClient = client.CIN
+          LEFT JOIN service ON reservation.refService = service.reference
+          LEFT JOIN personnel ON reservation.CINPersonnel = personnel.CIN
+        WHERE
+          reservation.refCentre = ?;
+      `;
+    
+      connection.query(query, refCentre, (err, rows) => {
+        if (err) {
+          console.error("Error executing query: " + err.stack);
+          return;
+        }
+        console.log("Result rows:", rows);
+        res.json(rows);
+      });
     });
-  })
-  
-  
-  
-
-
-
-
-
-  
-  
+      route.get("/api/getResvClient/:email", (req, res) => {
+        const email = req.params.email;
+      
+        const query1 = "SELECT CIN FROM client WHERE email = ?";
+        const query2 = "SELECT reservation.reference,service.nomService,service.duree,service.prix,startDateResv,endDateResv,centre.nom ,image.src FROM reservation INNER JOIN service ON reservation.refService = service.reference INNER JOIN centre ON reservation.refCentre = centre.reference INNER JOIN image ON reservation.refCentre = image.refCentre WHERE CINClient=? and couverture=1";
+        connection.query(query1, [email], (err, rows1) => {
+          if (err) {
+            console.error("Error executing query1: " + err.stack);
+            return;
+          }
+      
+          const CIN = rows1[0].CIN;
+      
+          connection.query(query2, [CIN], (err, rows2) => {
+            if (err) {
+              console.error("Error executing query2: " + err.stack);
+              return;
+            }
+            
+            console.log("Result rows:", rows2);
+            res.json(rows2);
+          });
+        });
+      });
+      route.delete("/api/deleteResv/:reference",(req,res) => {
+        const reference=req.params.reference;
+        var sql = "DELETE FROM reservation WHERE reference = ?";
+        connection.query(sql,reference,function (err, rows){
+          if (err) {
+            console.error("Error executing query: " + err.stack);
+            return;
+          }
+          console.log("Result rows:", rows);
+          res.json( rows);
+        });
+        }); 
+        route.put("/api/updateResv/:reference", (req, res) => {
+          const reference = req.params.reference;
+          const startDate = req.body.startDate;
+          
+          const query = "SELECT service.duree FROM reservation INNER JOIN service ON service.reference = reservation.refService WHERE reservation.reference = ?";
+          const sql = "UPDATE reservation SET startDateResv = ?, endDateResv = ? WHERE reference = ?";
+        
+          connection.query(query, [reference], function (err, rows2) {
+            if (err) {
+              console.error("Error executing query: " + err.stack);
+              res.status(500).json({ error: "Internal server error" });
+              return;
+            }
+        
+            if (rows2.length === 0) {
+              // Handle the case where no rows were returned
+              res.status(404).json({ error: "Service not found" });
+              return;
+            }
+        
+            console.log("Result rows 2:", rows2);
+            const durationString = rows2[0].duree;
+            
+            const dateTime = new Date(startDate);
+        
+            const durationParts = durationString.split(":");
+            const hours = parseInt(durationParts[0], 10);
+            const minutes = parseInt(durationParts[1], 10);
+            const seconds = parseInt(durationParts[2], 10);
+        
+            const updatedDateTime = new Date(
+              dateTime.getTime() + hours * 3600000 + minutes * 60000 + seconds * 1000
+            );
+        
+            const updatedHours = updatedDateTime.getHours().toString().padStart(2, "0");
+            const updatedMinutes = updatedDateTime.getMinutes().toString().padStart(2, "0");
+            const updatedSeconds = updatedDateTime.getSeconds().toString().padStart(2, "0");
+        
+            const updatedDateTimeString = `${updatedDateTime.getFullYear()}-${(
+              updatedDateTime.getMonth() + 1
+            )
+              .toString()
+              .padStart(2, "0")}-${updatedDateTime
+              .getDate()
+              .toString()
+              .padStart(2, "0")} ${updatedHours}:${updatedMinutes}:${updatedSeconds}`;
+        
+            console.log(updatedDateTimeString);
+        
+            connection.query(sql, [startDate, updatedDateTimeString, reference], function (err, rows3) {
+              if (err) {
+                console.error("Error executing query: " + err.stack);
+                res.status(500).json({ error: "Internal server error" });
+                return;
+              }
+        
+              console.log("Result rows 3:", rows3);
+              res.json({ success: true });
+            });
+          });
+        });
+        
+      
 //**********************************Gestion des categories****************************************/
 
 //View categories
@@ -1312,37 +1544,6 @@ route.get("/api/categories",(req,res) => {
   });
   });
 
-
-//View categories
-route.get("/api/categories",(req,res) => {
-  var sql = "SELECT * FROM categorie";
-  connection.query(sql,function (error, result){
-      if(error) {
-          console.log("3"); 
-      }else {
-          res.send({status: true, data: result});
-      }
-  });
-});
-//Create categories
-
-route.post("/api/categories/add",(req,res) => {
-  let details = {
-      nom:req.body.nom,
-      description:req.body.description,
-  };
-  let sql = "INSERT INTO categorie SET ?";
-  connection.query(sql,details,(error) => {
-      if(error){
-          res.send({ status: false, message: "Categorie created Failed"});
-      } else {
-          res.send({ status: true, message: "Categorie created successfully"}); 
-      }
-  });
-});
-
-//Search categories
-
 route.get("/api/categories/search/:value", (req, res) => {
   var nom = req.params.value;
   var sql = "SELECT * FROM categorie WHERE nom like '"+nom.toString()+"%'";
@@ -1355,39 +1556,8 @@ route.get("/api/categories/search/:value", (req, res) => {
   });
 });
 
-//Update categories
 
-route.put("/api/categories/update/:reference",(req,res) => {
-  let sql = "UPDATE categorie SET nom='" +
-      req.body.nom +
-      "', description='" + 
-      req.body.description +
-      "' WHERE reference=" +
-      req.params.reference;
 
-  let query = connection.query(sql, (error,result) => {
-      if(error){
-          res.send({ status: false, message: "Categorie Updated Failed"});
-      } else {
-          res.send({ status: true, message: "Categorie Updated successfully"}); 
-      }
-  });
-});
-
-//Delete categories
-
-route.delete("/api/categories/delete/:reference",(req,res) => {
-  let sql = "DELETE FROM categorie WHERE reference=" +
-      req.params.reference;
-
-  let query = connection.query(sql, (error,result) => {
-      if(error){
-          res.send({ status: false, message: "Categorie Deleted Failed"});
-      } else {
-          res.send({ status: true, message: "Categorie Deleted successfully"}); 
-      }
-  });
-});
 //**********************************Gestion des services****************************************/
 
 //View services
@@ -1422,9 +1592,6 @@ route.get("/api/getService/:nomService",(req,res) => {
   });
 });
 
-
-
-
 //View services par nom centre
 route.get("/api/servicesNomCentre/:nomCentre",(req,res) => {
   const nomCentre=req.params.nomCentre;
@@ -1439,8 +1606,9 @@ route.get("/api/servicesNomCentre/:nomCentre",(req,res) => {
   });
 });
 
-//Create service
 
+<<<<<<< HEAD
+=======
 route.post("/api/services/add/:refCentre",(req,res) => {
   const refCentre=req.params.refCentre;
   let details = {
@@ -1544,4 +1712,5 @@ route.post("/stripe/charge",cors(),async(req,res)=>{
         })
     }
 })
+>>>>>>> a0d3df61f0fffe6a22be2f0e0b2ae5c772246f51
 module.exports = route;
