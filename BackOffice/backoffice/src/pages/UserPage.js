@@ -41,9 +41,9 @@ const TABLE_HEAD = [
   { id: 'Cin', label: 'CIN', alignRight: false },
   { id: 'telephone', label: 'Telephone', alignRight: false },
   { id: 'email', label: 'Email', alignRight: false },
-  { id: 'password', label: 'Password', alignRight: false },
   { id: 'sexe', label: 'Sexe', alignRight: false },
   {id:'valide'},
+  { id: '' },
 ];
 
   
@@ -108,6 +108,7 @@ export default function UserPage() {
              if (result.isConfirmed) {
               window.location.reload()
               axios.delete(`http://localhost:5000/api/deleteClient/${CIN}`)
+              .then(res => setCIN(res.data));
                swalWithBootstrapButtons.fire(
                  'Supprimé!',
                  'Votre client a été supprimé.',
@@ -237,8 +238,9 @@ export default function UserPage() {
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row,index) => {
-                    const { id, nom,prenom, tel, sexe, CIN, photo, email , password} = row;
+                  {filteredUsers.
+                  slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row,index) => {
+                    const { id, nom,prenom, tel, sexe, CIN, photo, email} = row;
                     const selectedUser = selected.indexOf(nom) !== -1;
                    
                     return (
@@ -258,13 +260,14 @@ export default function UserPage() {
 
                         <TableCell align="left">{email}</TableCell>
 
+
                         <TableCell align="left">
                           <Label>{sexe}</Label>
                         </TableCell>
 
-                        <TableCell align="centre">
+                        <TableCell align="right">
                           
-                          <IconButton align="centre" size="large" sx={{ color: 'error.main' }} onClick={() => onDelete(CIN)}>
+                          <IconButton size="large" sx={{ color: 'error.main' }} onClick={() => onDelete(CIN)}>
                             <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
                       
                           </IconButton>

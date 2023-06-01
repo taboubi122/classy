@@ -36,11 +36,6 @@ import DashboardLayoutCentreProp from './layouts/DashboardPropCentre/DashboardLa
 import PropProfil from './pages/PropProfil';
 import PropPage from './pages/PropPage';
 import StripeContainer from './pages/Stripe/StripeContainer'
-import AjouterCentre from './pages/AjouterCentre';
-import PropLogin from './pages/PropLogin';
-import AvisClient from './pages/AvisClient';
-import GereCommAdmin from './pages/GereCommAdmin';
-import ConsulterComm from './pages/ConsulterComm';
 
 // ----------------------------------------------------------------------
 
@@ -64,12 +59,16 @@ export default function Router() {
      element: <HomeApp/> ,index: true ,
     },
     {
+      path: '/payer',
+     element: <StripeContainer/> ,index: true ,
+    },
+    {
       path: '/admin',
      element: <LoginAdmin/> ,index: true ,
     },
     {
       path: '/prop',
-     element: <PropLogin/> ,index: true ,
+     element: <PersoLogin/> ,index: true ,
     },
     {
       path: '/perso',
@@ -108,14 +107,12 @@ export default function Router() {
         { path: 'reservation', element: <Reservation/> },
         { path: 'categories', element: <CategoriesPage /> },
         { path: 'services', element: <ServicePageProp /> },
-        { path: 'offres', element: <OffrePageProp /> },
-        { path: 'comm', element: <GereCommAdmin /> }, 
+        { path: 'offres', element: <OffrePageProp /> }, 
         { path: 'horaires', element: <HoraireProp /> },
         { path: 'info', element: <DetailsCentre/> },
         { path: 'detailPerso/:CIN', element: <PersonnelDetails/> },
       ],
     },
-    { path: '/add/:id', element: <HoraireProp /> },
     {    
       path: '/dashboardCentreProp/:id',
       element:<DashboardLayoutCentreProp/> ,
@@ -126,7 +123,6 @@ export default function Router() {
         { path: 'reservationProp', element: <Reservation/> },
         { path: 'categoriesProp', element: <CategoriesPage /> },
         { path: 'servicesProp', element: <ServicePageProp /> },
-        { path: 'comm', element: <ConsulterComm /> },
         { path: 'offresProp', element: <OffrePageProp /> }, 
         { path: 'horairesProp', element: <HoraireProp /> },
         { path: 'infoProp', element: <DetailsCentre/> },
@@ -140,12 +136,9 @@ export default function Router() {
         { element: <Navigate to="/dashboardProp/:id/appProp" />, index: true },
         { path: 'appProp', element: <DashboardProp/>},
         { path: 'centres', element: <CentresPageProp/> },
-        { path: 'payer', element: <StripeContainer/> },
-        { path: 'add/:ref', element: <AjouterCentre/>},
         { path: 'info', element: <PropProfil/> },
       ],
     },
-
     {    
       path: '/dashboardPerso/:id',
       element:<DashboardLayoutPersonnel/> ,
@@ -153,11 +146,9 @@ export default function Router() {
         { element: <Navigate to="/dashboardPerso/:id/reservation" />, index: true },
         { path: 'reservation', element: <DashboardPerso/> },
         { path: 'horaires', element: <DashboardPerso/> },
-        { path: 'profile', element: <PersonnelDetails/> },
+        { path: 'profile', element: <DashboardPerso/> },
       ],
     },
-    { path: 'profile/:id/p', element: <PersonnelDetails/>, index: true },
-
     {
       element: <SimpleLayout />,
       children: [
@@ -169,14 +160,6 @@ export default function Router() {
     {
       path: '*',
       element: <Navigate to="/404" replace />,
-    },
-    {
-      path: '/avis',
-      element: <AvisClient />,
-    },
-    {
-      path: '/avis/:cin/:centre/:resv',
-      element: <AvisClient />,
     },
     
   ]);
