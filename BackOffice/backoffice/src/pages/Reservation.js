@@ -54,7 +54,10 @@ const [perso, setPerso] = useState([]);
       })
       .catch(error => console.error(error));
   }, [IdSalon]);
+<<<<<<< HEAD
   console.log(Resv)
+=======
+>>>>>>> adfcb93a1f33a1b03b9b8f9f1c866f0cec974d85
 
 
   useEffect(()=>{
@@ -76,6 +79,7 @@ const [perso, setPerso] = useState([]);
       localStorage.setItem("calendarView", calendarView);
     }, [calendarView]);
     
+<<<<<<< HEAD
     const createEvent = (reservation) => {
       console.log(services)
       const personnel=perso.filter((ele)=>ele.CIN===reservation.CINPersonnel)
@@ -105,6 +109,38 @@ const [perso, setPerso] = useState([]);
       };
     }
   
+=======
+
+    const createEvent = (reservation) => {
+      const { nomService, startDateResv, endDateResv, nomPerso, prenomPerso, nom, prenom, titre } = reservation;
+      let personnel = '';
+      let client = '';
+      let service = '';
+    
+      if (nomPerso && prenomPerso) {
+        personnel = `${nomPerso} ${prenomPerso}`;
+      }
+      if (nom && prenom) {
+        client = `${nom} ${prenom}`;
+      }
+      if (nomService) {
+        service = nomService;
+      } else {
+        service = titre || 'Titre par défaut'; // Ajout d'un titre par défaut si le service et le titre sont tous les deux vides
+      }
+    
+      return {
+        title: service,
+        start: startDateResv,
+        end: endDateResv,
+        personnel: personnel,
+        client: client,
+        allDay: false,
+      };
+    };
+    
+    
+>>>>>>> adfcb93a1f33a1b03b9b8f9f1c866f0cec974d85
   const [newEvent, setNewEvent] = useState({ title:"", start: new Date(), end:new Date(),nom:"",prenom:"",nomPerso:"",prenomPerso:"" });
  
   const events = Resv.map((reservation) => createEvent(reservation));
@@ -122,7 +158,46 @@ const [perso, setPerso] = useState([]);
          }
   const [allEvents,setAllEvents]=useState(events)
 
+  const handleAddEvent = async () => {
+    try {
+      await axios.post('http://localhost:5000/api/addResv', {
+        refCentre: IdSalon,
+        startDate: newEvent.start,
+        endDate: newEvent.end,
+        titre: newEvent.title
+      });
+      console.log('Reservation added');
+      window.location.reload();
+    } catch (error) {
+      console.error('Error adding reservation:', error);
+    }
+  
+    const { title, start, end, nom, prenom, nomPerso, prenomPerso } = newEvent;
+    const startTimestamp = Date.parse(start);
+    const endTimestamp = Date.parse(end);
+  
+    const newEventObject = {
+      title,
+      start: new Date(startTimestamp),
+      end: new Date(endTimestamp),
+      nom,
+      prenom,
+      nomPerso,
+      prenomPerso
+    };
+    setAllEvents([...allEvents, newEventObject]);
+    setNewEvent({ title: '', start: new Date(), end: new Date(), nom: '', prenom: '', nomPerso: '', prenomPerso: '' });
+  };
+  
+const handleSelectEvent = (event, e) => {
+  const popoverContent = `
+    <p>Start: ${event.start.toLocaleString()}</p>
+    <p>End: ${event.end.toLocaleString()}</p>
+    ${event.client ? `<p>Client: ${event.client}</p>` : ''}
+    ${event.personnel ? `<p>Personnel: ${event.personnel}</p>` : ''}
+  `;
 
+<<<<<<< HEAD
 const handleAddEvent = () => {
   const { title, start, end ,nom,prenom,nomPerso,prenomPerso} = newEvent;
   const startTimestamp = Date.parse(start);
@@ -204,7 +279,19 @@ const handleAddEvent = () => {
       });
       popover.show();
       }
+=======
+  const popover = new bootstrap.Popover(e.target, {
+    title: event.title,
+    content: popoverContent,
+    trigger: "hover",
+    placement: "auto",
+    html: true,
+    customClass: "popoverStyle",
+  });
+  popover.show();
+>>>>>>> adfcb93a1f33a1b03b9b8f9f1c866f0cec974d85
 };
+
 const eventStyleGetter = (event, start, end, isSelected) => {
 let backgroundColor = '';
 if (event.title === 'Coupe Coiffage cheveux') {
@@ -250,6 +337,49 @@ return {
       Calendrier
     </Typography>
   )}
+<<<<<<< HEAD
+  {isOpenPopAdd ? null : (
+    <Button
+      variant="contained"
+      startIcon={<Iconify icon="eva:plus-fill" />}
+      onClick={togglePopup}
+    >
+      New Event
+    </Button>
+  )}
+  {isOpenPopAdd && (
+    <div className="popupEvent">
+      <Button variant="contained" onClick={togglePopup}>
+        X
+      </Button>
+      <h2>Ajouter un event</h2>
+      <DateTimePicker
+  placeholder="Select Start Date"
+  value={newEvent.start}
+  onChange={(start) => setNewEvent({ ...newEvent, start })}
+  timePicker
+/>
+<DateTimePicker
+  placeholder="Select End Date"
+  value={newEvent.end}
+  onChange={(end) => setNewEvent({ ...newEvent, end })}
+  timePicker
+/>
+<Input
+  type="text"
+  placeholder="Add Title"
+  value={newEvent.title}
+  onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+/>
+      <br />
+      <br />
+      <Button variant="contained" onClick={handleAddEvent}>
+        Ajouter
+      </Button>
+    </div>
+  )}
+=======
+>>>>>>> a0d3df61f0fffe6a22be2f0e0b2ae5c772246f51
 </Stack>
            <Card>
             <Calendar
