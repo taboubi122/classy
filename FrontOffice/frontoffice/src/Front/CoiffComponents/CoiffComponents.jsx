@@ -36,6 +36,7 @@ const CoiffComponents= ({ isLoggedIn}) =>{
         .then(res=>setVille(res.data)
         );
          },[]);
+         console.log(ville)
     const [loc,setLoc]=useState([]);
     const l=[]
     let local=()=>{
