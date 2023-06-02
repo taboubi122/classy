@@ -3,22 +3,14 @@ import { Navigate, useRoutes, useNavigate } from 'react-router-dom';
 import SimpleLayout from './layouts/simple';
 //
 import Page404 from './pages/Page404';
-import EnvoyerDemandePage from './pages/EnvoyerDemandePage';
 import ConfirmationProp from './pages/ConfirmationProp';
 import {useState,React } from 'react';
 // layouts
-//
-import UserPage from './pages/UserPage';
-import ProductsPage from './pages/ProductsPage';
-import DetailsCentre from './pages/DetailsCentre';
-import PersonnelPage from './pages/personnels';
-import PersonnelDetails from './pages/PersonnelDetails';
-import Reservation from './pages/Reservation';
+import ProfilClient from './Front/profilClient';
 import Home from './Front/Home';
 import Auth from './Front/Auth';
 import ConfirmUser from './Front/confirmUser';
 import SignUp from './Front/SignUp/SignUp';
-import Calendrier from './Front/Calendrier';
 import Coiffure from './Front/coiffure/Coiffure';
 import DetailsCoiff from './Front/detailsCoiff/DetailsCoiff';
 import CoiffComponents from './Front/CoiffComponents/CoiffComponents';

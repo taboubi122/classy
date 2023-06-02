@@ -692,8 +692,8 @@ route.post('/api/signIn', (req, res) => {
   }
   console.log("Result rows:", rows);
   res.json( rows);
+ });
 });
-  } );
 
 
    
@@ -834,6 +834,18 @@ const day = format(currentDate, "EEEE", { locale: fr });
     res.json(filteredRows);
   });
 });
+route.get("/api/getAll/:ville",(req,res)=>{
+  const ville=req.params.ville;
+  const query =  "SELECT image.src,succursale.adresse, centre.nom FROM centre INNER JOIN image ON centre.reference = image.refCentre INNER JOIN succursale ON centre.reference = succursale.refCentre INNER JOIN ville ON ville.code = succursale.codeVille  WHERE ville.nom = ? and couverture=1";
+  connection.query(query,ville,(err, rows) => {
+    if (err) {
+      console.error("Error executing query: " + err.stack);
+      return;
+    }
+    console.log("Result rows:", rows);
+    res.json( rows);
+  });
+})
 route.get("/api/getCentresProp/:CIN",(req,res)=>{
   const id = req.params.CIN;
   const query =  "SELECT centre.reference, image.src, centre.nom, centre.type FROM centre INNER JOIN image ON centre.reference = image.refCentre AND couverture = 1 WHERE centre.Cinprop ="+id;

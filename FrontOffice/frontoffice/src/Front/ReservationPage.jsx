@@ -30,12 +30,19 @@ const ReservationPage= ({ isLoggedIn}) =>{
     if (location.pathname.split('/').length > 4) {
       refUpdate = location.pathname.split('/')[4];
     }
-const [services, setServices] = useState([]);
-const [Perso, setPerso] = useState([]);
-const [name,setName]=useState([]);
-const [adresse,setAdresse]=useState([]);
-const [selectedPerso, setSelectedPerso] = useState('');
-const [avis,setAvis]=useState([]);
+    const [services, setServices] = useState([]);
+    const [Perso, setPerso] = useState([]);
+    const [name,setName]=useState([]);
+    const [avis,setAvis]=useState([]);
+    const [adresse,setAdresse]=useState([]);
+    const [selectedPerso, setSelectedPerso] = useState(0);
+    const [horairesDisponibles, setHorairesDisponibles] = useState([]);
+    const [email, setEmail] = useState('');
+    const [client, setClient] = useState([]);
+    const [selectedDateTime, setSelectedDateTime] = useState(null);
+    const [confirmer, setConfirmer] = useState(false);
+    const [newPres, setNewPres] = useState(false);
+    const [leSservices,setLesServices]=useState([]);
 
 
 const handlePersoChange = (event) => {
