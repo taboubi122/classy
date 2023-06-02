@@ -4,6 +4,16 @@ import {useState, useEffect, React} from 'react';
 import { Buffer } from 'buffer';
 import { faker } from '@faker-js/faker';
 import { Calendar, momentLocalizer  } from 'react-big-calendar';
+import {
+  Card,
+  Stack,
+  TableRow,
+  TableBody,
+  TableCell,
+  Container,
+  Typography,
+  Grid,
+} from '@mui/material';
 import moment from 'moment';
 import "react-big-calendar/lib/css/react-big-calendar.css"
 import "react-datepicker/dist/react-datepicker.css"
@@ -11,13 +21,6 @@ import * as bootstrap from "bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css"
 import 'moment/locale/fr';
 import 'datetime-picker-reactjs/dist/index.css'
-import {
-    Container, 
-    Typography,
-    Grid,
-    Card,
-    Stack
-  } from '@mui/material';
   
 import { useLocation} from "react-router-dom";
 import { makeStyles } from '@material-ui/core/styles';
@@ -75,11 +78,8 @@ const useStyles = makeStyles((theme) => ({
   }));
   
 export default function PersonnelDetails() {
-<<<<<<< HEAD
   const [Horaire,setHoraire]=useState([]);
-=======
   moment.locale('fr');
->>>>>>> a0d3df61f0fffe6a22be2f0e0b2ae5c772246f51
 const [nomService,setNomservice] = useState("");
 const [fonction, setFonction] = useState("");
 const classes = useStyles();
@@ -226,8 +226,6 @@ Telephone
 <Typography variant="h6">{row.tel}</Typography>
 </div>
 <div>
-<<<<<<< HEAD
-=======
 <Typography variant="body2" color="textSecondary">
 Email
 </Typography>
@@ -238,12 +236,10 @@ Email
 Sexe
 </Typography>
 <Typography variant="h6">{row.sexe}</Typography>
->>>>>>> a0d3df61f0fffe6a22be2f0e0b2ae5c772246f51
 </div>
 </div>
 </div>
 </Card>
-<<<<<<< HEAD
 <Card style={{ width: '50%',height:'fit-content' }}>
   {Horaire.map((donne, index) => (
     <table>
@@ -260,9 +256,7 @@ Sexe
     </table>
   ))}
 </Card>
-=======
 <AppOrderTimeline list={newsList} />
->>>>>>> a0d3df61f0fffe6a22be2f0e0b2ae5c772246f51
 </Grid> )})}
 
         </Grid>

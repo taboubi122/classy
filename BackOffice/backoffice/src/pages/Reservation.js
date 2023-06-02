@@ -8,9 +8,13 @@ import * as bootstrap from "bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css"
 import 'moment/locale/fr';
 import 'datetime-picker-reactjs/dist/index.css'
+import Swal from "sweetalert2";
+import DateTimePicker from 'react-datetime-picker';
+
+
 import axios from 'axios';
 // @mui
-import { Card, Stack, Button, Container, Typography,Input , FormControlLabel, Radio,RadioGroup } from '@mui/material';
+import { Card, Stack, Container,Button,Input, Typography} from '@mui/material';
 import { useLocation} from "react-router-dom";
 import Iconify from '../components/iconify';
 // sections
@@ -19,13 +23,24 @@ export default function Reservation() {
 const localizer = momentLocalizer(moment);
 const [Resv, setResv] = useState([]);
 const [PersoCalen, setPersoCalen] = useState([]);
+const [services, setServices] = useState([]);
+const [client, setClient] = useState([]);
+const [perso, setPerso] = useState([]);
     const location = useLocation();
   const IdSalon= location.pathname.split("/")[2];
   console.log(`${IdSalon}`);
-
-
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/getReservation/${IdSalon}`)
+    axios
+      .get("http://localhost:5000/api/getAllServices")
+      .then((res) => setServices(res.data));
+  }, []);
+  useEffect(()=>{
+    axios.get(`http://localhost:5000/api/getp`)
+    .then(res=>setPerso(res.data)
+    );
+     },[]);
+  useEffect(() => {
+    axios.get(`http://localhost:5000/api/getResvC/${IdSalon}`)
       .then(res => {
         const formattedData = res.data.map((reservation) => ({
           ...reservation,
@@ -37,25 +52,14 @@ const [PersoCalen, setPersoCalen] = useState([]);
       .catch(error => console.error(error));
   }, [IdSalon]);
   console.log(Resv)
+
+
   useEffect(()=>{
     axios.get(`http://localhost:5000/api/getAllPersonnels/${IdSalon}`)
     .then(res=>setPersoCalen(res.data)
     );
      },[]);
     
-     const showCalendar=(CIN)=>{
-      console.log(CIN)
-      axios.get(`http://localhost:5000/api/getResvPerso/${CIN}`)
-        .then(res => {
-          const formattedData = res.data.map((reservation) => ({
-            ...reservation,
-            startDateResv: moment(reservation.startDateResv).toDate(),
-            endDateResv: moment(reservation.endDateResv).toDate(),
-          }));
-          setResv(formattedData);
-        })
-        .catch(error => console.error(error));
-    }
     
     const [calendarView, setCalendarView] = useState("global");
 
@@ -70,38 +74,51 @@ const [PersoCalen, setPersoCalen] = useState([]);
     }, [calendarView]);
     
     const createEvent = (reservation) => {
-      const { nomService, startDateResv, endDateResv, nomPerso, prenomPerso, nom, prenom, titre } = reservation;
-      let personnel = '';
-      let client = '';
-      let service = '';
-    
-      if (nomPerso && prenomPerso) {
-        personnel = `${nomPerso} ${prenomPerso}`;
+      console.log(services)
+      const personnel=perso.filter((ele)=>ele.CIN===reservation.CINPersonnel)
+      const nomC=client.filter((ele)=>ele.CIN===reservation.CINClient)
+      let res1=""
+      let res2=""
+      if(nomC.length===0){
+         res1=""
+      }else{
+         res1=nomC[0].nom+" "+ nomC[0].prenom
       }
-      if (nom && prenom) {
-        client = `${nom} ${prenom}`;
-      }
-      if (nomService) {
-        service = nomService;
-      } else {
-        service = titre || 'Titre par défaut'; // Ajout d'un titre par défaut si le service et le titre sont tous les deux vides
-      }
-    
+      if(personnel.length===0){
+        res2=""
+     }else{
+        res2=personnel[0].nom+" "+ personnel[0].prenom
+     }
       return {
-        title: service,
-        start: startDateResv,
-        end: endDateResv,
-        personnel: personnel,
-        client: client,
+        title: services.filter((ele)=>ele.reference===reservation.refService)[0].nomService,
+        start: reservation.startDateResv,
+        refClient:reservation.CINClient,
+        personnel:res2,
+        client:res1,
+        end: reservation.endDateResv,
+        centre:reservation.refCentre,
+        ref:reservation.reference,
         allDay: false,
       };
-    };
+    }
+  
     
     
   const [newEvent, setNewEvent] = useState({ title:"", start: new Date(), end:new Date(),nom:"",prenom:"",nomPerso:"",prenomPerso:"" });
  
   const events = Resv.map((reservation) => createEvent(reservation));
- console.log(events)
+         console.log(events)
+         function currentTime(d) {
+          let duree = "";
+          const [hours, minutes] = d.split(":");
+          const date = new Date();
+          date.setHours(parseInt(hours, 10));
+          date.setMinutes(parseInt(minutes, 10));
+            duree = `${hours} : ${minutes} `;
+            const [x, t] = duree.split(',')
+            const trimmedTime = t.trim();
+          return trimmedTime;
+         }
   const [allEvents,setAllEvents]=useState(events)
 
   const handleAddEvent = async () => {
@@ -134,53 +151,6 @@ const [PersoCalen, setPersoCalen] = useState([]);
     setAllEvents([...allEvents, newEventObject]);
     setNewEvent({ title: '', start: new Date(), end: new Date(), nom: '', prenom: '', nomPerso: '', prenomPerso: '' });
   };
-  
-const handleSelectEvent = (event, e) => {
-  const popoverContent = `
-    <p>Start: ${event.start.toLocaleString()}</p>
-    <p>End: ${event.end.toLocaleString()}</p>
-    ${event.client ? `<p>Client: ${event.client}</p>` : ''}
-    ${event.personnel ? `<p>Personnel: ${event.personnel}</p>` : ''}
-  `;
-
-      console.log('Reservation added');
-      window.location.reload();
-    }
-  
-    const { title, start, end, nom, prenom, nomPerso, prenomPerso } = newEvent;
-    const startTimestamp = Date.parse(start);
-    const endTimestamp = Date.parse(end);
-  
-    const newEventObject = {
-      title,
-      start: new Date(startTimestamp),
-      end: new Date(endTimestamp),
-      nom,
-      prenom,
-      nomPerso,
-      prenomPerso
-    };
-    setAllEvents([...allEvents, newEventObject]);
-    setNewEvent({ title: '', start: new Date(), end: new Date(), nom: '', prenom: '', nomPerso: '', prenomPerso: '' });
-  };
-  
-const handleSelectEvent = (event, e) => {
-  const popoverContent = `
-    <p>Start: ${event.start.toLocaleString()}</p>
-    <p>End: ${event.end.toLocaleString()}</p>
-    ${event.client ? `<p>Client: ${event.client}</p>` : ''}
-    ${event.personnel ? `<p>Personnel: ${event.personnel}</p>` : ''}
-  `;
-
-const handleAddEvent = () => {
-  const { title, start, end ,nom,prenom,nomPerso,prenomPerso} = newEvent;
-  const startTimestamp = Date.parse(start);
-  const endTimestamp = Date.parse(end);
-
-  const newEventObject = { title, start: new Date(startTimestamp), end: new Date(endTimestamp),nom,prenom,nomPerso,prenomPerso};
-  setAllEvents([...allEvents, newEventObject]);
-  setNewEvent({ title: '', start: new Date(), end: new Date(),nom:"",prenom:"",nomPerso:"",prenomPerso:"" });
-};
     function testDate(d){
       const dateObject = new Date();
       const day = dateObject.getDate();
@@ -253,15 +223,6 @@ const handleAddEvent = () => {
       });
       popover.show();
       }
-  const popover = new bootstrap.Popover(e.target, {
-    title: event.title,
-    content: popoverContent,
-    trigger: "hover",
-    placement: "auto",
-    html: true,
-    customClass: "popoverStyle",
-  });
-  popover.show();
 };
 
 const eventStyleGetter = (event, start, end, isSelected) => {
@@ -300,24 +261,7 @@ return {
 
       <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-  {isOpenPopAdd ? (
-    <Typography variant="h4" gutterBottom>
-      &nbsp;
-    </Typography>
-  ) : (
-    <Typography variant="h4" gutterBottom>
-      Calendrier
-    </Typography>
-  )}
-  {isOpenPopAdd ? null : (
-    <Button
-      variant="contained"
-      startIcon={<Iconify icon="eva:plus-fill" />}
-      onClick={togglePopup}
-    >
-      New Event
-    </Button>
-  )}
+
   {isOpenPopAdd && (
     <div className="popupEvent">
       <Button variant="contained" onClick={togglePopup}>
@@ -349,7 +293,7 @@ return {
       </Button>
     </div>
   )}
-  </Stack>
+
            <Card>
             <Calendar
                     localizer={localizer}
@@ -371,9 +315,8 @@ return {
                   />
 
           </Card>
+          </Stack>
       </Container>
-  </>
-  )}
-
-
-    
+    </>
+  );
+}

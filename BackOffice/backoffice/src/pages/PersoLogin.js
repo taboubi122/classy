@@ -15,7 +15,7 @@ import TopNavbarVide from "./Home/components/Nav/TopNavbarVide";
 
     useEffect(() => {
 		axios
-			.get("http://localhost:5000/api/LoginProp")
+			.get("http://localhost:5000/api/LoginPerso")
 			.then((res) => setProps(res.data));
 	}, []);
 
@@ -83,7 +83,7 @@ import TopNavbarVide from "./Home/components/Nav/TopNavbarVide";
    console.log(getMail[0].CIN) 
     console.log("test1: ",test1," test2: ",test2)
     if(!test1 && !test2){
-        navigate(`/dashboardCentre/${getMail[0].CIN}/app`);
+        navigate(`/dashboardPerso/${getMail[0].CIN}/reservation`);
     }
 	};
   return (
