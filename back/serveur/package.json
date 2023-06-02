@@ -33,13 +33,7 @@
     "nodemon": "^2.0.20",
     "onesignal-node": "^3.4.0",
     "pdf-lib": "^1.17.1",
-<<<<<<< HEAD
-    "pdfobject": "^2.2.8"
-  },
-  "description": ""
-=======
     "pdfobject": "^2.2.8",
     "stripe": "^12.7.0"
   }
->>>>>>> a0d3df61f0fffe6a22be2f0e0b2ae5c772246f51
 }

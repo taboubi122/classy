@@ -18,7 +18,7 @@ import TopNavbarVide from "./Home/components/Nav/TopNavbarVide";
 			.get("http://localhost:5000/api/LoginProp")
 			.then((res) => setProps(res.data));
 	}, []);
-
+  console.log(props)
     const [pass, setPass] = useState('');
     const [mail, setMail] = useState('');
 
@@ -43,10 +43,9 @@ import TopNavbarVide from "./Home/components/Nav/TopNavbarVide";
         setMessageMail(false)
       }
     }
-
+    const getMail=props.filter((ele) => ele.email === mail);
     const handleInsert = (event) => {
 		event.preventDefault();
-        const getMail=props.filter((ele) => ele.email === mail);
         console.log(getMail)
     if(mail===''){
       setError(true)
@@ -83,7 +82,7 @@ import TopNavbarVide from "./Home/components/Nav/TopNavbarVide";
    console.log(getMail[0].CIN) 
     console.log("test1: ",test1," test2: ",test2)
     if(!test1 && !test2){
-        navigate(`/dashboardCentre/${getMail[0].CIN}/app`);
+        navigate(`/dashboardProp/${getMail[0].CIN}/appProp`);
     }
 	};
   return (

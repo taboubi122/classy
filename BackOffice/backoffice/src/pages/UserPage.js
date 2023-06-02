@@ -259,15 +259,6 @@ export default function UserPage() {
                         <TableCell align="left">{tel}</TableCell>
 
                         <TableCell align="left">{email}</TableCell>
-
-<<<<<<< HEAD
-
-=======
-<<<<<<< HEAD
-=======
-
->>>>>>> adfcb93a1f33a1b03b9b8f9f1c866f0cec974d85
->>>>>>> cf491cf37d540a2f7cfde42115be4d73b333d84c
                         <TableCell align="left">
                           <Label>{sexe}</Label>
                         </TableCell>

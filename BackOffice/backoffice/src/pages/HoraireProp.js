@@ -116,16 +116,16 @@ export default function HoraireProp() {
 	};
 	const handleSelectAllClick = (event) => {
 		if (event.target.checked) {
-			const newSelecteds = horaires.map((n) => n.nom);
+			const newSelecteds = jour.map((n) => n.nom);
 			setSelected(newSelecteds);
 			return;
 		}
 		setSelected([]);
 	};
 	const emptyRows =
-		page > 0 ? Math.max(0, (1 + page) * rowsPerPage - horaires.length) : 0;
+		page > 0 ? Math.max(0, (1 + page) * rowsPerPage - jour.length) : 0;
 	const filteredUsers = applySortFilter(
-		horaires
+		jour
 		, getComparator(order, orderBy)
 		, filternom
 	);
@@ -145,10 +145,13 @@ export default function HoraireProp() {
 		const svs = jour.filter((sv) => sv.reference === id);
 		return svs.length > 0 ? svs[0].jour : 'Inconnu';
 	}
-	// Get Name Centre
-	function getJour(id) {
-		const svs = horaires.filter((sv) => sv.reference === id);
-		return svs.length > 0 ? svs[0].refHoraire : 'Inconnu';
+	function Ouverture(id) {
+		const svs = horaires.filter((sv) =>  sv.refHoraire===id && sv.refCentre===idProp);
+		return svs.length > 0 ? svs[0].ouverture : null;
+	}
+	function Fermeture(id) {
+		const svs = horaires.filter((sv) =>  sv.refHoraire===id && sv.refCentre===idProp);
+		return svs.length > 0 ? svs[0].fermeture : null;
 	}
 	// Update
 	const [errMessageO, setErrMessageO]=useState('');
@@ -302,7 +305,7 @@ export default function HoraireProp() {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={horaires.length}
+                  rowCount={jour.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
@@ -311,7 +314,7 @@ export default function HoraireProp() {
                   
                   {filteredUsers
                     .map((row, index) => {
-                      const { reference, ouverture, fermeture, refHoraire } = row;
+                      const { reference, jour } = row;
                       const selectedUser = selected.indexOf(jour) !== -1;
 
                       return (
@@ -330,12 +333,12 @@ export default function HoraireProp() {
                               spacing={2}
                             >
                               <Typography variant="subtitle2" noWrap>
-                              {getNameJour(refHoraire)}
+                              {jour}
                               </Typography>
                             </Stack>
                           </TableCell>
-                          <TableCell align="left"> {currentTime(ouverture)} </TableCell>
-                          <TableCell align="left" width="120"> {currentTime(fermeture)} </TableCell>
+                          <TableCell align="left">{currentTime(Ouverture(reference))}  </TableCell>
+                          <TableCell align="left" width="120"> {currentTime(Fermeture(reference))} </TableCell>
                           <TableCell align="left" width="120"> <div/> </TableCell>
 
                           <TableCell align="right">
@@ -389,7 +392,7 @@ export default function HoraireProp() {
               }}>
                   X
                 </Button>
-                <h2> {getNameJour(getJour(referenceUpdate))} </h2>
+                <h2> {getNameJour(referenceUpdate)} </h2><br/>
                 <Stack spacing={3}>
 					<TextField
                     name="duree"
