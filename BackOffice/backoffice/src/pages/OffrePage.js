@@ -409,7 +409,7 @@ export default function OffrePage() {
 	// Get Name Centre
 	function getNameService(id) {
 		const svs = service.filter((sv) => sv.reference === id);
-		return svs.length > 0 ? svs[0].nom : 'Inconnu';
+		return svs.length > 0 ? svs[0].nomService : 'Inconnu';
 	}
 	// Get description
 	function getdesc(desc) {

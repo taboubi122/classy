@@ -87,11 +87,12 @@ useEffect(() => {
     res[6]=centres.filter((ele) => ele.startDateResv.substring(0, 10) === d[6] && ele.refService===id).length 
    return res
   }
-
+console.log(clients)
+console.log(centres)
   function getCentreRes() {
     const x = [];
     const result=[{label:'',value:0},{label:'',value:0},{label:'',value:0},{label:'',value:0}]
-    if(clients===0 || reservation.length===0){
+    if(clients===0 || centres.length===0){
         return result
     }
     clients.map((row, index) => {
@@ -131,9 +132,10 @@ useEffect(() => {
         type: 'area',
         fill: 'gradient',
         data: [0,0,0,0,0,0,0]}]
-    if(services.length===0 || reservation.length===0){
+    if(services.length===0){
         return result
     }
+    console.log(services)
     services.map((row, index) => {
       const d=getData(row.reference)
       if (d.length===0)
@@ -142,7 +144,23 @@ useEffect(() => {
        s.push({ name: sv[0].nomService, type: 'area', fill: 'gradient', data:getData(row.refService) });
       }
     });
-      return s;
+    
+    var j=0
+    var res=[]
+    for(var i=0;i<s.length;i++){
+      var test=false
+      var f=false;
+      for(var e=0;e<7;e++){
+        if(s[i].data[e]===0){
+          test=false
+        }else{f=true}
+      }
+      if(f===true){
+        res[j]=s[i]
+        j++
+      }
+    }
+      return res;
   }
   return (
     <>

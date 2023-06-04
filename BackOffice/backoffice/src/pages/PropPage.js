@@ -87,7 +87,7 @@ export default function PropPage() {
 	}, []);
 
 	// Desapprouver
-	function DesApprouver(reference) {
+	function Supprimer(CIN) {
 		const swalWithBootstrapButtons = Swal.mixin({
 			customclassName: {
 				confirmButton: "btn btn-success"
@@ -107,15 +107,15 @@ export default function PropPage() {
 			, })
 			.then((result) => {
 				if (result.isConfirmed) {
+          window.location.reload();
 					axios
-						.delete(`http://localhost:5000/api/DesapprouverDemande/${reference}`)
-						.then((res) => setReference(res.data));
+						.delete(`http://localhost:5000/api/SupprimerProp/${CIN}`)
 					swalWithBootstrapButtons.fire(
 						"Supprimé!"
 						, "La demande a été supprimé."
 						, "success"
 					);
-					window.location.reload();
+					
 				} else if (result.dismiss === Swal.DismissReason.cancel) {
 					swalWithBootstrapButtons.fire(
 						"Annulé"
@@ -134,7 +134,7 @@ export default function PropPage() {
 	const [rowsPerPage, setRowsPerPage] = useState(5);
 	const [setReference] = useState();
 	const [isOpenPopAdd, setIsOpenPopAdd] = useState(false);
-
+  console.log(demandes)
 	const togglePopup = () => {
 		setIsOpenPopAdd(!isOpenPopAdd);
 		document.body.style.overflow = "auto";
@@ -173,32 +173,12 @@ export default function PropPage() {
 		, filternom
 	);
 	const isNotFound = !filteredUsers.length && !!filternom;
-	// Duree
+	// etat
 	function etat(d) {
 		if(d===0)
         {return false}
         return true
 	}
-	const downloadPdf2= (id)=> {
-		fetch(`http://localhost:5000/api/getDoc/${id}`)
-		.then(response => response.blob())
-      .then(blob => {
-        const pdfUrl = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.style.display = 'none';
-        document.body.appendChild(link);
-        link.href = pdfUrl;
-        link.setAttribute('download', 'Nouveau Fichier.pdf');
-        link.click();
-        document.body.removeChild(link);
-      })
-      .catch(error => {
-        console.error('Erreur lors du téléchargement du fichier PDF :', error);
-      });
-	  }
-	  console.log(rowsPerPage)
-	  console.log(page)
-	  console.log("xx: ",emptyRows)
 	return (
 		<>
       <Helmet>
@@ -241,10 +221,10 @@ export default function PropPage() {
                   {filteredUsers
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((row, index) => {
-                      const { reference, nom, prenom, email, tel,sexe,activer } = row;
+                      const { CIN, nom, prenom, email, tel,sexe,activer } = row;
                       return (
                         <TableRow
-                          key={reference}
+                          key={CIN}
                         >
                           <TableCell padding="checkbox">
                             <div/>
@@ -297,7 +277,7 @@ export default function PropPage() {
                               sx={{
                                 color: "error.main",
                               }}
-                              onClick={() => DesApprouver(reference)}
+                              onClick={() => Supprimer(CIN)}
                             >
                               <Iconify
                                 icon={"eva:trash-2-outline"}

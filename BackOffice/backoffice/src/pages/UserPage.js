@@ -259,8 +259,6 @@ export default function UserPage() {
                         <TableCell align="left">{tel}</TableCell>
 
                         <TableCell align="left">{email}</TableCell>
-
-
                         <TableCell align="left">
                           <Label>{sexe}</Label>
                         </TableCell>

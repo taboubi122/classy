@@ -1,42 +1,21 @@
 import { Navigate, useRoutes, useNavigate } from 'react-router-dom';
 // layouts
-import DashboardLayout from './layouts/dashboard';
-import DashboardLayoutCentre from './layouts/dashboard - Copie/DashboardLayoutCentre';
 import SimpleLayout from './layouts/simple';
 //
 import Page404 from './pages/Page404';
-import DashboardAppPage from './pages/DashboardAppPage';
-import CategoriesPage from './pages/CategoriesPage';
-import ServicesPage from './pages/ServicesPage';
-import ServicePageProp from './pages/ServicePageProp';
-import OffrePage from './pages/OffrePage';
-import OffrePageProp from './pages/OffrePageProp';
-import HoraireProp from './pages/HoraireProp';
-import DemandesPage from './pages/DemandesPage';
-import EnvoyerDemandePage from './pages/EnvoyerDemandePage';
 import ConfirmationProp from './pages/ConfirmationProp';
-import DashboardAdmin from './pages/DashboardAdmin';
-import LoginAdmin from './pages/LoginAdmin';
-import PropLogin from './pages/PropLogin';
 import {useState,React } from 'react';
-import UserPage from './pages/UserPage';
-import ProductsPage from './pages/ProductsPage';
-import DetailsCentre from './pages/DetailsCentre';
-import PersonnelPage from './pages/personnels';
-import PersonnelDetails from './pages/PersonnelDetails';
-import Reservation from './pages/Reservation';
+// layouts
+import ProfilClient from './Front/profilClient';
 import Home from './Front/Home';
 import Auth from './Front/Auth';
-import ProfilClient from './Front/profilClient';
 import ConfirmUser from './Front/confirmUser';
 import SignUp from './Front/SignUp/SignUp';
-import Calendrier from './Front/Calendrier';
 import Coiffure from './Front/coiffure/Coiffure';
 import DetailsCoiff from './Front/detailsCoiff/DetailsCoiff';
 import CoiffComponents from './Front/CoiffComponents/CoiffComponents';
 import ReservationPage from './Front/ReservationPage';
-import DashboardLayoutPersonnel from './layouts/dashboardPersonnel/DashboardLayoutPersonnel';
-import ReservationPerso from './pages/ReservationPerso';
+import EnvDemande from './Front/EnvDemande';
 
 export default function Router() {
   const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem('isLoggedIn') === 'true');
@@ -53,55 +32,6 @@ export default function Router() {
     localStorage.removeItem('isLoggedIn');
   };
   const routes = useRoutes([
-    {
-      path: '/dashboard',
-      element: <DashboardLayout />,
-      children: [
-        { element: <Navigate to="/dashboard/app" />, index: true },
-        { path: 'app', element: <DashboardAdmin /> },
-        { path: 'demandes', element: <DemandesPage /> },
-        { path: 'clients', element: <UserPage /> },
-        { path: 'centres', element: <ProductsPage /> },
-        { path: 'categories', element: <CategoriesPage /> },
-        { path: 'services', element: <ServicesPage /> },
-        { path: 'offres', element: <OffrePage /> },
-      ],
-    },
-    {    
-      path: '/dashboardCentre/:id',
-      element:<DashboardLayoutCentre/> ,
-      children: [
-        { path: '/dashboardCentre/:id/app', element: <DashboardLayoutCentre/>},
-        { path: 'personnels', element: <PersonnelPage/> },
-        { path: 'reservation', element: <Reservation/> },
-        { path: 'categories', element: <CategoriesPage /> },
-        { path: 'services', element: <ServicePageProp /> },
-        { path: 'offres', element: <OffrePageProp /> }, 
-        { path: 'horaires', element: <HoraireProp /> },
-        { path: 'info', element: <DetailsCentre/> },
-        { path: 'detailPerso/:CIN', element: <PersonnelDetails/> },
-      ],
-    },
-    {    
-      path: '/dashboardPerso/:id',
-      element:<DashboardLayoutPersonnel/> ,
-      children: [
-        { path: '/dashboardPerso/:id', element: <DashboardLayoutPersonnel/>,index: true },
-        { path: 'reservation', element: <ReservationPerso/> },
-      ],
-    },
-    {
-      path: 'login',
-      element: <EnvoyerDemandePage />,
-    },
-    {
-      path: 'loginAdmin',
-      element: <LoginAdmin />,
-    },
-    {
-      path: 'loginProp',
-      element: <PropLogin />,
-    },
     {
       path: 'confirmation',
       element: <ConfirmationProp />,
@@ -145,6 +75,10 @@ export default function Router() {
     {
       path: '/:type/:ville',
      element: <CoiffComponents isLoggedIn={isLoggedIn}/>  ,
+    },
+    {
+      path: '/demande',
+     element: <EnvDemande/>  ,
     },
     {
       path: '/:type/:ville/:nom',

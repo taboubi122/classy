@@ -39,6 +39,12 @@ import PropProfil from './pages/PropProfil';
 import PropPage from './pages/PropPage';
 import StripeContainer from './pages/Stripe/StripeContainer'
 
+import AjouterCentre from './pages/AjouterCentre';
+import PropLogin from './pages/PropLogin';
+import AvisClient from './pages/AvisClient';
+import GereCommAdmin from './pages/GereCommAdmin';
+import ConsulterComm from './pages/ConsulterComm';
+
 // ----------------------------------------------------------------------
 
 export default function Router() {
@@ -132,7 +138,7 @@ export default function Router() {
     },
     {
       path: '/prop',
-     element: <PersoLogin/> ,index: true ,
+     element: <PropLogin/> ,index: true ,
     },
     {
       path: '/perso',
@@ -161,6 +167,8 @@ export default function Router() {
         { path: 'offres', element: <OffrePage /> },
       ],
     },
+    { path: '/add/:id', element: <HoraireProp /> },
+    
     {    
       path: '/dashboardCentre/:id',
       element:<DashboardLayoutCentre/> ,
@@ -173,6 +181,7 @@ export default function Router() {
         { path: 'services', element: <ServicePageProp /> },
         { path: 'offres', element: <OffrePageProp /> }, 
         { path: 'horaires', element: <HoraireProp /> },
+        { path: 'comm', element: <GereCommAdmin /> },
         { path: 'info', element: <DetailsCentre/> },
         { path: 'detailPerso/:CIN', element: <PersonnelDetails/> },
       ],
@@ -188,6 +197,7 @@ export default function Router() {
         { path: 'categoriesProp', element: <CategoriesPage /> },
         { path: 'servicesProp', element: <ServicePageProp /> },
         { path: 'offresProp', element: <OffrePageProp /> }, 
+        { path: 'comm', element: <ConsulterComm /> }, 
         { path: 'horairesProp', element: <HoraireProp /> },
         { path: 'infoProp', element: <DetailsCentre/> },
         { path: 'detailPersoProp/:CIN', element: <PersonnelDetails/> },
@@ -200,6 +210,8 @@ export default function Router() {
         { element: <Navigate to="/dashboardProp/:id/appProp" />, index: true },
         { path: 'appProp', element: <DashboardProp/>},
         { path: 'centres', element: <CentresPageProp/> },
+        { path: 'payer', element: <StripeContainer/> },
+        { path: 'add/:ref', element: <AjouterCentre/>},
         { path: 'info', element: <PropProfil/> },
       ],
     },
@@ -210,7 +222,7 @@ export default function Router() {
         { element: <Navigate to="/dashboardPerso/:id/reservation" />, index: true },
         { path: 'reservation', element: <DashboardPerso/> },
         { path: 'horaires', element: <DashboardPerso/> },
-        { path: 'profile', element: <DashboardPerso/> },
+        { path: 'profile', element: <PersonnelDetails/> },
       ],
     },
     {

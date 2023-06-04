@@ -83,6 +83,7 @@ export default function Nav({ openNav, onCloseNav }) {
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                 {account.role}
                 {centre.nom}
+              {centre.nom}
               </Typography>
             </Box>
           </StyledAccount>

@@ -43,11 +43,7 @@ const TABLE_HEAD = [
 		, label: "Categorie"
 		, alignRight: false
 	, }
-	, {
-		id: "centre"
-		, label: "Centre"
-		, alignRight: false
-	, },
+	, 
 	{
 		id: "valide"
 	, },

@@ -11,6 +11,7 @@ import {FaMoneyBillWave} from 'react-icons/fa'
 import {
   Typography,
     Card,
+    Container,
     FormControl,
     FormControlLabel,
     FormLabel,Radio,RadioGroup
@@ -29,18 +30,21 @@ const ReservationPage= ({ isLoggedIn}) =>{
     if (location.pathname.split('/').length > 4) {
       refUpdate = location.pathname.split('/')[4];
     }
-const [services, setServices] = useState([]);
-const [Perso, setPerso] = useState([]);
-const [name,setName]=useState([]);
-const [adresse,setAdresse]=useState([]);
-const [selectedPerso, setSelectedPerso] = useState(0);
-const [horairesDisponibles, setHorairesDisponibles] = useState([]);
-const [email, setEmail] = useState('');
-const [client, setClient] = useState([]);
-const [selectedDateTime, setSelectedDateTime] = useState(null);
-const [confirmer, setConfirmer] = useState(false);
-const [newPres, setNewPres] = useState(false);
-const [leSservices,setLesServices]=useState([]);
+    const [services, setServices] = useState([]);
+    const [Perso, setPerso] = useState([]);
+    const [name,setName]=useState([]);
+    const [avis,setAvis]=useState([]);
+    const [adresse,setAdresse]=useState([]);
+    const [selectedPerso, setSelectedPerso] = useState(0);
+    const [horairesDisponibles, setHorairesDisponibles] = useState([]);
+    const [email, setEmail] = useState('');
+    const [client, setClient] = useState([]);
+    const [selectedDateTime, setSelectedDateTime] = useState(null);
+    const [confirmer, setConfirmer] = useState(false);
+    const [newPres, setNewPres] = useState(false);
+    const [leSservices,setLesServices]=useState([]);
+
+
 const handlePersoChange = (event) => {
     setSelectedPerso(event.target.value);
     setHorairesDisponibles([]);
@@ -90,7 +94,7 @@ useEffect(() => {
       console.error("Error fetching data:", error);
     });
   }, []);
-  
+  console.log(Perso)
 useEffect(()=>{
     axios.get(`http://localhost:5000/api/getAdresse/${nomSalon}`)
     .then(res=>setAdresse(res.data)
@@ -103,6 +107,14 @@ useEffect(()=>{
         );
         
          },[]);
+         useEffect(() => {
+    
+          axios.get(`http://localhost:5000/api/getAvisCentre/${nomSalon}`)
+            .then(res => {
+              setAvis(res.data);
+            });
+      }, []);
+
          
          useEffect(() => {
           axios.get(`http://localhost:5000/api/getInfosClient/${email}`)
@@ -137,6 +149,32 @@ useEffect(()=>{
             setConfirmer(true);
             setSelectedDateTime(dateTime);
           };
+          function currentTime(d) {
+            let duree = "";
+            const [hours, minutes] = d.split(":");
+            const date = new Date();
+            date.setHours(parseInt(hours, 10));
+            date.setMinutes(parseInt(minutes, 10));
+            if (hours === "00") {
+              duree = `${minutes} min`;
+            } else if (minutes === "00") {
+              duree = `${hours} h`;
+            } else {
+              duree = `${hours} h ${minutes} min`;
+            }
+            return duree;
+          }
+          function getAvis() {
+            if(avis.length===0){
+              return 0
+            }
+            var s=0
+            for(let i=0 ;i<avis.length;i++){
+              s=s+avis[i].note
+            }
+            s=s/avis.length
+            return s.toFixed(1)
+          }
           const sendNotification = () => {
             const data = { userId: '123' }; // Les données que vous souhaitez envoyer avec la notification
           
@@ -176,8 +214,8 @@ const scrollThreshold = "header scroll";
         <>
          <Navbar change={scrollThreshold}isLoggedIn={isLoggedIn} />
         <div className='navBarLinks'/>
-        <div><br/><p/><br/></div>
-        <section className='reservationPage'  >
+        <div style={{backgroundColor:"#F1F1F1"}} ><br/><p/><br/></div>
+        <section className='reservationPage' style={{backgroundColor:"#F1F1F1"}} >
             <div className='container'>
                   {name.map((donne) => (
                       <div key={donne.reference}>

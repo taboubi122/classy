@@ -138,7 +138,7 @@ export default function PersonnelPage() {
            }).then((result) => {
              if (result.isConfirmed) {
               axios.delete(`http://localhost:5000/api/deletePerso/${CIN}`)
-              .then(res => setCIN(res.data));
+              
               console.log(CIN)  
                swalWithBootstrapButtons.fire(
                  'Supprimé!',
