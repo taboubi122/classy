@@ -5,6 +5,7 @@ import 'package:shop_app/components/default_button.dart';
 import 'package:shop_app/components/form_error.dart';
 import 'package:shop_app/screens/complete_profile/complete_profile_screen.dart';
 
+import '../../../adresse.dart';
 import '../../../constants.dart';
 import '../../../size_config.dart';
 
@@ -53,7 +54,7 @@ class _SignUpFormState extends State<SignUpForm> {
       final String prenom = prenomController.text;
 
       try {
-        await dio.post('http://192.168.1.37:5000/api/SignUp', data: {
+        await dio.post('http://${Adresse.adresseIP}:5000/api/SignUp', data: {
           'email': email,
           'password': password,
           'tel': tel,

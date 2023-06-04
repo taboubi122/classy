@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:shop_app/components/categories_menu.dart';
-import 'package:shop_app/models/Product.dart';
 import 'package:dio/dio.dart';
-import '../../../components/service_menu.dart';
-import '../../../constants.dart';
+import '../../../adresse.dart';
 import '../../../size_config.dart';
 import 'custom_app_bar.dart';
 
@@ -21,13 +17,28 @@ class head extends StatelessWidget {
   final GestureTapCallback? pressOnSeeMore;
   final int reference;
   final String nomCentre;
+  Future<List<dynamic>> getAdresse() async {
+    try {
+      final response = await dio
+          .get('http://${Adresse.adresseIP}:5000/api/getAdresse/${nomCentre}');
+      final dynamic data = response.data;
+      print(data);
+      if (data != null) {
+        return data as List<dynamic>;
+      } else {
+        throw Exception('No data available.');
+      }
+    } catch (e) {
+      throw Exception('Failed to get item: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     Future<List<dynamic>> getItem() async {
       try {
         final response = await dio
-            .get('http://192.168.1.39:5000/api/getIdEtab/${reference}');
+            .get('http://${Adresse.adresseIP}:5000/api/getIdEtab/${reference}');
         final dynamic data = response.data;
         print(data);
         if (data != null) {
@@ -77,9 +88,52 @@ class head extends StatelessWidget {
           ),
           child: Text(
             salonItem['nom'],
-            style: TextStyle(fontSize: 12),
+            style: TextStyle(
+                fontSize: 20, fontFamily: "Times", color: Colors.black),
           ),
         ),
+        Padding(
+            padding: EdgeInsets.only(
+              left: getProportionateScreenWidth(25),
+              right: getProportionateScreenWidth(64),
+            ),
+            child: FutureBuilder<List<dynamic>>(
+              future: getAdresse(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Text('No salon data available');
+                } else {
+                  final salonData = snapshot.data!;
+                  final salonItem = salonData[0];
+                  return Row(
+                    children: [
+                      const Icon(
+                        Icons.location_on,
+                        color: Colors.grey,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 5),
+                      Expanded(
+                        child: Text(
+                          salonItem['adresse'],
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontFamily: "Times",
+                            color: Colors.grey,
+                            decoration:
+                                TextDecoration.underline, // Add underline
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+              },
+            )),
         Padding(
           padding: EdgeInsets.only(
             left: getProportionateScreenWidth(9),

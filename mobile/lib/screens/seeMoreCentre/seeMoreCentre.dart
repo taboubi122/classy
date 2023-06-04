@@ -4,12 +4,19 @@ import 'package:flutter/cupertino.dart';
 import 'package:dio/dio.dart';
 import 'package:shop_app/screens/details/details_screen.dart';
 import 'dart:async';
+import '../../adresse.dart';
+import '../../models/Cart.dart';
 import '../../salon.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../Carte/carte.dart';
+import '../details/components/custom_app_bar.dart';
 
 final dio = Dio();
 Future<List<salon>> getItems() async {
   try {
-    final response = await dio.get('http://192.168.1.39:5000/api/getNamesEtab');
+    final response =
+        await dio.get('http://${Adresse.adresseIP}:5000/api/getNamesEtab');
     final List<dynamic> data = response.data;
     final items = data
         .map((itemJson) => salon.fromJson(itemJson as Map<String, dynamic>))
@@ -20,61 +27,139 @@ Future<List<salon>> getItems() async {
   }
 }
 
-class seeMoreCentre extends StatelessWidget {
+Future<List<dynamic>> getTel(reference) async {
+  try {
+    final response =
+        await dio.get('http://${Adresse.adresseIP}:5000/api/getTel/$reference');
+    final dynamic data = response.data;
+    print(data);
+    if (data != null) {
+      return data as List<dynamic>;
+    } else {
+      throw Exception('No data available.');
+    }
+  } catch (e) {
+    throw Exception('Failed to get item: $e');
+  }
+}
+
+Future<List<dynamic>> getHoraires(reference) async {
+  try {
+    final response = await dio
+        .get('http://${Adresse.adresseIP}:5000/api/heureCalendrier/$reference');
+    final List<dynamic> data = response.data;
+    print(data);
+    if (data != null) {
+      return data as List<dynamic>;
+    } else {
+      throw Exception('No data available.');
+    }
+  } catch (e) {
+    throw Exception('Failed to get item: $e');
+  }
+}
+
+void launchPhoneCall(String phoneNumber) async {
+  String url = 'tel:$phoneNumber';
+  if (await canLaunch(url)) {
+    await launch(url);
+  } else {
+    throw 'Could not launch $url';
+  }
+}
+
+String formatDuration(String duration) {
+  final parts = duration.split(':');
+  final hours = int.parse(parts[0]);
+  final minutes = int.parse(parts[1]);
+  final seconds = int.parse(parts[2]);
+
+  if (hours > 0) {
+    return '$hours h';
+  } else if (minutes > 0) {
+    return '$minutes min';
+  } else {
+    return '$seconds s';
+  }
+}
+
+class seeMoreCentre extends StatefulWidget {
   const seeMoreCentre({Key? key}) : super(key: key);
+
+  @override
+  _seeMoreCentreState createState() => _seeMoreCentreState();
+}
+
+class _seeMoreCentreState extends State<seeMoreCentre>
+    with TickerProviderStateMixin {
+  late TabController _tabController;
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-        length: 2,
-        child: Scaffold(
-            appBar: PreferredSize(
-              preferredSize: const Size.fromHeight(90.0),
-              child: AppBar(
-                backgroundColor: Colors.white,
-                centerTitle: true,
-                elevation: 3,
-                bottom: const TabBar(
-                    indicatorColor: Colors.black,
-                    indicatorWeight: 1,
-                    tabs: [
-                      Tab(
-                        child: Text('Résultats',
-                            style: TextStyle(color: Colors.black)),
-                      ),
-                      Tab(
-                        child: Text('Carte',
-                            style: TextStyle(color: Colors.black)),
-                      )
-                    ]),
-                title: const Text(
-                  "Centres",
-                  style: TextStyle(
-                      color: Color.fromARGB(255, 15, 15, 15),
-                      fontFamily: 'Times',
-                      fontSize: 14),
+      length: 2,
+      child: Scaffold(
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(80.0),
+          child: AppBar(
+            backgroundColor: Colors.white,
+            centerTitle: true,
+            elevation: 3,
+            bottom: TabBar(
+              indicatorColor: Colors.black,
+              indicatorWeight: 1,
+              tabs: [
+                Tab(
+                  child: Text('Résultats',
+                      style: TextStyle(color: Colors.black, fontSize: 12)),
                 ),
-                leading: IconButton(
-                  icon: const Icon(
-                    Icons.arrow_back_ios_new,
-                    color: Colors.black,
-                    size: 14,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
+                Tab(
+                  child: Text('Carte',
+                      style: TextStyle(color: Colors.black, fontSize: 12)),
                 ),
-              ),
-            ),
-            body: TabBarView(
-              children: [
-                buildPageRes(MediaQuery.of(context).size.width),
-                buildPageCart(),
               ],
-            )));
+              controller: _tabController,
+            ),
+            title: const Text(
+              "CLASSY",
+              style: TextStyle(
+                  color: Color.fromARGB(255, 15, 15, 15), fontSize: 14),
+            ),
+            leading: IconButton(
+              icon: const Icon(
+                Icons.arrow_back_ios_new,
+                color: Colors.black,
+                size: 14,
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ),
+        ),
+        body: TabBarView(
+          children: [
+            buildPageRes(MediaQuery.of(context).size.width),
+            buildPageCart(),
+          ],
+          controller: _tabController,
+        ),
+      ),
+    );
   }
 
-  Widget buildPageCart() => Scaffold();
-
+  Widget buildPageCart() => Scaffold(body: CartePage());
   Widget buildPageRes(width) => Scaffold(
         body: SafeArea(
           child: SingleChildScrollView(
@@ -120,19 +205,16 @@ class seeMoreCentre extends StatelessWidget {
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: salons.length,
-                          itemBuilder: (context, index) => salon2Card(
-                            salons[index],
-                            index,
-                            () {
-                              Navigator.pushNamed(
-                                context,
-                                DetailsScreen.routeName,
-                                arguments: salonDetailsArguments(
-                                    reference: salons[index].reference,
-                                    nomCentre: salons[index].nom),
-                              );
-                            },
-                          ),
+                          itemBuilder: (context, index) =>
+                              salon2Card(salons[index], index, () {
+                            Navigator.pushNamed(
+                              context,
+                              DetailsScreen.routeName,
+                              arguments: salonDetailsArguments(
+                                  reference: salons[index].reference,
+                                  nomCentre: salons[index].nom),
+                            );
+                          }, _tabController),
                           separatorBuilder: (context, index) =>
                               const SizedBox(height: 10),
                         );
@@ -147,11 +229,11 @@ class seeMoreCentre extends StatelessWidget {
       );
 }
 
-Widget salon2Card(salon salon, int index, tap) {
+Widget salon2Card(salon salon, int index, tap, TabController tabController) {
   return GestureDetector(
     onTap: tap,
     child: Container(
-      height: 200, // Ajustez la hauteur en fonction de vos besoins
+      height: 167, // Adjust the height according to your needs
       child: Card(
         clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -160,8 +242,8 @@ Widget salon2Card(salon salon, int index, tap) {
           children: [
             MyImageWidget(imageBytes: salon.src),
             Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(15),
+              child: Padding(
+                padding: const EdgeInsets.all(11),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -173,20 +255,12 @@ Widget salon2Card(salon salon, int index, tap) {
                       ),
                     ),
                     Text(salon.type),
-                    const Spacer(),
-                    const Text('Waiting time: 2hrs'),
-                    Text(
-                      'Se ferme à 22h',
-                      style: TextStyle(color: Colors.redAccent[100]),
-                    ),
+                    CustomAppBar(rating: 4.5),
+                    Fermeture(salon),
                     Row(
                       children: [
-                        cardButtons(Icons.call, 'Appeler'),
-                        cardButtons(Icons.location_on, 'Map'),
-                        const Spacer(),
-                        Text(
-                          '21 km',
-                        ),
+                        SizedBox(height: 10),
+                        cardButtonsApp(salon),
                       ],
                     ),
                   ],
@@ -200,25 +274,59 @@ Widget salon2Card(salon salon, int index, tap) {
   );
 }
 
-Widget cardButtons(IconData iconData, String label) {
+Widget cardButtonsApp(salon salon) {
   return Padding(
-    padding: const EdgeInsets.only(right: 10),
+    padding: const EdgeInsets.only(left: 5),
     child: ElevatedButton(
-      onPressed: () {},
+      onPressed: () async {
+        try {
+          final salons = await getTel(salon.reference);
+          final phoneNumber = salons[0]['tel'].toString();
+          print(phoneNumber);
+          launchPhoneCall(phoneNumber);
+        } catch (e) {
+          print('Error: $e');
+        }
+      },
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.black,
-        padding: const EdgeInsets.all(5),
+        backgroundColor: Colors.white,
+        padding: const EdgeInsets.all(6),
         minimumSize: Size.zero,
       ),
-      child: Row(
+      child: const Row(
         children: [
-          Icon(iconData, size: 16),
-          const SizedBox(width: 2),
-          Text(label)
+          Icon(
+            Icons.call,
+            color: Colors.black,
+            size: 13,
+          ),
+          SizedBox(width: 1),
+          Text(
+            "Appeler",
+            style: TextStyle(color: Colors.black, fontSize: 13),
+          ),
         ],
       ),
     ),
   );
+}
+
+Widget Fermeture(salon) {
+  return FutureBuilder(
+      future: getHoraires(salon.reference),
+      builder: (context, snapshot) {
+        final horaires = snapshot.data;
+        final fermeture = horaires?[0]['fermeture'];
+
+        if (fermeture == null) {
+          return const Text('Fermé');
+        } else {
+          return Text(
+            "Se ferme à ${formatDuration(fermeture)}",
+            style: TextStyle(color: const Color.fromARGB(255, 216, 26, 8)),
+          );
+        }
+      });
 }
 
 class Indicator extends StatelessWidget {
@@ -238,78 +346,6 @@ class Indicator extends StatelessWidget {
     );
   }
 }
-
-Widget salonCard(salon salon, int index) => Hero(
-      tag: salon.reference.toString(),
-      child: Material(
-        child: Container(
-          height: 300,
-          width: 350,
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: AspectRatio(
-                  aspectRatio: 1.84,
-                  child: Stack(
-                    alignment: Alignment.bottomCenter,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: MyImageWidget(imageBytes: salon.src),
-                      ),
-                      const Positioned(
-                        bottom: 10,
-                        right: 70,
-                        child: Indicator(
-                          isActive: false,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(
-                  left: 30.0,
-                  right: 8.0,
-                  top: 10.0,
-                ),
-                child: Column(
-                  children: [
-                    SizedBox(
-                      width: 350,
-                      height: 24,
-                      child: Text(
-                        salon.nom,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    const SizedBox(
-                      width: 350,
-                      height: 24,
-                      child: Text(
-                        "This salon is here for you!",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w400,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
 
 class MyImageWidget extends StatelessWidget {
   final Uint8List imageBytes;

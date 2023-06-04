@@ -78,3 +78,15 @@ module.exports.updateServProp=(connection,values,id)=>{
       }
     });
 }
+
+module.exports.getServiceMobile=(connection,values)=>{
+  var sql = "SELECT * FROM service INNER JOIN servicecentre ON servicecentre.refService = service.reference where refCateg=? and servicecentre.refCentre=?";
+  connection.query(sql, values, (err, rows) => {
+    if (err) {
+      console.log("Error executing query: " + err.stack);
+      return;
+    } else {
+      console.log("getService")
+    }
+  });
+}

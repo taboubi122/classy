@@ -40,14 +40,11 @@ export default function Nav({ openNav, onCloseNav }) {
   const params = useParams();
   const idProp = params.id;
   const [user, setUser] = useState([]);
-<<<<<<< HEAD
-=======
   useEffect(() => {
     axios
       .get(`http://localhost:5000/api/getCentreById/${idProp}`)
       .then((res) => setUser(res.data));
   }, []);
->>>>>>> a0d3df61f0fffe6a22be2f0e0b2ae5c772246f51
   console.log(user)
   const { pathname } = useLocation();
   const isDesktop = useResponsive('up', 'lg');
@@ -80,15 +77,12 @@ export default function Nav({ openNav, onCloseNav }) {
           <StyledAccount>
             <Box sx={{ ml: 2 }}>
               <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
-<<<<<<< HEAD
               Centre
               </Typography>
 
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                 {account.role}
-=======
                 {centre.nom}
->>>>>>> a0d3df61f0fffe6a22be2f0e0b2ae5c772246f51
               </Typography>
             </Box>
           </StyledAccount>

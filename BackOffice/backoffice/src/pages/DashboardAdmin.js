@@ -102,7 +102,6 @@ function getCentreRes() {
     return weekDates;
   }
 
-<<<<<<< HEAD
   function getData(id) {
     const d = generateWeekDates();
     const res = [];
@@ -110,7 +109,6 @@ function getCentreRes() {
       res[i] = reservation.filter((ele) => ele.dateResv && ele.dateResv.substring(0, 10) === d[i] && ele.refService === id).length;
     }
     return res;
-=======
   function getData (id){
     const d=generateWeekDates()
     const res=[]
@@ -122,7 +120,6 @@ function getCentreRes() {
     res[5]=reservation.filter((ele) => ele.dateResv.substring(0, 10) === d[5] && ele.refService===id).length 
     res[6]=reservation.filter((ele) => ele.dateResv.substring(0, 10) === d[6] && ele.refService===id).length 
    return res
->>>>>>> a0d3df61f0fffe6a22be2f0e0b2ae5c772246f51
   }
   
 
@@ -252,4 +249,5 @@ function getCentreRes() {
       </Container>
     </>
   );
+}
 }

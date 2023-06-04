@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shop_app/components/categories_menu.dart';
 import 'package:shop_app/models/Product.dart';
 import 'package:dio/dio.dart';
+import '../../../adresse.dart';
 import '../../../components/service_menu.dart';
 import '../../../constants.dart';
 import '../../../size_config.dart';
@@ -23,8 +24,8 @@ class ProductDescription extends StatelessWidget {
   final String nomCentre;
   Future<List<dynamic>> getCateg() async {
     try {
-      final response = await dio
-          .get('http://192.168.1.39:5000/api/servicesNomCentre/${nomCentre}');
+      final response = await dio.get(
+          'http://${Adresse.adresseIP}:5000/api/servicesNomCentre/${nomCentre}');
       final dynamic data = response.data;
       print(data);
       if (data != null) {
@@ -42,7 +43,7 @@ class ProductDescription extends StatelessWidget {
     Future<List<dynamic>> getItem() async {
       try {
         final response = await dio
-            .get('http://192.168.1.39:5000/api/getIdEtab/${reference}');
+            .get('http://${Adresse.adresseIP}:5000/api/getIdEtab/${reference}');
         final dynamic data = response.data;
         print(data);
         if (data != null) {
@@ -85,7 +86,8 @@ class ProductDescription extends StatelessWidget {
           ),
           child: Text(
             "Choix de la prestation",
-            style: Theme.of(context).textTheme.headline6,
+            style: TextStyle(
+                fontSize: 17, fontFamily: "Robot", color: Colors.black),
           ),
         ),
         FutureBuilder<List<dynamic>>(
@@ -109,7 +111,9 @@ class ProductDescription extends StatelessWidget {
                       for (var categItem in categorie)
                         CategorieMenu(
                           text: categItem['nomCateg'],
-                          ref: categItem['refCateg'],
+                          refCateg: categItem['refCateg'],
+                          refCentre: categItem['refCentre'],
+                          nomCentre: nomCentre,
                         ),
                     ],
                   ),

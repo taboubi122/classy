@@ -27,10 +27,8 @@ import Reservation from './pages/Reservation';
 import DashboardLayoutPersonnel from './layouts/dashboardPersonnel/DashboardLayoutPersonnel';
 import HomeApp from './pages/Home/HomeApp';
 import PersoLogin from './pages/PersoLogin';
-<<<<<<< HEAD
 import HorairePerso from './pages/HorairePerso';
 import ReservationPerso from './pages/ReservationPerso';
-=======
 import DashboardCentre from './pages/DashboardCentre';
 import DashboardPerso from './pages/DashboardPerso';
 import DashboardLayoutProp from './layouts/dashboardProp/DashboardLayoutProp';
@@ -40,7 +38,6 @@ import DashboardLayoutCentreProp from './layouts/DashboardPropCentre/DashboardLa
 import PropProfil from './pages/PropProfil';
 import PropPage from './pages/PropPage';
 import StripeContainer from './pages/Stripe/StripeContainer'
->>>>>>> a0d3df61f0fffe6a22be2f0e0b2ae5c772246f51
 
 // ----------------------------------------------------------------------
 
@@ -58,7 +55,6 @@ export default function Router() {
     localStorage.removeItem('isLoggedIn');
   };
   const routes = useRoutes([
-<<<<<<< HEAD
     {
       path: '/dashboard',
       element: <DashboardLayout />,
@@ -121,9 +117,7 @@ export default function Router() {
       path: '*',
       element: <Navigate to="/404" replace />,
     },
-=======
     
->>>>>>> a0d3df61f0fffe6a22be2f0e0b2ae5c772246f51
     {
       path: '/',
      element: <HomeApp/> ,index: true ,

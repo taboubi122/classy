@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import '../../adresse.dart';
 import 'components/body.dart';
 import 'components/custom_app_bar.dart';
 import '../../salon.dart';
@@ -15,8 +16,8 @@ class DetailsScreen extends StatelessWidget {
         ModalRoute.of(context)!.settings.arguments as salonDetailsArguments;
     Future<List<dynamic>> getItem() async {
       try {
-        final response = await dio
-            .get('http://192.168.1.39:5000/api/getIdEtab/${args.reference}');
+        final response = await dio.get(
+            'http://${Adresse.adresseIP}:5000/api/getIdEtab/${args.reference}');
         final dynamic data = response.data;
         print(data);
         if (data != null) {

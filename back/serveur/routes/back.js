@@ -15,7 +15,7 @@ const { sendConfirmationEmail } = require('../confirmerEmail');
 const { sendConfirmationEmail2 } = require('./nodemailer');
 const  pushNotifController = require('../controllers/pushNotifController');
 const { getAllCateg, addCateg, updateCateg, deleteCateg } = require('../controllers/gestionCategories');
-const { getAllServ, addServ, updateServ, deleteServ, getServById, addServProp, updateServProp } = require('../controllers/gestionServices');
+const { getAllServ, addServ, updateServ, deleteServ, getServById, addServProp, updateServProp,getServiceMobile } = require('../controllers/gestionServices');
 const { getAllCentres, getAllVille, getAllVilleC } = require('../controllers/gestionCentres');
 const { getAllOffres, addOffre, updateOffre, deleteOffre, addOffreProp, updateOffreProp } = require('../controllers/gestionOffre');
 const { getAllHoraire, getAllJour, addHoraire, updateHoraire } = require('../controllers/gestionHoraire');
@@ -806,7 +806,6 @@ route.get("/api/heureCalendrierPerso/:CIN", (req, res) => {
         "Samedi",
         "Dimanche",
       ];
-  
       const joursRowsMap = new Map();
   
       rows.forEach((row) => {
@@ -912,7 +911,18 @@ route.get("/api/get",(req,res)=>{
       res.json( rows);
     });
   })
-
+  route.get("/api/getTel/:ref",(req,res)=>{
+    const ref=req.params.ref;
+    const query =  "SELECT tel FROM centre INNER JOIN succursale ON centre.reference = succursale.refCentre and centre.reference=?";
+    connection.query(query,ref,(err, rows) => {
+      if (err) {
+        console.error("Error executing query: " + err.stack);
+        return;
+      }
+      console.log("Result rows:", rows);
+      res.json( rows);
+    });
+  })
   route.get("/api/getByImage/:nom",(req,res)=>{
     const nom=req.params.nom;
   const query =  "SELECT * FROM centre INNER JOIN image ON centre.reference = image.refCentre WHERE image.couverture =0  AND centre.nom = ? ";
@@ -1003,7 +1013,7 @@ route.get("/api/getIdEtab/:id",(req,res)=>{
 
 route.get("/api/getNamesEtab",(req,res)=>{
     const nom=req.params.nom;
-    const query =  "SELECT centre.reference,src,centre.nom,centre.type FROM centre INNER JOIN image ON centre.reference = image.refCentre and couverture=1 ";
+    const query =  "SELECT centre.reference,src,centre.nom,centre.type,email FROM centre INNER JOIN image ON centre.reference = image.refCentre and couverture=1 ";
     connection.query(query,nom,(err, rows) => {
       if (err) {
         console.error("Error executing query: " + err.stack);
@@ -1013,7 +1023,30 @@ route.get("/api/getNamesEtab",(req,res)=>{
       res.json( rows);
     });
   })
-
+  route.get("/api/getLocalisation",(req,res)=>{
+    const query = "SELECT centre.reference,centre.nom,centre.type,localisation,longitude,latitude,adresse FROM centre INNER JOIN succursale ON succursale.refCentre = centre.reference";
+    connection.query(query,(err, rows) => {
+      if (err) {
+        console.error("Error executing query: " + err.stack);
+        return;
+      }
+      console.log("Result rows:", rows);
+      res.json( rows);
+    });
+  })
+  route.get("/api/getLocalisationCentre/:ref",(req,res)=>{
+    const ref=req.params.ref;
+    const query = "SELECT centre.reference,centre.nom,centre.type,localisation,longitude,latitude,adresse FROM centre INNER JOIN succursale ON succursale.refCentre = centre.reference and centre.reference=?";
+    connection.query(query,ref,(err, rows) => {
+      if (err) {
+        console.error("Error executing query: " + err.stack);
+        return;
+      }
+      console.log("Result rows:", rows);
+      res.json( rows);
+    });
+  })
+ 
   route.get("/api/getMail/:email",(req,res)=>{
     const email=req.params.email;
     const query =  "SELECT email FROM ( SELECT email FROM centre UNION ALL SELECT email FROM personnel UNION ALL SELECT email FROM client ) AS emails WHERE email=? ";
@@ -1172,10 +1205,8 @@ route.get("/api/getResvPerso/:CIN",(req,res)=>{
       res.json( rows);
     });
   })
-<<<<<<< HEAD
  
 
-=======
   route.get("/api/getResvP/:CIN",(req,res)=>{
     const id = req.params.CIN;
     const query =  "SELECT * FROM reservation WHERE CINPersonnel="+id;
@@ -1284,7 +1315,6 @@ route.get("/api/getResvPerso/:CIN",(req,res)=>{
     });
   })
   
->>>>>>> a0d3df61f0fffe6a22be2f0e0b2ae5c772246f51
   route.post("/api/addResvPerso", (req, res) => {
     const { cinPersonnel,cinClient, nomSalon, nomService, selectedTime} = req.body;
     console.log("avant"+cinPersonnel,cinClient, nomSalon, nomService, selectedTime)
@@ -1528,37 +1558,6 @@ connection.query(query, values3, (err, rows3) => {
           });
         });
         
-      
-//**********************************Gestion des categories****************************************/
-
-//View categories
-route.get("/api/categories",(req,res) => {
-  var sql = "SELECT * FROM categorie";
-  connection.query(sql,function (err, rows){
-    if (err) {
-      console.error("Error executing query: " + err.stack);
-      return;
-    }
-    console.log("Result rows:", rows);
-    res.json( rows);
-  });
-  });
-
-route.get("/api/categories/search/:value", (req, res) => {
-  var nom = req.params.value;
-  var sql = "SELECT * FROM categorie WHERE nom like '"+nom.toString()+"%'";
-  connection.query(sql, function (error, result){
-      if(error) {
-          console.log("Error Connecting to DB2"+error);  
-      }else {
-          res.send({status: true, data: result});
-      }
-  });
-});
-
-
-
-//**********************************Gestion des services****************************************/
 
 //View services
 
@@ -1606,83 +1605,36 @@ route.get("/api/servicesNomCentre/:nomCentre",(req,res) => {
   });
 });
 
+route.get("/api/getServiceMobile",(req,res) => {
+  const refCentre=req.body.refCentre;
+  const refCateg=req.body.refCateg;
+  var sql = "SELECT * FROM service INNER JOIN servicecentre ON servicecentre.refService = service.reference where refCateg=? and servicecentre.refCentre=?";
 
-<<<<<<< HEAD
-=======
-route.post("/api/services/add/:refCentre",(req,res) => {
-  const refCentre=req.params.refCentre;
-  let details = {
-      nom:req.body.nom,
-      refCateg:1,
-      prix:req.body.prix,
-      duree:req.body.duree,
-      description:req.body.description,
-      refCentre:1
-  };
-
-  let sql = "INSERT INTO service SET ?";
-  connection.query(sql,details,(error) => {
-      if(error){
-          res.send({ status: false, message: "Service created Failed"});
-          console.log(" not ok"+error)
-      } else {
-          res.send({ status: true, message: "Service created successfully"}); 
-          console.log(" not ok"+error)
+    connection.query(sql,[refCateg,refCentre], (err, rows)=>{
+      if (err) {
+        console.error("Error executing query: " + err.stack);
+        return;
       }
-  });
+      console.log("Result rows:", rows);
+      res.json( rows);
+    });
+});
+route.get("/api/getDetailsServiceMobile",(req,res) => {
+  const refCentre=req.body.refCentre;
+  const nomService=req.body.nomService;
+  var sql = "SELECT * FROM service INNER JOIN servicecentre ON servicecentre.refService = service.reference where nomService=? and servicecentre.refCentre=?";
+
+    connection.query(sql,[nomService,refCentre], (err, rows)=>{
+      if (err) {
+        console.error("Error executing query: " + err.stack);
+        return;
+      }
+      console.log("Result rows:", rows);
+      res.json( rows);
+    });
 });
 
-//Search service
 
-route.get("/api/services/search/:value", (req, res) => {
-  var nom = req.params.value;
-  var sql = "SELECT * FROM service WHERE nom like '"+nom.toString()+"%'";
-  connection.query(sql, function (error, result){
-      if(error) {
-          console.log("Error Connecting to DB2"+error);  
-      }else {
-          res.send({status: true, data: result});
-      }
-  });
-});
-
-//Update service
-
-route.put("/api/services/update/:reference",(req,res) => {
-  let sql = "UPDATE service SET nom='" +
-      req.body.nom +
-      "', description='" + 
-      req.body.description +
-      "' , prix=" +
-      req.body.prix +
-      " , duree=" +
-      req.body.duree +
-      " WHERE reference=" +
-      req.params.reference;
-
-  let query = connection.query(sql, (error,result) => {
-      if(error){
-          res.send({ status: false, message: "Service Updated Failed"});
-      } else {
-          res.send({ status: true, message: "Service Updated successfully"}); 
-      }
-  });
-});
-
-//Delete service
-
-route.delete("/api/services/delete/:reference",(req,res) => {
-  let sql = "DELETE FROM service WHERE reference=" +
-      req.params.reference;
-
-  let query = connection.query(sql, (error,result) => {
-      if(error){
-          res.send({ status: false, message: "Service Deleted Failed"});
-      } else {
-          res.send({ status: true, message: "Service Deleted successfully"}); 
-      }
-  });
-});
 require("dotenv").config();
 const stripe=require("stripe")(process.env.STRIPE_SECRET_TEST);
 const bodyParser=require('body-parser');
@@ -1712,5 +1664,4 @@ route.post("/stripe/charge",cors(),async(req,res)=>{
         })
     }
 })
->>>>>>> a0d3df61f0fffe6a22be2f0e0b2ae5c772246f51
 module.exports = route;

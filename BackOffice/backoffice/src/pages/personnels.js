@@ -594,16 +594,13 @@ const onSubmit = (data) => Insert(data.CIN,data.nom,data.prenom,data.tel,data.se
                       <TableRow hover key={row.CIN} tabIndex={-1} role="checkbox" selected={selectedUser}>
                         <TableCell component="th" scope="row" padding="none">
                           <Stack direction="row" alignItems="center" spacing={2}>
-<<<<<<< HEAD
                           {photo && <img className='ClientPhoto' alt={id} src={`${Buffer.from(row.photo.data)}`}  />}
                           
-=======
                           <Box component="img" alt="..." src={row.photo && `data:image/png;base64,${Buffer.from(row.photo.data).toString('base64')}`} sx={{ width: 48, height: 48, borderRadius: 1.5, flexShrink: 0 }} />
                           </Stack>
                         </TableCell>
                         <TableCell component="th" scope="row" padding="none">
                           <Stack direction="row" alignItems="center" spacing={2}>                          
->>>>>>> a0d3df61f0fffe6a22be2f0e0b2ae5c772246f51
                             <Typography variant="subtitle2" noWrap>
                               {nom} {prenom}
                             </Typography>  

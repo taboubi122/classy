@@ -1,15 +1,22 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:shop_app/screens/reservation/reservation.dart';
+
+import '../adresse.dart';
 
 class CategorieMenu extends StatefulWidget {
   const CategorieMenu({
     Key? key,
     required this.text,
-    required this.ref,
+    required this.refCateg,
+    required this.refCentre,
+    required this.nomCentre,
   }) : super(key: key);
 
   final String text;
-  final int ref;
+  final String nomCentre;
+  final int refCateg;
+  final int refCentre;
 
   @override
   _CategorieMenuState createState() => _CategorieMenuState();
@@ -22,7 +29,10 @@ class _CategorieMenuState extends State<CategorieMenu> {
   Future<List<dynamic>> getItem() async {
     try {
       final response = await dio
-          .get('http://192.168.1.39:5000/api/servicesNomCentre/${widget.ref}');
+          .get('http://${Adresse.adresseIP}:5000/api/getServiceMobile', data: {
+        'refCentre': widget.refCentre,
+        'refCateg': widget.refCateg,
+      });
       final dynamic data = response.data;
       print(data);
       if (data != null) {
@@ -32,6 +42,21 @@ class _CategorieMenuState extends State<CategorieMenu> {
       }
     } catch (e) {
       throw Exception('Failed to get item: $e');
+    }
+  }
+
+  String formatDuration(String duration) {
+    final parts = duration.split(':');
+    final hours = int.parse(parts[0]);
+    final minutes = int.parse(parts[1]);
+    final seconds = int.parse(parts[2]);
+
+    if (hours > 0) {
+      return '$hours h';
+    } else if (minutes > 0) {
+      return '$minutes min';
+    } else {
+      return '$seconds s';
     }
   }
 
@@ -78,7 +103,7 @@ class _CategorieMenuState extends State<CategorieMenu> {
                       ),
                     ),
                     SizedBox(width: 60),
-                    Icon(
+                    const Icon(
                       Icons.keyboard_arrow_down_rounded,
                       color: Colors.black,
                     ),
@@ -87,15 +112,110 @@ class _CategorieMenuState extends State<CategorieMenu> {
               ),
             ),
             if (isExpanded)
-              Container(
-                color: Colors.white, // Arrière-plan noir
-                padding: EdgeInsets.symmetric(
-                  horizontal: 127,
-                ),
-                child: Text(
-                  'Contenu du paragraphe',
-                  style: TextStyle(color: Colors.black),
-                ),
+              FutureBuilder<List<dynamic>>(
+                future: getItem(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Text('No salon data available');
+                  } else {
+                    final service = snapshot.data!;
+                    return Container(
+                      color: Colors.white, // Arrière-plan noir
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          for (var servItem in service)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  height: 1, // Hauteur personnalisée du Divider
+                                  width: MediaQuery.of(context)
+                                      .size
+                                      .width, // Largeur de l'écran
+                                  color: const Color.fromARGB(
+                                          255, 134, 134, 134)
+                                      .withOpacity(
+                                          0.2), // Couleur personnalisée plus claire
+                                ),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            servItem['nomService'],
+                                            style: const TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 12),
+                                          ),
+                                          const SizedBox(height: 3),
+                                          Text(
+                                            servItem['description'],
+                                            style: const TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 12),
+                                          ),
+                                          Text(
+                                            '${formatDuration(servItem['duree'])}   ${servItem['prix']} D',
+                                            style: const TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 12),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          reservation.routeName,
+                                          arguments: salonReservation(
+                                            refCentre: servItem['refCentre'],
+                                            nomService: servItem['nomService'],
+                                            nomCentre: widget.nomCentre,
+                                          ),
+                                        );
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        minimumSize: const Size(
+                                            50, 20), // Taille minimale de 50x20
+                                        primary:
+                                            Colors.white, // Background blanc
+                                        onPrimary: Colors.black, // Texte noir
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                              5), // Bordure arrondie
+                                          side: const BorderSide(
+                                              color: Colors
+                                                  .black), // Bordure noire
+                                        ),
+                                      ),
+                                      child: Text(
+                                        "Choisir",
+                                        style: TextStyle(
+                                            color: Colors.black, fontSize: 9),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                              ],
+                            ),
+                        ],
+                      ),
+                    );
+                  }
+                },
               ),
           ],
         ),
