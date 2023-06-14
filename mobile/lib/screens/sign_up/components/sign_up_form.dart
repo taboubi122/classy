@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:shop_app/components/custom_surfix_icon.dart';
 import 'package:shop_app/components/default_button.dart';
 import 'package:shop_app/components/form_error.dart';
-import 'package:shop_app/screens/complete_profile/complete_profile_screen.dart';
-
+import 'package:cool_alert/cool_alert.dart';
 import '../../../adresse.dart';
 import '../../../constants.dart';
 import '../../../size_config.dart';
+import 'package:flutter/cupertino.dart';
+
+import '../../home/home_screen.dart';
 
 class SignUpForm extends StatefulWidget {
   @override
@@ -15,11 +17,18 @@ class SignUpForm extends StatefulWidget {
 }
 
 class _SignUpFormState extends State<SignUpForm> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController telController = TextEditingController();
+  final TextEditingController nomController = TextEditingController();
+  final TextEditingController prenomController = TextEditingController();
+
   final _formKey = GlobalKey<FormState>();
   String? email;
   String? password;
-  String? conform_password;
-  bool remember = false;
+  String? firstName;
+  String? lastName;
+  String? phoneNumber;
   final List<String?> errors = [];
 
   void addError({String? error}) {
@@ -28,6 +37,17 @@ class _SignUpFormState extends State<SignUpForm> {
         errors.add(error);
       });
     }
+  }
+
+  void showSuccessDialog() {
+    CoolAlert.show(
+      context: context,
+      type: CoolAlertType.success,
+      title: "Success",
+      text: "Please check your email.",
+      confirmBtnColor: Colors.black,
+      autoCloseDuration: Duration(seconds: 5),
+    );
   }
 
   void removeError({String? error}) {
@@ -39,34 +59,52 @@ class _SignUpFormState extends State<SignUpForm> {
   }
 
   final dio = Dio();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController telController = TextEditingController();
-  final TextEditingController nomController = TextEditingController();
-  final TextEditingController prenomController = TextEditingController();
-  final formKey = GlobalKey<FormState>();
+
   Future<void> signUp() async {
-    if (formKey.currentState!.validate()) {
-      final String email = emailController.text;
-      final String password = passwordController.text;
-      final int tel = int.tryParse(telController.text) ?? 0;
-      final String nom = nomController.text;
-      final String prenom = prenomController.text;
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
 
       try {
         await dio.post('http://${Adresse.adresseIP}:5000/api/SignUp', data: {
           'email': email,
           'password': password,
-          'tel': tel,
-          'nom': nom,
-          'prenom': prenom,
+          'tel': phoneNumber,
+          'nom': lastName,
+          'prenom': firstName,
         });
-
         print('Client registration success');
+        emailController.clear();
+        passwordController.clear();
+        telController.clear();
+        nomController.clear();
+        prenomController.clear();
+        showSuccessDialog();
       } catch (err) {
         print(err);
+        emailController.clear();
+        passwordController.clear();
+        telController.clear();
+        nomController.clear();
+        prenomController.clear();
         print('Client registration failed');
       }
+    }
+  }
+
+  Future<bool> checkEmail(String email) async {
+    final url = 'http://${Adresse.adresseIP}:5000/api/getMail/$email';
+    try {
+      final response = await Dio().get(url);
+      if (response.statusCode == 200) {
+        final data = response.data;
+        return data.length > 0;
+      } else {
+        print('Failed to check email: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Error checking email: $e');
+      return false;
     }
   }
 
@@ -80,16 +118,20 @@ class _SignUpFormState extends State<SignUpForm> {
           SizedBox(height: getProportionateScreenHeight(30)),
           buildPasswordFormField(),
           SizedBox(height: getProportionateScreenHeight(30)),
-          buildConformPassFormField(),
+          buildFirstNameFormField(),
+          SizedBox(height: getProportionateScreenHeight(30)),
+          buildLastNameFormField(),
+          SizedBox(height: getProportionateScreenHeight(30)),
+          buildPhoneNumberFormField(),
+          SizedBox(height: getProportionateScreenHeight(30)),
           FormError(errors: errors),
           SizedBox(height: getProportionateScreenHeight(40)),
           DefaultButton(
-            text: "S'inscrire",
+            text: "Sign Up",
             press: () {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState!.save();
                 signUp();
-                Navigator.pushNamed(context, CompleteProfileScreen.routeName);
               }
             },
           ),
@@ -98,36 +140,125 @@ class _SignUpFormState extends State<SignUpForm> {
     );
   }
 
-  TextFormField buildConformPassFormField() {
+  TextFormField buildPhoneNumberFormField() {
     return TextFormField(
-      controller: passwordController,
-      obscureText: true,
-      onSaved: (newValue) => conform_password = newValue,
+      controller: telController,
+      keyboardType: TextInputType.phone,
+      onSaved: (newValue) => phoneNumber = newValue,
       onChanged: (value) {
         if (value.isNotEmpty) {
-          removeError(error: kPassNullError);
-        } else if (value.isNotEmpty && password == conform_password) {
-          removeError(error: kMatchPassError);
+          removeError(error: kPhoneNumberNullError);
         }
-        conform_password = value;
+        return null;
       },
       validator: (value) {
         if (value!.isEmpty) {
-          addError(error: kPassNullError);
+          addError(error: kPhoneNumberNullError);
           return "";
-        } else if ((password != value)) {
-          addError(error: kMatchPassError);
+        } else if (value.length != 8) {
+          addError(error: "Le numéro de téléphone doit contenir 8 chiffres");
           return "";
         }
         return null;
       },
       decoration: const InputDecoration(
-        labelText: "Confirm Password",
-        hintText: "Re-enter your password",
+        labelText: "Tel",
+        hintText: "Entrer votre Télephone",
         floatingLabelBehavior: FloatingLabelBehavior.always,
-        suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Lock.svg"),
+        suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Phone.svg"),
       ),
     );
+  }
+
+  TextFormField buildLastNameFormField() {
+    return TextFormField(
+      controller: nomController,
+      onSaved: (newValue) => lastName = newValue,
+      onChanged: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kNamelNullError);
+        }
+        return null;
+      },
+      validator: (value) {
+        if (value!.isEmpty) {
+          addError(error: kNamelNullError);
+          return "";
+        } else if (!isValidName(value)) {
+          addError(error: "Le nom ne doit contenir que des lettres");
+          return "";
+        }
+        return null;
+      },
+      decoration: const InputDecoration(
+        labelText: "nom",
+        hintText: "Entrer votre nom",
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/User.svg"),
+      ),
+    );
+  }
+
+  bool isValidName(String value) {
+    // Regular expression for letters only
+    final letterRegExp = RegExp(r'^[a-zA-Z]+$');
+
+    // Check if the name meets the requirements
+    if (value.length < 3) {
+      return false; // Name length is less than 3
+    }
+    if (!letterRegExp.hasMatch(value)) {
+      return false; // Name contains non-letter characters
+    }
+    return true; // Name meets all requirements
+  }
+
+  TextFormField buildFirstNameFormField() {
+    return TextFormField(
+      controller: prenomController,
+      onSaved: (newValue) => firstName = newValue,
+      onChanged: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kNamelNullError);
+        }
+        return null;
+      },
+      validator: (value) {
+        if (value!.isEmpty) {
+          addError(error: kNamelNullError);
+          return "";
+        } else if (!isValidName(value)) {
+          addError(error: "Le prénom doit contenir uniquement des lettres.");
+          return "";
+        }
+        return null;
+      },
+      decoration: const InputDecoration(
+        labelText: "Prenom",
+        hintText: "Entrer votre Prenom",
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/User.svg"),
+      ),
+    );
+  }
+
+  bool isPasswordValid(String value) {
+    // Regular expressions for uppercase letters, lowercase letters, and numbers
+    final upperCaseRegExp = RegExp(r'[A-Z]');
+    final lowerCaseRegExp = RegExp(r'[a-z]');
+    final digitRegExp = RegExp(r'\d');
+
+    // Check if the password meets the requirements
+    if (!upperCaseRegExp.hasMatch(value)) {
+      return false; // Password does not contain an uppercase letter
+    }
+    if (!lowerCaseRegExp.hasMatch(value)) {
+      return false; // Password does not contain a lowercase letter
+    }
+    if (!digitRegExp.hasMatch(value)) {
+      return false; // Password does not contain a number
+    }
+    return true; // Password meets all requirements
   }
 
   TextFormField buildPasswordFormField() {
@@ -150,18 +281,28 @@ class _SignUpFormState extends State<SignUpForm> {
         } else if (value.length < 8) {
           addError(error: kShortPassError);
           return "";
+        } else if (!isPasswordValid(value)) {
+          addError(
+              error:
+                  "Le mot de passe doit contenir des lettres majuscules, minuscules et des chiffres");
+          return "";
         }
         return null;
       },
       decoration: const InputDecoration(
         labelText: "Password",
         hintText: "Entrer votre mot de passe",
-        // If  you are using latest version of flutter then lable text and hint text shown like this
-        // if you r using flutter less then 1.20.* then maybe this is not working properly
         floatingLabelBehavior: FloatingLabelBehavior.always,
         suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Lock.svg"),
       ),
     );
+  }
+
+  bool isValidMail(String value) {
+    if (checkEmail(value) == true) {
+      return true;
+    }
+    return false;
   }
 
   TextFormField buildEmailFormField() {
@@ -183,6 +324,8 @@ class _SignUpFormState extends State<SignUpForm> {
           return "";
         } else if (!emailValidatorRegExp.hasMatch(value)) {
           addError(error: kInvalidEmailError);
+        } else if (isValidMail(value)) {
+          addError(error: "Mail existant ");
           return "";
         }
         return null;
@@ -190,8 +333,6 @@ class _SignUpFormState extends State<SignUpForm> {
       decoration: const InputDecoration(
         labelText: "Email",
         hintText: "Entrer votre email",
-        // If  you are using latest version of flutter then lable text and hint text shown like this
-        // if you r using flutter less then 1.20.* then maybe this is not working properly
         floatingLabelBehavior: FloatingLabelBehavior.always,
         suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Mail.svg"),
       ),

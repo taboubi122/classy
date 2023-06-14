@@ -233,7 +233,7 @@ Widget salon2Card(salon salon, int index, tap, TabController tabController) {
   return GestureDetector(
     onTap: tap,
     child: Container(
-      height: 167, // Adjust the height according to your needs
+      height: 169, // Adjust the height according to your needs
       child: Card(
         clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -259,7 +259,6 @@ Widget salon2Card(salon salon, int index, tap, TabController tabController) {
                     Fermeture(salon),
                     Row(
                       children: [
-                        SizedBox(height: 10),
                         cardButtonsApp(salon),
                       ],
                     ),

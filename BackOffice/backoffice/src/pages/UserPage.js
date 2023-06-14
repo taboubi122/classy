@@ -81,7 +81,7 @@ function applySortFilter(array, comparator, query) {
 
 export default function UserPage() {
   useEffect(()=>{
-    axios.get('http://localhost:5000/api/getAllClients')
+    axios.get('http://localhost:5000/api/getclientav')
     .then(res=>setClient(res.data)
     );
      },[]);

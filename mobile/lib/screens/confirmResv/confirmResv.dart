@@ -4,13 +4,13 @@ import 'components/body.dart';
 
 final dio = Dio();
 
-class reservation extends StatelessWidget {
-  static String routeName = "/reservation";
+class confirm extends StatelessWidget {
+  static String routeName = "/confirm";
 
   @override
   Widget build(BuildContext context) {
-    final salonReservation args =
-        ModalRoute.of(context)!.settings.arguments as salonReservation;
+    final confirmReservation args =
+        ModalRoute.of(context)!.settings.arguments as confirmReservation;
     return Scaffold(
         body: Body(
       refCentre: args.refCentre,
@@ -20,12 +20,12 @@ class reservation extends StatelessWidget {
   }
 }
 
-class salonReservation {
+class confirmReservation {
   final String nomService;
   final String nomCentre;
   final int refCentre;
   final int? refResv;
-  salonReservation(
+  confirmReservation(
       {required this.refCentre,
       required this.nomService,
       required this.nomCentre,

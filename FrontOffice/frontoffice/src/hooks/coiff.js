@@ -33,9 +33,9 @@ import { Buffer } from 'buffer';
      return (
         <div className='row'>
         {ville.map(data => 
-        <div key={data.idVille}> <a href={`/${type}/${data.nom}`} > <button onClick={() => handle(data.nom,type)} className="decouvrez"><h4 >Découvrez nos {type}s à </h4></button></a>
+        <div key={data.idVille}> <a href={`/classy/${type}/${data.nom}`} > <button onClick={() => handle(data.nom,type)} className="decouvrez"><h4 >Découvrez nos {type}s à </h4></button></a>
      <br/><br/>
-     <a href={`/${type}/${data.nom}`} >
+     <a href={`/classy/${type}/${data.nom}`} >
       <img alt="1"className='forme' src={`data:image/png;base64,${Buffer.from(data.image.data).toString('base64')}`} /></a>
      <br/><br/>
             </div>   

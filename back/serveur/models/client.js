@@ -12,7 +12,7 @@ const client = function (client) {
 };
 
 client.getAll = (result) => {
-  sql.query("SELECT * FROM client where isActive= 1", (err, res) => {
+  sql.query("SELECT * FROM client where isActive=1", (err, res) => {
     if (err) {
       console.log("error: ", err);
       result(null, err);

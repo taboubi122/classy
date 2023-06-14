@@ -5,7 +5,7 @@ import 'package:shop_app/helper/keyboard.dart';
 import 'package:shop_app/screens/forgot_password/forgot_password_screen.dart';
 import 'package:shop_app/screens/login_faild/login_faild_screen.dart';
 import 'package:shop_app/screens/login_success/login_success_screen.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../adresse.dart';
 import '../../../components/default_button.dart';
 import '../../../constants.dart';
@@ -34,21 +34,29 @@ class _SignFormState extends State<SignForm> {
       });
 
       final String type = response.data['type'];
-
+      emailController.clear();
+      passwordController.clear();
       print('Login success');
       print('user type: $type');
+
+      // Sauvegarde des informations d'identification de l'utilisateur
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setString('email', email);
+      prefs.setString('password', password);
+
       Navigator.pushNamed(context, LoginSuccessScreen.routeName);
     } catch (err) {
       Navigator.pushNamed(context, LoginFaildScreen.routeName);
       print(err);
       print('Login failed');
+      emailController.clear();
+      passwordController.clear();
     }
   }
 
   final _formKey = GlobalKey<FormState>();
   String? email;
   String? password;
-  bool? remember = false;
   final List<String?> errors = [];
 
   void addError({String? error}) {
@@ -77,22 +85,12 @@ class _SignFormState extends State<SignForm> {
           SizedBox(height: getProportionateScreenHeight(30)),
           Row(
             children: [
-              Checkbox(
-                value: remember,
-                activeColor: Colors.black,
-                onChanged: (value) {
-                  setState(() {
-                    remember = value;
-                  });
-                },
-              ),
-              const Text("Remember me", style: TextStyle(fontFamily: "Robot")),
               const Spacer(),
               GestureDetector(
                 onTap: () => Navigator.pushNamed(
                     context, ForgotPasswordScreen.routeName),
                 child: const Text(
-                  "Forgot Password",
+                  "Mot de passe Oublié",
                   style: TextStyle(
                       decoration: TextDecoration.underline,
                       fontFamily: "Robot"),

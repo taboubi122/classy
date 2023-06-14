@@ -10,9 +10,9 @@ import {
   TableRow,
   TableBody,
   TableCell,
-  Container,
   Typography,
   Grid,
+  Container, 
 } from '@mui/material';
 import moment from 'moment';
 import "react-big-calendar/lib/css/react-big-calendar.css"
@@ -21,15 +21,7 @@ import * as bootstrap from "bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css"
 import 'moment/locale/fr';
 import 'datetime-picker-reactjs/dist/index.css'
-import {
-    Container, 
-    Typography,
-    Grid,
-    Card,
-    Stack,
-    TableBody,
-    TableRow
-  } from '@mui/material';
+
   
 import { useLocation} from "react-router-dom";
 import { makeStyles } from '@material-ui/core/styles';

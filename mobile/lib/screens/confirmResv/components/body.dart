@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shop_app/screens/home/home_screen.dart';
 import '../../../adresse.dart';
 import '../../../size_config.dart';
-import '../autrePrestation.dart';
 
 final dio = Dio();
 
-class prestation extends StatelessWidget {
-  prestation({
+class Body extends StatelessWidget {
+  Body({
     Key? key,
     required this.refCentre,
     required this.nomService,
@@ -33,12 +34,6 @@ class prestation extends StatelessWidget {
     } else {
       return '$seconds s';
     }
-  }
-
-  void updateSelectedPersonnel(String? personnel) {
-    setState(() {
-      selectedPerso = personnel!;
-    });
   }
 
   Future<List<dynamic>> getItem() async {
@@ -83,37 +78,22 @@ class prestation extends StatelessWidget {
     }
   }
 
+  Future<void> Insert() async {
+    try {
+      final response = await dio
+          .post('http://${Adresse.adresseIP}:5000/api/addResvPerso', data: {
+        'email': nomCentre,
+        'password': nomService,
+      });
+      print('insert success');
+    } catch (err) {
+      print(err);
+      print('Login failed');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<dynamic>>(
-      future: getItem(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
-        } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Text('No salon data available');
-        } else {
-          final services = snapshot.data!;
-          final serviceItem = services[0];
-          return afficherDonneesPrestation(
-              context, serviceItem, updateSelectedPersonnel);
-        }
-      },
-    );
-  }
-
-  void setState(VoidCallback callback) {
-    // Votre implémentation de la logique de setState ici
-  }
-
-  Widget afficherDonneesPrestation(BuildContext context, dynamic serviceItem,
-      Function(String?) updateSelectedPersonnel) {
-    final String nomService = serviceItem['nomService'];
-    final String duree = serviceItem['duree'];
-    final int prix = serviceItem['prix'];
-
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Container(
         decoration: BoxDecoration(
@@ -147,7 +127,7 @@ class prestation extends StatelessWidget {
               Icon(Icons.schedule_outlined, size: 13),
               SizedBox(width: 1),
               Text(
-                '${formatDuration(duree)}',
+                nomCentre,
                 style: const TextStyle(
                   color: Colors.black,
                   fontSize: 13,
@@ -158,7 +138,7 @@ class prestation extends StatelessWidget {
               const Icon(Icons.monetization_on_outlined, size: 13),
               SizedBox(width: 1),
               Text(
-                '$prix D',
+                nomService,
                 style: const TextStyle(
                   color: Colors.black,
                   fontSize: 13,
@@ -180,16 +160,7 @@ class prestation extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             ElevatedButton(
-              onPressed: () async {
-                showModalBottomSheet(
-                  context: context,
-                  builder: (context) => Personnel(
-                      context,
-                      nomService,
-                      nomCentre,
-                      updateSelectedPersonnel), // Passer la fonction de rappel
-                );
-              },
+              onPressed: () {},
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                 primary: Colors.white,
@@ -203,15 +174,7 @@ class prestation extends StatelessWidget {
               ),
               child: const Row(
                 children: [
-                  Text(
-                    "Choisir avec qui",
-                    style: TextStyle(color: Colors.black, fontSize: 14),
-                  ),
                   SizedBox(width: 5),
-                  Icon(
-                    Icons.keyboard_arrow_down_rounded,
-                    color: Colors.black,
-                  ),
                 ],
               ),
             ),
@@ -224,17 +187,7 @@ class prestation extends StatelessWidget {
         child: Padding(
             padding: EdgeInsets.all(0),
             child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AutrePrestation(
-                      nomService: nomService,
-                      nomCentre: nomCentre,
-                    ),
-                  ),
-                );
-              },
+              onPressed: () {},
               style: ElevatedButton.styleFrom(
                 primary: Color.fromARGB(174, 0, 0, 0),
                 onPrimary: Colors.white,
@@ -253,10 +206,6 @@ class prestation extends StatelessWidget {
                   SizedBox(
                     width: 4,
                   ),
-                  Text(
-                    "Ajouter une autre prestation",
-                    style: TextStyle(color: Colors.white, fontSize: 14),
-                  ),
                 ],
               ),
             )),
@@ -264,68 +213,7 @@ class prestation extends StatelessWidget {
     ]);
   }
 
-  Widget Personnel(BuildContext context, String nomService, String nomCentre,
-      Function(String? p1) updateSelectedPersonnel) {
-    String? selectedPersonnel;
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(
-            topRight: Radius.circular(30), topLeft: Radius.circular(30)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          child: FutureBuilder<List<dynamic>>(
-            future: getItems(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              } else if (snapshot.hasError) {
-                return Text('${snapshot.error}');
-              } else {
-                final etablis = snapshot.data as List<dynamic>?;
-                return SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      for (int index = 0; index < etablis!.length + 1; index++)
-                        ListTile(
-                          title: index == 0
-                              ? const Text(
-                                  'Sans préférence',
-                                  style: TextStyle(
-                                    color: Color.fromARGB(255, 15, 15, 15),
-                                    fontSize: 14,
-                                  ),
-                                )
-                              : Text(
-                                  etablis[index - 1]['persoName'],
-                                  style: TextStyle(
-                                    color: Color.fromARGB(255, 15, 15, 15),
-                                    fontSize: 14,
-                                  ),
-                                ),
-                          onTap: () {
-                            selectedPersonnel = index == 0
-                                ? 'Sans préférence'
-                                : etablis[index - 1]['persoName'];
-                            print(selectedPersonnel);
-                            updateSelectedPersonnel(selectedPersonnel);
-
-                            Navigator.pop(context, selectedPersonnel);
-                          },
-                        ),
-                    ],
-                  ),
-                );
-              }
-            },
-          ),
-        ),
-      ),
-    );
+  void setState(VoidCallback callback) {
+    // Votre implémentation de la logique de setState ici
   }
 }

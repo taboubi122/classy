@@ -1,13 +1,35 @@
+import 'dart:typed_data';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
+import '../../../adresse.dart';
+import '../../../salon.dart';
 import '../../../size_config.dart';
+import '../../details/details_screen.dart';
 import '../../seeMoreCentre/seeMoreCentre.dart';
 import 'section_title.dart';
+
+final dio = Dio();
 
 class SpecialOffers extends StatelessWidget {
   const SpecialOffers({
     Key? key,
   }) : super(key: key);
+
+  Future<List<salon>> getItems() async {
+    try {
+      final response =
+          await dio.get('http://${Adresse.adresseIP}:5000/api/getNamesEtab');
+      final List<dynamic> data = response.data;
+      final items = data
+          .map((itemJson) => salon.fromJson(itemJson as Map<String, dynamic>))
+          .toList();
+      return items;
+    } catch (e) {
+      throw Exception('Failed to get items: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,32 +48,48 @@ class SpecialOffers extends StatelessWidget {
             },
           ),
         ),
-        SizedBox(height: getProportionateScreenWidth(11)),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              SpecialOfferCard(
-                image: "14.jpg",
-                category: "Smartphone",
-                numOfBrands: 18,
-                press: () {},
-              ),
-              SpecialOfferCard(
-                image: "assets/images/Image Banner 3.png",
-                category: "Fashion",
-                numOfBrands: 24,
-                press: () {},
-              ),
-              SpecialOfferCard(
-                image: "assets/images/Image Banner 3.png",
-                category: "Fashion",
-                numOfBrands: 24,
-                press: () {},
-              ),
-              SizedBox(width: getProportionateScreenWidth(20)),
-            ],
-          ),
+        SizedBox(height: getProportionateScreenWidth(13)),
+        FutureBuilder<List<salon>>(
+          future: getItems(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Text('Error: ${snapshot.error}'),
+              );
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(
+                child: Text('No data available.'),
+              );
+            } else {
+              final salons = snapshot.data!;
+              final visibleSalons =
+                  salons.take(4).toList(); // Limiter les salons à 4
+              return SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: visibleSalons.map((salon) {
+                    return SpecialOfferCard(
+                      imageBytes: salon.src,
+                      category: salon.nom,
+                      numOfBrands: salon.type,
+                      press: () {
+                        Navigator.pushNamed(
+                          context,
+                          DetailsScreen.routeName,
+                          arguments: salonDetailsArguments(
+                              reference: salon.reference, nomCentre: salon.nom),
+                        );
+                      },
+                    );
+                  }).toList(),
+                ),
+              );
+            }
+          },
         ),
       ],
     );
@@ -59,16 +97,16 @@ class SpecialOffers extends StatelessWidget {
 }
 
 class SpecialOfferCard extends StatelessWidget {
-  const SpecialOfferCard({
-    Key? key,
-    required this.category,
-    required this.image,
-    required this.numOfBrands,
-    required this.press,
-  }) : super(key: key);
-
-  final String category, image;
-  final int numOfBrands;
+  const SpecialOfferCard(
+      {Key? key,
+      required this.category,
+      required this.numOfBrands,
+      required this.press,
+      required this.imageBytes})
+      : super(key: key);
+  final Uint8List imageBytes;
+  final String category;
+  final String numOfBrands;
   final GestureTapCallback press;
 
   @override
@@ -84,9 +122,10 @@ class SpecialOfferCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(15),
             child: Stack(
               children: [
-                Image.asset(
-                  image,
+                Image.memory(
+                  imageBytes,
                   fit: BoxFit.cover,
+                  width: 400,
                 ),
                 Container(
                   decoration: BoxDecoration(
@@ -102,8 +141,8 @@ class SpecialOfferCard extends StatelessWidget {
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: getProportionateScreenWidth(10.0),
-                    vertical: getProportionateScreenWidth(45),
+                    horizontal: getProportionateScreenWidth(15.0),
+                    vertical: getProportionateScreenWidth(15),
                   ),
                   child: Text.rich(
                     TextSpan(
@@ -116,7 +155,7 @@ class SpecialOfferCard extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        TextSpan(text: "$numOfBrands Brands")
+                        TextSpan(text: "$numOfBrands")
                       ],
                     ),
                   ),

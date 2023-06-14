@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import '../../../adresse.dart';
 import '../../../constants.dart';
 import '../../../salon.dart';
 import '../../../size_config.dart';
@@ -31,7 +32,7 @@ class _ProductImagesState extends State<ProductImages> {
   Future<List<salon>> getItems() async {
     try {
       final response = await dio.get(
-          'http://192.168.1.39:5000/api/getByImageRef/${widget.reference}');
+          'http://${Adresse.adresseIP}:5000/api/getByImageRef/${widget.reference}');
       final List<dynamic> data = response.data;
       final items = data
           .map((itemJson) => salon.fromJson(itemJson as Map<String, dynamic>))

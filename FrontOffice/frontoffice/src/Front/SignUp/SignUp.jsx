@@ -11,7 +11,7 @@ import img1 from '../../Assets/Photos/7.png'
 import Navbar from '../Navbar/navbar';
 import Footer from '../Footer';
 
-const SignUp= () =>{
+const SignUp= (isLoggedIn) =>{
   const validationSchema = Yup.object({
     email: Yup.string().email('Adresse email invalide').required('Email est obligatoire'),
    password: Yup.string().min(8, 'Mot de passe doit contenir au moins 8 caractères').matches( /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/, "Mot de passe doit contenir au moins 8 caractères, dont au moins une lettre majuscule, une lettre minuscule et un chiffre" ).required('Mot de passe est obligatoire'),
@@ -64,9 +64,15 @@ const SignUp= () =>{
     const fermer=()=>{
       setShowAlert(false)
     }
+    const scrollThreshold = "header scroll";
+    if (isLoggedIn) {
+      // Utilisateur connecté, redirigez vers la page d'accueil
+      window.location.href = '/';
+      return null; // Vous pouvez également retourner null pour éviter le rendu du reste du composant
+    }
     return(
         <>
-        <Navbar/>
+        <Navbar  change={scrollThreshold}/>
         <div className='navBarLinks'/>
         <section className='SignUp'  >
             <div className='container'>

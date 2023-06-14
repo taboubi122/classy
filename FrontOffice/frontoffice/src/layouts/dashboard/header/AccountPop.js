@@ -28,43 +28,37 @@ export default function AccountPop({handleLogout,nom,prenom,email,photo}) {
   const handleClose = () => {
     setOpen(null);
   };
-  function Deconnecter()
-  {   
-       const swalWithBootstrapButtons = Swal.mixin({
-           customClass: {
-             confirmButton: 'btn btn-success',
-             cancelButton: 'btn btn-danger'
-           },
-           buttonsStyling: false
-         })
-         swalWithBootstrapButtons.fire({
-           title: 'Êtes-vous sûr?',
-           text: "Vous ne pourrez pas revenir en arrière!",
-           icon: 'warning',
-           showCancelButton: true,
-           confirmButtonText: 'Oui, Deconnecter!',
-           cancelButtonText: 'Non, annuler!',
-           reverseButtons: true
-         }).then((result) => {
-           if (result.isConfirmed) {
-            handleLogout();
-             swalWithBootstrapButtons.fire(
-               'Deconnecter!',
-               'success'
-             )
-            window.location.reload()
-           } else if (
-             result.dismiss === Swal.DismissReason.cancel
-           ) {
-             swalWithBootstrapButtons.fire(
-               'Annulé',
-               'Vous rester connecter :)',
-               'erreur'
-             )
-           }
-         })
-         
-       
+  function Deconnecter() {
+    const swalWithBootstrapButtons = Swal.mixin({
+      customClass: {
+        confirmButton: 'btn btn-success',
+        cancelButton: 'btn btn-danger',
+      },
+      buttonsStyling: false,
+    });
+    swalWithBootstrapButtons
+      .fire({
+        title: 'Êtes-vous sûr?',
+        text: "Vous ne pourrez pas revenir en arrière!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Oui, Deconnecter!',
+        cancelButtonText: 'Non, annuler!',
+        reverseButtons: true,
+      })
+      .then((result) => {
+        if (result.isConfirmed) {
+          handleLogout(); // Utiliser la fonction handleLogout ici
+          swalWithBootstrapButtons.fire('Deconnecter!', 'success');
+          window.location.reload();
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          swalWithBootstrapButtons.fire(
+            'Annulé',
+            'Vous restez connecté :)',
+            'erreur'
+          );
+        }
+      });
   }
   return (
     <>
@@ -86,7 +80,8 @@ export default function AccountPop({handleLogout,nom,prenom,email,photo}) {
         }}
       >
         {photo!==null ?(
-     <Avatar >    <img className="shadow" alt={1} src={`${Buffer.from(photo.data)}`}  />
+     <Avatar >  
+    <img alt="1"className="shadow" src={`data:image/png;base64,${Buffer.from(photo.data).toString('base64')}`} />
 
   </Avatar> ):
   (<Avatar><img src={img} alt="1"/></Avatar>)}
@@ -132,7 +127,7 @@ export default function AccountPop({handleLogout,nom,prenom,email,photo}) {
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
-        <MenuItem onClick={Deconnecter} sx={{ m: 1 }}>
+        <MenuItem onClick={handleLogout} sx={{ m: 1 }}>
            Se déconnecter
         </MenuItem>
       </Popover>

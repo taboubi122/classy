@@ -13,8 +13,8 @@ class Categories extends StatelessWidget {
       {"icon": "facial.png", "text": "Soin"},
       {"icon": "nail-polish.png", "text": "Manucure"},
     ];
-    return Padding(
-      padding: EdgeInsets.all(getProportionateScreenWidth(22)),
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,27 +47,28 @@ class CategoryCard extends StatelessWidget {
     return GestureDetector(
       onTap: press,
       child: SizedBox(
-        width: getProportionateScreenWidth(54),
+          child: Padding(
+        padding: EdgeInsets.all(getProportionateScreenWidth(10)),
         child: Column(
           children: [
             Container(
-              padding: EdgeInsets.all(getProportionateScreenWidth(10)),
+              padding: EdgeInsets.all(getProportionateScreenWidth(5)),
               height: getProportionateScreenHeight(70),
               width: getProportionateScreenWidth(70),
               decoration: BoxDecoration(
-                color: Color.fromARGB(246, 13, 13, 13),
+                color: Color.fromARGB(224, 13, 13, 13),
                 borderRadius: BorderRadius.circular(50),
               ),
               child: Image.asset(
                 icon!,
-                color: Color.fromARGB(255, 244, 228, 228),
+                color: const Color.fromARGB(213, 255, 255, 255),
               ),
             ),
             SizedBox(height: 5),
-            Text(text!, textAlign: TextAlign.center)
+            Text(text!)
           ],
         ),
-      ),
+      )),
     );
   }
 }

@@ -560,8 +560,18 @@ font-size: 15px;
 input[type="radio"]:checked + span {
   color: black;
 }
+.SuppNewPres{
+  color: black;
+  cursor: pointer;
+  font-family: "Robot";
+  text-decoration: underline;
+  font-size: 18px;
+}
+/**********************************Page ajoutPres****************************************/
 
-
+.custom-card {
+  width: 70%;
+}
 /**********************************Page reservation****************************************/
 
 

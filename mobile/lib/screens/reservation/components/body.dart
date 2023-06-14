@@ -1,11 +1,15 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shop_app/components/joursMenu.dart';
 import 'package:shop_app/screens/reservation/components/calendrier.dart';
 import 'package:shop_app/screens/reservation/components/prestation.dart';
 import 'package:shop_app/screens/seeMoreCentre/seeMoreCentre.dart';
 
+import '../../../adresse.dart';
 import '../../../components/categories_menu.dart';
 import '../../../size_config.dart';
+
+final dio = Dio();
 
 class Body extends StatelessWidget {
   final String nomService;
@@ -18,6 +22,42 @@ class Body extends StatelessWidget {
       required this.nomService,
       required this.nomCentre})
       : super(key: key);
+
+  Future<void> Insert(param1) async {
+    final DateTime formattedDateTime = DateTime.utc(
+      param1.year,
+      param1.month,
+      param1.day,
+      param1.hour,
+      param1.minute,
+      param1.second,
+    );
+    DateTime selectDateTime =
+        DateTime.parse(formattedDateTime.toString().replaceAll(' ', 'T'));
+    print(selectDateTime);
+
+    try {
+      final response = await dio.post(
+        'http://${Adresse.adresseIP}:5000/api/addResvPerso',
+        data: {
+          'nomService': nomService,
+          'nomSalon': nomCentre,
+          'selectedTime': selectDateTime.toIso8601String(),
+          'cinClient': 17124618,
+          'cinPersonnel': 7845152,
+        },
+      );
+
+      print('Insert success');
+    } catch (err) {
+      print(err);
+      print('Insert failed');
+    }
+  }
+
+  void HandleResv(DateTime param1) {
+    Insert(param1);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,57 +121,10 @@ class Body extends StatelessWidget {
               ],
             ),
           ),
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 2,
-                  blurRadius: 5,
-                  offset: Offset(0, 3),
-                ),
-              ],
-            ),
-            child: prestation(refCentre: refCentre, nomService: nomService),
-          ),
-          SizedBox(height: 12),
-          Container(
-            color: const Color.fromARGB(100, 236, 236, 236),
-            child: Padding(
-              padding: EdgeInsets.all(0),
-              child: ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.black, // Fond blanc
-                  onPrimary: Colors.white, // Texte noir
-                  shape: const RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.zero, // Supprimer le borderRadius
-                  ),
-                ),
-                child: const Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment.center, // Centrer le contenu
-                  children: [
-                    Icon(
-                      Icons.add_circle_outline,
-                      size: 14,
-                      color: Colors.white,
-                    ),
-                    SizedBox(
-                      width:
-                          4, // Espacement horizontal entre l'icône et le texte
-                    ),
-                    Text(
-                      "Ajouter une autre prestation",
-                      style: TextStyle(color: Colors.white, fontSize: 14),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+          prestation(
+              refCentre: refCentre,
+              nomService: nomService,
+              nomCentre: nomCentre),
           SizedBox(height: 12),
           Container(
             color: const Color.fromARGB(100, 236, 236, 236),
@@ -157,6 +150,7 @@ class Body extends StatelessWidget {
                   height: 10,
                 ),
                 Calendrier(
+                    onReservation: (param1) => HandleResv(param1),
                     nomService: nomService,
                     nomCentre: nomCentre,
                     refCentre: refCentre),

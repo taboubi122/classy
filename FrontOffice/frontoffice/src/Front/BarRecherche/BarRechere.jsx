@@ -2,6 +2,7 @@
 import React,{useState, useEffect} from "react";
 import './barRecherche.css';
 import {GrLocation} from'react-icons/gr';
+import { useNavigate } from "react-router-dom"; 
 import axios from 'axios';
 import { Buffer } from 'buffer';
 import {GoSearch} from 'react-icons/go';
@@ -25,7 +26,20 @@ const useStyles = makeStyles({
 });
 
 const BarRecherche= ({isLoggedIn}) =>{
-  
+  const [ville,setVille]=useState('')
+  const [nom,setNom]=useState('')
+  const navigate = useNavigate(); 
+  function cher(){
+    console.log(nom.length!==0)
+    if(ville.length===0 && nom.length===0){
+        return
+    }else if (! nom===''){
+          navigate(`/${nom}`);
+    }else if(ville.length!==0 && !nom===0){
+      navigate(`/${nom}/${ville}`);
+
+    }
+} 
 const[resv,setResv]=useState([]);
 const [email, setEmail] = useState('');
   useEffect(() => {
@@ -65,7 +79,8 @@ const [email, setEmail] = useState('');
                 Que chercher-vous ?
                 </label>
                  <div className="input1 flex">
-                    <input className="inputRech" type="text" placeholder='Nom du salon, prestations (coupe...)'/>
+                    <input className="inputRech" type="text"  value={nom}
+                    onChange={(e)=>setNom(e.target.value)} placeholder='Nom du salon, prestations (coupe...)'/>
                  </div>
                </div>
                <div className="CityInput">
@@ -73,38 +88,19 @@ const [email, setEmail] = useState('');
                  Où ?
                 </label>
                  <div className="input1 flex">
-                    <input  className="inputRech" type="text" placeholder='Adresse, ville...'/>
+                    <input  className="inputRech" type="text"  value={ville}
+                    onChange={(e)=>setVille(e.target.value)} placeholder='Adresse, ville...'/>
                  <GrLocation className='icon'/>
                  </div>
                </div>
                
-                <div className="searchOption1 flex">
+                <div className="searchOption1 flex" onClick={()=>cher()}>
                 <a href="/recherche" className='navLink'> <span>Rechercher</span></a>
                 
                     <GoSearch className="icon"/>
                     </div>           
             </div>
-            {isLoggedIn ? (
-               <> 
-             
-             <Grid container spacing={2}> 
-             {resv.map((row) => (
-               <Grid item key={row.startDateResv}>
-                 <Card className={classes.root}>
-                 <img  className={classes.media}
-            alt='1'
-            src={`data:image/png;base64,${Buffer.from(row.src.data).toString('base64')}`}
-          /><CardContent>
-                     <Typography variant="subtitle2">{row.nom}</Typography>
-                   </CardContent>
-                 </Card>
-               </Grid>
-             ))}
-           </Grid>                              
-           </>
-               ):(  
-          <div/>
-           )}
+           
         </div>
       </section> 
     )

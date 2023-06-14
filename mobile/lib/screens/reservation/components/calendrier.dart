@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:calendar_agenda/calendar_agenda.dart';
-import 'package:intl/intl.dart';
 
 import '../../../adresse.dart';
 
@@ -9,12 +8,14 @@ class Calendrier extends StatefulWidget {
   final String nomService;
   final String nomCentre;
   final int refCentre;
+  final Function(DateTime) onReservation;
 
   Calendrier({
     Key? key,
     required this.refCentre,
     required this.nomService,
     required this.nomCentre,
+    required this.onReservation,
   }) : super(key: key);
 
   @override
@@ -25,6 +26,7 @@ class _CalendrierState extends State<Calendrier> {
   CalendarAgendaController _calendarAgendaControllerAppBar =
       CalendarAgendaController();
   final dio = Dio();
+  List<DateTime> _selectedDays = []; // Dates sélectionnées
   List<String> _selectedDayHours =
       []; // Heures de travail pour la date sélectionnée
   bool _isSundaySelected = false;
@@ -36,16 +38,17 @@ class _CalendrierState extends State<Calendrier> {
       final response = await dio.get(
           'http://${Adresse.adresseIP}:5000/api/heureCalendrier/${widget.refCentre}');
       final dynamic data = response.data;
-      print(data);
+
       if (data != null && data is List<dynamic>) {
         _workingHoursPerDay.clear();
         for (dynamic item in data) {
-          String jour = item['jour'];
-          String? ouverture = item['ouverture'];
-          String? fermeture = item['fermeture'];
-          int? dayOfWeek = _getDayOfWeek(jour);
-          if (dayOfWeek != null && (ouverture != null || fermeture != null)) {
-            String hourRange = _formatHourRange(ouverture, fermeture);
+          String day = item['jour'];
+          String? openingHour = item['ouverture'];
+          String? closingHour = item['fermeture'];
+          int? dayOfWeek = _getDayOfWeek(day);
+          if (dayOfWeek != null &&
+              (openingHour != null || closingHour != null)) {
+            String hourRange = _formatHourRange(openingHour, closingHour);
             _workingHoursPerDay[dayOfWeek] =
                 _workingHoursPerDay[dayOfWeek] ?? [];
             _workingHoursPerDay[dayOfWeek]!.add(hourRange);
@@ -59,8 +62,42 @@ class _CalendrierState extends State<Calendrier> {
     }
   }
 
-  int? _getDayOfWeek(String jour) {
-    switch (jour) {
+  Future<void> getResvPerso() async {
+    try {
+      final response = await dio.get(
+        'http://${Adresse.adresseIP}:5000/api/getAllpersonnelResv',
+        queryParameters: {
+          'nomService': widget.nomService,
+          'nomCentre': widget.nomCentre,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        var data = response.data;
+        // Faites quelque chose avec les données retournées
+      } else {
+        print('Erreur lors de la récupération des données.');
+      }
+    } catch (error) {
+      print('Erreur lors de la requête HTTP : $error');
+    }
+  }
+
+  Future<List<dynamic>> getReservation() async {
+    try {
+      final response = await Dio().get(
+          'http://${Adresse.adresseIP}:5000/api/getReservationMobile/${widget.refCentre}');
+      final data = response.data;
+
+      return data;
+    } catch (error) {
+      print('Erreur lors de la requête HTTP : $error');
+      throw error;
+    }
+  }
+
+  int? _getDayOfWeek(String day) {
+    switch (day) {
       case 'Lundi':
         return 1;
       case 'Mardi':
@@ -80,17 +117,18 @@ class _CalendrierState extends State<Calendrier> {
     }
   }
 
-  String _formatHourRange(String? ouverture, String? fermeture) {
-    String formattedOpeningTime =
-        ouverture != null ? ouverture.substring(0, 5) : '';
-    String formattedClosingTime =
-        fermeture != null ? fermeture.substring(0, 5) : '';
-    return '$formattedOpeningTime - $formattedClosingTime';
+  String _formatHourRange(String? openingHour, String? closingHour) {
+    String formattedOpeningHour =
+        openingHour != null ? openingHour.substring(0, 5) : '';
+    String formattedClosingHour =
+        closingHour != null ? closingHour.substring(0, 5) : '';
+    return '$formattedOpeningHour - $formattedClosingHour';
   }
 
   @override
   void initState() {
     super.initState();
+
     getItem().then((_) {
       DateTime now = DateTime.now();
       int dayOfWeek = now.weekday;
@@ -117,10 +155,46 @@ class _CalendrierState extends State<Calendrier> {
     return allHours;
   }
 
+  Future<bool> isReservationExists(
+      String selectedDateTime, String selectedTime) async {
+    String dateS;
+    dateS = selectedDateTime.toString().split(" ").first;
+    final List<String> dateParts = dateS.split('-');
+    final int year = int.parse(dateParts[0]);
+    final int month = int.parse(dateParts[1]);
+    final int day = int.parse(dateParts[2]);
+
+    final DateTime selectedDateTimeModified = DateTime(
+      year,
+      month,
+      day,
+      int.parse(selectedTime.split(':')[0]),
+      int.parse(selectedTime.split(':')[1]),
+    );
+
+    final reservations = await getReservation();
+
+    return reservations.any((reservation) {
+      final DateTime startDateResv =
+          DateTime.parse(reservation['startDateResv']);
+      final DateTime endDateResv = DateTime.parse(reservation['endDateResv']);
+
+      // Vérifier si selectedDateTimeModified est inclus dans l'intervalle
+      return selectedDateTimeModified.year == startDateResv.year &&
+          selectedDateTimeModified.month == startDateResv.month &&
+          selectedDateTimeModified.day == startDateResv.day &&
+          (selectedDateTimeModified.isAtSameMomentAs(startDateResv) ||
+              selectedDateTimeModified.isAtSameMomentAs(endDateResv));
+    });
+  }
+
+  DateTime? dateSelect;
   @override
   Widget build(BuildContext context) {
     List<String> allHours = _generateAllHours();
-
+    final DateTime currentDate = DateTime.now();
+    final int page = 0;
+    final int index = 0;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -148,6 +222,9 @@ class _CalendrierState extends State<Calendrier> {
           lastDate: DateTime.now().add(const Duration(days: 60)),
           onDateSelected: (date) {
             int dayOfWeek = date.weekday;
+            setState(() {
+              dateSelect = date;
+            });
             _updateSelectedDayHours(dayOfWeek);
             print(date);
           },
@@ -183,25 +260,53 @@ class _CalendrierState extends State<Calendrier> {
                         return allHours
                             .sublist(openingHourIndex, closingHourIndex + 1)
                             .map((hour) {
-                          return ElevatedButton(
-                            onPressed: () {
-                              print('Heure sélectionnée : $hour');
+                          String dateS;
+                          if (dateSelect == null) {
+                            dateS = DateTime.now().toString().split(" ").first;
+                          } else {
+                            dateS = dateSelect.toString().split(" ").first;
+                          }
+                          return FutureBuilder<bool>(
+                            future: isReservationExists(dateS, hour),
+                            builder: (BuildContext context,
+                                AsyncSnapshot<bool> snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return CircularProgressIndicator();
+                              } else if (snapshot.hasError) {
+                                print(
+                                    'Erreur lors de la vérification de la réservation : ${snapshot.error}');
+                                return Text(
+                                    'Erreur lors de la vérification de la réservation');
+                              } else {
+                                final bool isDisabled = snapshot.data ?? false;
+                                return ElevatedButton(
+                                  onPressed: () {
+                                    DateTime selectedDateTime =
+                                        DateTime.parse('$dateS $hour');
+                                    widget.onReservation(selectedDateTime);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 8, horizontal: 16),
+                                    primary:
+                                        isDisabled ? Colors.grey : Colors.white,
+                                    onPrimary: Colors.black,
+                                  ),
+                                  child: Text(
+                                    hour,
+                                    style: TextStyle(
+                                      color: isDisabled
+                                          ? Colors.white
+                                          : Colors.black,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                );
+                              }
                             },
-                            style: ElevatedButton.styleFrom(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 8, horizontal: 16),
-                              primary: Colors.white,
-                              onPrimary: Colors.black,
-                            ),
-                            child: Text(
-                              hour,
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 14,
-                              ),
-                            ),
                           );
-                        });
+                        }).toList();
                       }).toList(),
               ),
             ),

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate,useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import {
   Table,
@@ -10,14 +10,9 @@ import {
   Paper,
   Card,
 } from "@material-ui/core";
+import { VscChevronUp ,VscChevronDown } from "react-icons/vsc";
 
 const ServiceChoix = ({ service,nomCentre }) => {
-  const location=useLocation()
-  const nomSalon =location.pathname.split('/')[2].split('%20').join(' ')
-  let servicePath = null;
-  if (location.pathname.split('/').length > 4) {
-    servicePath = location.pathname.split('/')[3].split('%20').join(' ')
-  }
   const [expandedList, setExpandedList] = useState(
     service.map(() => false)
   );
@@ -26,6 +21,20 @@ const ServiceChoix = ({ service,nomCentre }) => {
  console.log(service)
  Navigate(`/reservation/${nomCentre}/${service}`);
   }
+  const formatDuration = (duration) => {
+    const [hours, minutes, seconds] = duration.split(':').map(Number);
+  
+    if (hours > 0) {
+      if (minutes === 0) {
+        return `${hours}h`;
+      } else {
+        return `${hours}h ${minutes}min`;
+      }
+    } else {
+      return `${minutes}min`;
+    }
+  };
+  
   // Stocker les catégories séparément des services
   const categories = {};
   service.forEach((serviceData) => {
@@ -38,46 +47,25 @@ const ServiceChoix = ({ service,nomCentre }) => {
     }
     categories[serviceData.refCateg].services.push(serviceData);
   });
-  // Duree
-	function currentTime(d) {
-		let duree = "";
-		const [hours, minutes] = d.split(":");
-		const date = new Date();
-		date.setHours(parseInt(hours, 10));
-		date.setMinutes(parseInt(minutes, 10));
-		if (hours === "00") {
-			duree = `${minutes} min`;
-		} else if (minutes === "00") {
-			duree = `${hours} h`;
-		} else {
-			duree = `${hours} h ${minutes} min`;
-		}
-		return duree;
-	}
 
   // Afficher les catégories dans des tableaux séparés
   const categoriesList = Object.keys(categories).map((key) => (
     <div key={key}>
-      <h2 className="resvTitre2">{categories[key].nom}</h2>
-      <p>{categories[key].description}</p>
+          <span className="resvTitre">{categories[key].nom}</span>
+          <h5 className="resvSmallTitre">{categories[key].description}</h5>
+
       <br/>
-      <Card style={{ borderRadius: '10px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }} > 
+      <Card style={{ borderRadius: '10px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}  >
     
-        <table style={{ margin: '0 auto', borderRadius: '10px'}} key={`table-${key}`} >
+        <Table key={`table-${key}`}>
           <TableBody>
             {categories[key].services.map((serviceData, index) => (
               <TableRow key={serviceData.refService}>
-                <TableCell scope="col" style={{ width: "60%" }}>
-                  <h4>{serviceData.nomService}</h4>
-                  {expandedList[index] ? (
+                <TableCell scope="col" style={{ width: "25%" }}>
+                  <p>{serviceData.nomService}</p>
+                  {expandedList[index] && (
                     <div className="details-text">
                       {serviceData.description}
-                    </div>
-                  ) : (
-                    <div className="details-text">
-                      {serviceData.description.length > 50
-                        ? `${serviceData.description.slice(0, 50)}...`
-                        : serviceData.description}
                     </div>
                   )}
                   <span
@@ -88,25 +76,36 @@ const ServiceChoix = ({ service,nomCentre }) => {
                       setExpandedList(newList);
                     }}
                   >
-                    {expandedList[index] && serviceData.description.length>50? "Moins de détails" : !expandedList[index] && serviceData.description.length>50 ?"Plus de détails":""}
+                    {expandedList[index]
+                      ? "Moins de détails"
+                      : "Plus de détails"}
+                    {expandedList[index] ? " " : <span>&nbsp;</span>}
+                    {expandedList[index] ? (
+                      <VscChevronUp color="gray" />
+                    ) : (
+                      <VscChevronDown color="gray" />
+                    )}
                   </span>
                 </TableCell>
-                <TableCell scope="col">
-                  <h5 className="resvSmallTitre">{currentTime(serviceData.duree)}</h5>
+                <TableCell scope="col" style={{ width: "0.1%" }}>
+                  <h5 className="resvSmallTitre">{formatDuration(serviceData.duree)}</h5>
                 </TableCell>
-                <TableCell>
-                  <h5 className="resvSmallTitre">{serviceData.prix} Dinar</h5>
+                <TableCell style={{ width: "0.1%" }}>
+                  <h5 className="resvSmallTitre">{serviceData.prix}Dinar</h5>
                 </TableCell>
                 <TableCell style={{ width: "0.1%" }}>
                   <button className="buttonCoiff" onClick={()=>reserv(serviceData.nomService)}>Choisir</button>
                 </TableCell>
                 <TableCell style={{ width: "0.1%" }}>
-                  <p  style={{ color:"white"}}> classy </p>
+                  <p> </p>
+                </TableCell>
+                <TableCell style={{ width: "0.1%" }}>
+                  <p> </p>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
-        </table>
+        </Table>
    
       </Card>
     </div>

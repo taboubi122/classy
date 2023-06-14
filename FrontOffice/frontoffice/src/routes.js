@@ -16,7 +16,7 @@ import DetailsCoiff from './Front/detailsCoiff/DetailsCoiff';
 import CoiffComponents from './Front/CoiffComponents/CoiffComponents';
 import ReservationPage from './Front/ReservationPage';
 import EnvDemande from './Front/EnvDemande';
-
+import AlertProtection from './AlertProtection';
 export default function Router() {
   const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem('isLoggedIn') === 'true');
   const [email] = useState(localStorage.getItem('email'));
@@ -44,10 +44,7 @@ export default function Router() {
         { path: '*', element: <Navigate to="/404" /> },
       ],
     },
-    {
-      path: '*',
-      element: <Navigate to="/404" replace />,
-    },
+    
     {
       path: '/',
      element: <Home isLoggedIn={isLoggedIn} email={email}/> ,index: true ,
@@ -58,7 +55,7 @@ export default function Router() {
     },
     {
       path: '/SignUp',
-     element: <SignUp/> ,index: true ,
+     element: <SignUp isLoggedIn={isLoggedIn}/> ,index: true ,
     },
     {
       path: '/Profil',
@@ -69,11 +66,11 @@ export default function Router() {
      element: <ConfirmUser/>  ,
     },
     {
-      path: '/:type',
+      path: '/classy/:type',
      element: <Coiffure isLoggedIn={isLoggedIn}/>  ,
     },
     {
-      path: '/:type/:ville',
+      path: '/classy/:type/:ville',
      element: <CoiffComponents isLoggedIn={isLoggedIn}/>  ,
     },
     {
@@ -81,7 +78,7 @@ export default function Router() {
      element: <EnvDemande/>  ,
     },
     {
-      path: '/:type/:ville/:nom',
+      path: '/classy/:type/:ville/:nom',
      element: <DetailsCoiff isLoggedIn={isLoggedIn}/>  ,
     },
     {
@@ -91,6 +88,10 @@ export default function Router() {
     {
       path: '/reservation/:centre/:service/:ref',
      element: <ReservationPage isLoggedIn={isLoggedIn}/>  ,
+    },
+    {
+      path: '/notConnected',
+     element: <AlertProtection/>  ,
     },
   ]);
 

@@ -44,6 +44,7 @@ useEffect(() => {
   }
 }, [email]);
 const scrollThreshold = "header scroll";
+
     return(
         <>
          <Navbar change={scrollThreshold}  />
@@ -73,9 +74,8 @@ const scrollThreshold = "header scroll";
          onChange={(e) => {setPassword(e.target.value)}} className='inputAuth'/>
         </div>
         <br/>
-        <button className="a" ><a href='/restPass' className="Autha">Mot de passe oublié ? </a></button>
-       <br/>
-       <button className="Authbtn1" onClick={signIn}> Se Connecter</button>
+        
+       <button className="btn" onClick={signIn}> Se Connecter</button>
 
   
         <div className='divider'>

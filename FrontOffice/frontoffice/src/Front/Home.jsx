@@ -8,6 +8,8 @@ import BarRecherche from './BarRecherche/BarRechere';
 
 const Home = ({ isLoggedIn, handleLogout }) => {
   const scrollThreshold = "header";
+  console.log(handleLogout)
+
   return (
     <>
       <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} change={scrollThreshold}/>

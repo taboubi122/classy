@@ -64,10 +64,11 @@ const SignUp= () =>{
     const fermer=()=>{
       setShowAlert(false)
     }
-    const scrollThreshold = "header scroll";
-    return(
-        <>
-         <Navbar change={scrollThreshold} />
+   
+const scrollThreshold = "header scroll";
+return(
+    <>
+     <Navbar change={scrollThreshold}  />
         <div className='navBarLinks'/>
         <section className='SignUp'  >
             <div className='container'>

@@ -113,13 +113,6 @@ function getCentreRes() {
     return weekDates;
   }
 
-  function getData(id) {
-    const d = generateWeekDates();
-    const res = [];
-    for (let i = 0; i < d.length; i++) {
-      res[i] = reservation.filter((ele) => ele.dateResv && ele.dateResv.substring(0, 10) === d[i] && ele.refService === id).length;
-    }
-    return res;
   function getData (id){
     const d=generateWeekDates()
     const res=[]
@@ -132,7 +125,6 @@ function getCentreRes() {
     res[6]=reservation.filter((ele) => ele.startDateResv.substring(0, 10) === d[6] && ele.refService===id).length 
    return res
   }
-  
 
   function getTitre(){
     const t= generateWeekDates()
@@ -272,5 +264,4 @@ function getCentreRes() {
       </Container>
     </>
   );
-}
 }

@@ -28,7 +28,7 @@ import {
   FormControlLabel,
   FormLabel,
   FormHelperText,
-  Radio,RadioGroup, Box
+  Radio,RadioGroup, Box,Checkbox
 } from '@mui/material';
 // components
 import { useLocation} from "react-router-dom";
@@ -592,15 +592,14 @@ const onSubmit = (data) => Insert(data.CIN,data.nom,data.prenom,data.tel,data.se
                    
                     return (
                       <TableRow hover key={row.CIN} tabIndex={-1} role="checkbox" selected={selectedUser}>
+                         <TableCell padding="checkbox">
+                          <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, nom)} />
+                        </TableCell>
+
                         <TableCell component="th" scope="row" padding="none">
                           <Stack direction="row" alignItems="center" spacing={2}>
                           {photo && <img className='ClientPhoto' alt={id} src={`${Buffer.from(row.photo.data)}`}  />}
                           
-                          <Box component="img" alt="..." src={row.photo && `data:image/png;base64,${Buffer.from(row.photo.data).toString('base64')}`} sx={{ width: 48, height: 48, borderRadius: 1.5, flexShrink: 0 }} />
-                          </Stack>
-                        </TableCell>
-                        <TableCell component="th" scope="row" padding="none">
-                          <Stack direction="row" alignItems="center" spacing={2}>                          
                             <Typography variant="subtitle2" noWrap>
                               {nom} {prenom}
                             </Typography>  

@@ -9,7 +9,7 @@ import AccountPop from '../../layouts/dashboard/header/AccountPop';
 
 
 const Navbar = ({ isLoggedIn, handleLogout, change}) => {
-  
+  console.log(handleLogout)
   const [active, setActive] = useState('navBar');
   const [scroll, setScroll] = useState(false);
   const [email, setEmail] = useState('');
@@ -65,25 +65,25 @@ const navbarClass = scroll ? 'header scroll' :change ;
         <div className={active}>
           <ul className="navLists flex">
             <li className="navItem">
-              <a href={`/${coiffure}`} className="navLink">
+              <a href={`/classy/${coiffure}`} className="navLink">
                 {' '}
                 Coiffure{' '}
               </a>
             </li>
             <li className="navItem">
-              <a href={`/${barbier}`} className="navLink">
+              <a href={`/classy/${barbier}`} className="navLink">
                 {' '}
                 Barbier{' '}
               </a>
             </li>
             <li className="navItem">
-              <a href={`/${manucure}`} className="navLink">
+              <a href={`/classy/${manucure}`} className="navLink">
                 {' '}
                 Manucure{' '}
               </a>
             </li>
             <li className="navItem">
-              <a href={`/${institut}`} className="navLink">
+              <a href={`/classy/${institut}`} className="navLink">
                 {' '}
                 Institut de beauté{' '}
               </a>
@@ -99,9 +99,9 @@ const navbarClass = scroll ? 'header scroll' :change ;
             )}
             {isLoggedIn ? (
                <> 
-               <NotificationsPopover />
+               <NotificationsPopover isLoggedIn={isLoggedIn}/>
                {client.map((donne)=>    
-               <AccountPop nom={donne.nom} prenom={donne.prenom} email={donne.email} photo={donne.photo}  handleLogout={handleLogout}/>
+               <AccountPop  handleLogout={handleLogout} nom={donne.nom} prenom={donne.prenom} email={donne.email} photo={donne.photo} />
                        )} 
                  </>
             ) : (

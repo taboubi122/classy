@@ -1,10 +1,14 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class ProfilePic extends StatelessWidget {
   const ProfilePic({
+    required this.photo,
     Key? key,
   }) : super(key: key);
+  final Uint8List photo;
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +20,7 @@ class ProfilePic extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           CircleAvatar(
-            backgroundImage: AssetImage("assets/images/Profile Image.png"),
+            backgroundImage: MemoryImage(photo),
           ),
           Positioned(
             right: -16,
@@ -31,13 +35,13 @@ class ProfilePic extends StatelessWidget {
                     side: BorderSide(color: Colors.white),
                   ),
                   primary: Colors.white,
-                  backgroundColor: Color(0xFFF5F6F9),
+                  backgroundColor: const Color(0xFFF5F6F9),
                 ),
                 onPressed: () {},
                 child: SvgPicture.asset("assets/icons/Camera Icon.svg"),
               ),
             ),
-          )
+          ),
         ],
       ),
     );

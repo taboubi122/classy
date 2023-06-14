@@ -183,6 +183,7 @@ class _CategorieMenuState extends State<CategorieMenu> {
                                             refCentre: servItem['refCentre'],
                                             nomService: servItem['nomService'],
                                             nomCentre: widget.nomCentre,
+                                            refResv: null,
                                           ),
                                         );
                                       },

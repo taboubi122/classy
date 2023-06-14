@@ -13,14 +13,14 @@ import { useNavigate } from 'react-router-dom';
 const Coiffure= ({ isLoggedIn}) =>{
     const location = useLocation();
     const navigate = useNavigate();
-    const type = location.pathname.split("/")[1];
+    const type = location.pathname.split("/")[2];
     const [ville,setVille]=useState('')
     const scrollThreshold = "header scroll";
     function cher(){
         if(ville.length===0){
             return
         }else{
-            navigate(`/${type}/${ville}`);
+            navigate(`/classy/${type}/${ville}`);
         }
     }
     return(

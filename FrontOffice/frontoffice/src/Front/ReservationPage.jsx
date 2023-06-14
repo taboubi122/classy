@@ -1,4 +1,6 @@
-import {useState, useEffect,React } from 'react';
+import React, { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
+
 import axios from 'axios';
 import { Buffer } from 'buffer';
 import { useNavigate ,useLocation, useParams} from "react-router-dom";
@@ -20,6 +22,7 @@ import Footer from "./Footer";
 import Navbar from './Navbar/navbar';
 import Calendrier from './Calendrier';
 import ServiceChoix from '../hooks/ServiceChoix';
+import AjouterPres from '../hooks/AjouterPres';
 
 const ReservationPage= ({ isLoggedIn}) =>{
   
@@ -30,6 +33,7 @@ const ReservationPage= ({ isLoggedIn}) =>{
     if (location.pathname.split('/').length > 4) {
       refUpdate = location.pathname.split('/')[4];
     }
+   const  Navigate= useNavigate();
     const [services, setServices] = useState([]);
     const [Perso, setPerso] = useState([]);
     const [name,setName]=useState([]);
@@ -43,12 +47,16 @@ const ReservationPage= ({ isLoggedIn}) =>{
     const [confirmer, setConfirmer] = useState(false);
     const [newPres, setNewPres] = useState(false);
     const [leSservices,setLesServices]=useState([]);
+    const [addService, setaddService] = useState(null);
+    const [addDuree, setaddDuree] = useState(null);
+    const [addselectPerso, setaddselectPerso] = useState(null);
 
-
-const handlePersoChange = (event) => {
-    setSelectedPerso(event.target.value);
-    setHorairesDisponibles([]);
-  };
+    const handlePersoChange = (event) => {
+      const selectedValue = event.target.value;
+      setSelectedPerso(selectedValue);
+      setHorairesDisponibles([]);
+    };
+  
   const formatDuration = (duration) => {
     const [hours, minutes, seconds] = duration.split(':').map(Number);
   
@@ -62,8 +70,18 @@ const handlePersoChange = (event) => {
       return `${minutes}min`;
     }
   };
-  
 
+  const checkPersonnelAvailability = async (CIN, heure) => {
+    try {
+      const response = await axios.post('http://localhost:5000/api/isPersonnelDisponible', { CIN, heure });
+  
+      const available = response.data.available;
+      return available;
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      throw error;
+    }
+  };
 
   useEffect(() => {
     setEmail(localStorage.getItem('email'));
@@ -94,7 +112,6 @@ useEffect(() => {
       console.error("Error fetching data:", error);
     });
   }, []);
-  console.log(Perso)
 useEffect(()=>{
     axios.get(`http://localhost:5000/api/getAdresse/${nomSalon}`)
     .then(res=>setAdresse(res.data)
@@ -127,14 +144,62 @@ useEffect(()=>{
         }, [email]);
          const Insert = async (dateTime) => {
             try {
+              const confirmText = "Confirmez-vous la reservation ?";
+            
+              Swal.fire({
+                title: 'Confirmation',
+                text: confirmText,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Confirmer',
+                cancelButtonText: 'Annuler',
+              }).then(async (result) => {
+                if (result.isConfirmed) {
               await axios.post(`http://localhost:5000/api/addResvPerso`,
               {cinPersonnel:selectedPerso,cinClient:client[0].CIN,nomSalon,nomService:service,selectedTime:dateTime });
               console.log("reserv Registration success");
+              Navigate('/');
+            }
+          });
+        } catch (err) {
+          console.log(err);
+          console.log("resv Registration failed");
+        }
+      };
+          const Insert2 = async (dateTime, addService, addDuree, addselectPerso) => {
+            try {
+              const confirmText = "Confirmez-vous la reservation ?";
+            
+              Swal.fire({
+                title: 'Confirmation',
+                text: confirmText,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Confirmer',
+                cancelButtonText: 'Annuler',
+              }).then(async (result) => {
+                if (result.isConfirmed) {
+                  await axios.post(`http://localhost:5000/api/addResvPerso2`, {
+                    cinPersonnel: selectedPerso,
+                    cinPersonnel2: addselectPerso,
+                    cinClient: client[0].CIN, 
+                    nomSalon: nomSalon, 
+                    nomService: service,
+                    nomService2: addService,
+                    selectedTime: dateTime,
+                    addDuree: addDuree
+                  });
+              
+                  console.log("reserv Registration success");
+                  Navigate('/');
+                }
+              });
             } catch (err) {
               console.log(err);
               console.log("resv Registration failed");
             }
           };
+          
           const update = async (dateTime) => {
               try {
                 await axios.put(`http://localhost:5000/api/updateResv/${refUpdate}`,
@@ -145,10 +210,93 @@ useEffect(()=>{
                 console.log("resv update failed");
               }
             };
-         const handleReservation = (dateTime) => {
-            setConfirmer(true);
-            setSelectedDateTime(dateTime);
-          };
+            const dispoPerso = async (dateTime) => {
+              const personnelDisponible = [];
+              
+    
+              for (const person of Perso) {
+                console.log('Person:', person);
+                console.log(dateTime);
+                
+                const isAvailable = await checkPersonnelAvailability(person.CIN, dateTime);
+                console.log(isAvailable);
+            
+                personnelDisponible.push({ CIN: person.CIN, disponibilite: isAvailable });
+              }
+            
+              console.log('Personnel Disponible:', personnelDisponible);
+            
+              const availablePersonnel = personnelDisponible.filter(person => person.disponibilite === true);
+            
+              if (availablePersonnel.length > 0) {
+                  if (selectedPerso === 0) {
+                    console.log(handlePersoChange)
+                const randomIndex = Math.floor(Math.random() * availablePersonnel.length);
+                const selectedPersons = availablePersonnel[randomIndex];
+                setSelectedPerso(selectedPersons.CIN);
+                console.log('Selected Personnel:', selectedPersons.CIN);
+                setConfirmer(true);
+                setSelectedDateTime(dateTime);
+              }else {
+                setConfirmer(true);
+                setSelectedDateTime(dateTime);
+              }    
+            
+            } else {
+                setConfirmer(false);
+                console.log('Aucun personnel disponible.');
+              }
+            }
+            const handleReservation = async (dateTime,CIN) => {
+              console.log(dateTime)
+              if (!isLoggedIn) {
+                const swalWithBootstrapButtons = Swal.mixin({
+                  customClass: {
+                    confirmButton: 'btn btn-dark',
+                    cancelButton: 'btn btn-dark'
+                  },
+                  buttonsStyling: false
+                })
+                swalWithBootstrapButtons.fire({
+                  title: "Veuillez vous connecter",
+                  text: "Vous devez être connecté pour effectuer une réservation.",
+                  icon: "warning",
+                 
+                  confirmButtonText: "Se connecter",
+                  cancelButtonText: "Annuler",
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    // Rediriger vers la page de connexion
+                    Navigate("/auth");
+                  }
+                });
+                return;
+              }
+              if(CIN !== 0) {
+
+            }else{
+              if(Perso.length>0){
+                dispoPerso(dateTime); 
+              }else{
+                setSelectedPerso(0);
+                console.log('Selected Personnel:',0);
+                setConfirmer(true);
+                setSelectedDateTime(dateTime);
+              }
+           
+            };
+          }
+            const handleAjout=(addService,addDuree,addPrix,addselectPerso)=>{
+              console.log("frommmmm Page Resv")
+                console.log("Service choisi :", addService);
+                console.log("Durée :",addDuree);
+                console.log("Prix :", addPrix);
+                console.log("Personnel choisi :",addselectPerso);
+                setaddService(addService);
+                setaddDuree(addDuree);
+                setaddselectPerso(addselectPerso);
+              };
+            
           function currentTime(d) {
             let duree = "";
             const [hours, minutes] = d.split(":");
@@ -175,33 +323,56 @@ useEffect(()=>{
             s=s/avis.length
             return s.toFixed(1)
           }
-          const sendNotification = () => {
-            const data = { userId: '123' }; // Les données que vous souhaitez envoyer avec la notification
-          
-            axios.post('http://localhost:5000/sendNotification', data)
-              .then(response => {
-                console.log(response.data); // Traitez la réponse de la requête
-              })
-              .catch(error => {
-                console.error(error); // Gérez les erreurs éventuelles
-              });
+          const currentDates = new Date();
+currentDates.setHours(currentDates.getHours() + 1);
+
+          const sendNotification = async () => {
+            try {
+              await axios.post('http://localhost:5000/api/sendNotif', {
+                type:"confirmation",contenu:"votre réservation a été confirmé avec succès",
+                etat:0,confirmDate:currentDates,email:email});
+              console.log('Notification sent successfully');
+            } catch (error) {
+              console.error('Failed to send notification:', error);
+            }
           };
-          
+        
+          const handleSendNotification = () => {
+            const notification = {
+              app_id: "b6f5946a-9d60-4612-baea-251b590b1aec",
+              contents: { "en": "Hello" },
+              headings: { "en": "Votre reservation a été confirmé" },
+              included_segments: ["All"]
+            };
+            
+            
+            sendNotification(notification);
+          };
           const ConfirmerResv = () => {
             if (selectedDateTime) {
               if (location.pathname.split('/').length > 4) {
                 update(selectedDateTime);
-                sendNotification();
                 console.log("updatee");
               } else {
+                if(addService && addDuree && addselectPerso){
+                  
+                  Insert2(selectedDateTime,addService,addDuree,addselectPerso);
+              
+                }else{
                 Insert(selectedDateTime);
-                sendNotification();
+               
+                  }
               }
-            }
+             handleSendNotification();
+            } 
           };
           const AddNewPres=()=>{
            setNewPres(true);
           }
+          const SuppNewPres=()=>{
+            setNewPres(false);
+           }
+        
           const moment = require('moment');
           require('moment/locale/fr'); 
           const transformDate = (dateString) => {
@@ -212,7 +383,7 @@ useEffect(()=>{
 const scrollThreshold = "header scroll";
     return(
         <>
-         <Navbar change={scrollThreshold}isLoggedIn={isLoggedIn} />
+         <Navbar change={scrollThreshold} isLoggedIn={isLoggedIn} />
         <div className='navBarLinks'/>
         <div style={{backgroundColor:"#F1F1F1"}} ><br/><p/><br/></div>
         <section className='reservationPage' style={{backgroundColor:"#F1F1F1"}} >
@@ -283,7 +454,24 @@ const scrollThreshold = "header scroll";
                 </div><br/> </Card>
                    
                 <div><br/></div>
-                <button className='btnBlack' onClick={AddNewPres}>  <BsPlusLg/> Ajouter une prestation à la suite</button><br/> </>
+                {
+                !newPres ? (
+                  <>
+                   <button className='btnBlack' onClick={AddNewPres}> 
+                 <BsPlusLg/> Ajouter une prestation à la suite</button>
+                 <br/>
+                 </>
+                 ):
+                 (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto' }}>
+                 <h3 className="titreResv">Choix de la prestation à ajouter</h3>
+ 
+   <span onClick={SuppNewPres} className='SuppNewPres'>Supprimer</span> 
+  </div>
+
+                 )}
+
+                  </>
                 ):
                 (
                 <Card><br/><div className='infosResv'>
@@ -293,18 +481,24 @@ const scrollThreshold = "header scroll";
                        <Typography variant="body1"><BsStars/> {donne.nomService}</Typography>
                       <Typography variant="body1"><MdOutlineAccessTime/> {formatDuration(donne.duree)} <span/> <FaMoneyBillWave/> {donne.prix}D</Typography>
             </div>
-                ))}</div><br/></Card>
+                ))}
+                </div><br/></Card>
                 )}
                    <br/>
-                   {newPres ? (
-                    !confirmer ? (
-                      <ServiceChoix service={leSservices} nomCentre={nomSalon}/>
-                    ) : (
-                      <Card><br/> <div className='infosResv'>hi</div></Card>
-                    )
-                  ) : (
-                    <div></div>
-                  )}
+{newPres ? (
+    <AjouterPres
+      service={leSservices}
+      nomCentre={nomSalon}
+      nomService={service}
+      confirmer={confirmer}
+      onAjout={handleAjout}
+    />
+  
+ 
+) : (
+  <div></div>
+)}
+
 
 
 {!confirmer ? (<>
@@ -323,7 +517,7 @@ const scrollThreshold = "header scroll";
      <br/></Card>
       </>
       )}
-<div><br/><p/><br/></div>
+<div><p/></div>
 {confirmer ?(
    <>   
 <h3 className="titreResv">3. Identification</h3>

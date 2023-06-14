@@ -139,6 +139,7 @@ function applySortFilter(array, comparator, query) {
 				.indexOf(query) !== -1
 			);
 		});
+    
 	}
 	return stabilizedThis.map((el) => el[0]);
 }

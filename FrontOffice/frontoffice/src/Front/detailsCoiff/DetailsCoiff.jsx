@@ -7,7 +7,7 @@ import ImageSlider from "../../hooks/ImageSlider";
 import { Grid,Card,
   TableBody,
   TableCell,
-  TableRow,
+  TableRow,Table,
   Container,} from '@mui/material';
   
 import {CiLocationOn,CiStar} from 'react-icons/ci';
@@ -19,9 +19,9 @@ import Navbar from '../Navbar/navbar';
 import Maps from '../../hooks/maps';
 const DetailsCoiff= ({ isLoggedIn}) =>{
     const location=useLocation()
-    console.log(location.pathname.split('/')[3].split('%20').join(' '))
+    console.log(location.pathname.split('/')[4].split('%20').join(' '))
 
-     const nomEtab =location.pathname.split('/')[3].split('%20').join(' ')
+     const nomEtab =location.pathname.split('/')[4].split('%20').join(' ')
     const [name,setName]=useState([]);
     const [adresse,setAdresse]=useState([]);
     const [service,setService]=useState([]);
@@ -132,10 +132,8 @@ const DetailsCoiff= ({ isLoggedIn}) =>{
                    <span className='h4'>
                     <CiStar className='iconStar' /> {getAvis()} ({avis.length} avis)
                    </span>
-                   <div style={containerStyles}>
                       <ImageSlider slides={nomEtab} />
-                    </div>
-
+                    
                 </div>  
                 <br/>
               <h3 className='resvTitre'> Réserver en ligne pour un RDV Chez {nomEtab}</h3>
@@ -168,35 +166,28 @@ const DetailsCoiff= ({ isLoggedIn}) =>{
                 }
               </Card>
             </Container><br/>
-              <Container>
-              <div style={{ textAlign: 'center' }}>
-             <h3 className='resvTitre'>Horaires d'ouverture</h3><br/>
-             </div>
-             <Card style={{maxWidth: '450px', borderRadius: '10px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}>
-              {Horaire.map((donne, index) => (
-                <table style={{ margin: '0 auto', borderRadius: '10px'}}>
-                  <TableBody>
-                    <TableRow key={index}>
-                        <TableCell align="left">{donne.jour} :</TableCell>
-                        <TableCell padding="text">
-                          </TableCell>
-                          <TableCell padding="text">
-                          </TableCell>
-                          <TableCell padding="text">
-                          </TableCell>
-                          <TableCell padding="text">
-                          </TableCell>
-                          <TableCell padding="text">
-                          </TableCell>
-                          <TableCell padding="text">
-                          </TableCell>
-                        <TableCell align="right" className='trc'>{donne.ouverture ? `${currentTime(donne.ouverture)} - ${currentTime(donne.fermeture)}` : 'Fermé'}</TableCell>
-                    </TableRow>
-                  </TableBody>
-                </table>
-              ))}
-            </Card>
-            </Container><br/>
+            <Container>
+  <div style={{ textAlign: 'center' }}>
+    <h3 className='resvTitre'>Horaires d'ouverture</h3>
+    <br />
+  </div>
+  <Card style={{ maxWidth: '450px', borderRadius: '10px', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)' }}>
+    <Table style={{ margin: '0 auto', borderRadius: '10px' }}>
+      <TableBody>
+        {Horaire.map((donne, index) => (
+          <TableRow key={index}>
+            <TableCell align="left">{donne.jour}</TableCell>
+            <TableCell  padding="none"></TableCell>
+            <TableCell padding="none">
+              {donne.ouverture ? `${currentTime(donne.ouverture)} - ${currentTime(donne.fermeture)}` : 'Fermé'}
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  </Card>
+</Container>
+<br/>
             </div>
              </div>
                  <p/>

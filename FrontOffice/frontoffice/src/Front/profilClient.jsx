@@ -47,6 +47,8 @@ const [editClient, setEditClient] = useState("");
 const [editMode, setEditMode] = useState(false);
 const[imagess,setImagess]=useState("");
 const[resv,setResv]=useState([]);
+const[resvInter,setResvInter]=useState([]);
+
 const[del,setDel]=useState([]);
 
 function formatDate(dateString) {
@@ -80,7 +82,16 @@ function formatDate(dateString) {
         console.error(error);
       });
   }, [email]); 
-  
+
+  useEffect(() => {
+    axios.get(`http://localhost:5000/api/getResvClientWithIntermediare/${email}`)
+      .then(res => {
+        setResvInter(res.data);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  }, [email]); 
   const formatDuration = (duration) => {
     const [hours, minutes, seconds] = duration.split(':').map(Number);
   
@@ -124,7 +135,29 @@ function formatDate(dateString) {
       console.log("client Update failed");
       window.location.reload();
     }  };
- 
+    const currentDates = new Date();
+    currentDates.setHours(currentDates.getHours() + 1);
+    
+              const sendNotification = async () => {
+                try {
+                  await axios.post('http://localhost:5000/api/sendNotif', {
+                    type:"annulation",contenu:"votre réservation a été annulée",
+                    etat:0,confirmDate:currentDates,email:email});
+                  console.log('Notification sent successfully');
+                } catch (error) {
+                  console.error('Failed to send notification:', error);
+                }
+              }; const handleSendNotification = () => {
+                const notification = {
+                  app_id: "b6f5946a-9d60-4612-baea-251b590b1aec",
+                  contents: { "en": "Hello" },
+                  headings: { "en": "Votre reservation a été confirmé" },
+                  included_segments: ["All"]
+                };
+                
+                
+                sendNotification(notification);
+              };
     const onDelete= (reference)=>{
       const swalWithBootstrapButtons = Swal.mixin({
           customClass: {
@@ -151,6 +184,7 @@ function formatDate(dateString) {
               'Votre reservation a été supprimé.',
               'success'
             )
+            handleSendNotification();
            window.location.reload()
           } else if (
             result.dismiss === Swal.DismissReason.cancel
@@ -186,8 +220,8 @@ function formatDate(dateString) {
     
     <img className="shadow" alt={1} src={editClient.photo} />
   ) : (
+    <img alt="1"className="shadow" src={`data:image/png;base64,${Buffer.from(row.photo.data).toString('base64')}`} />
    
-    <img className="shadow" alt={1} src={`${Buffer.from(row.photo.data)}`}  />
    
   )}
 
@@ -403,56 +437,54 @@ function formatDate(dateString) {
                         </div>
                       </div>
                       <div className={`tab-pane fade ${activeTab === 'reservation' ? 'show active' : ''}`} id="reservation" role="tabpanel" aria-labelledby="reservation-tab">
-                        <h3 className="mb-4">Mes rendez-vous </h3>
-                        <div className="row">
-                         
-                        </div>
-                        <div>
-                          <div className="col-md-12">
-                            <div className="form-groupProfil"> {resv.map((row) => (
-                            <React.Fragment>
-                              
-                              <Card className={classes.root}>
-      <Grid container spacing={2}>
-        <Grid item xs={4}>
-        <img  className={classes.media}
-            alt='1'
-            src={`data:image/png;base64,${Buffer.from(row.src.data).toString('base64')}`}
-          />
-        
-        </Grid>
-        <Grid item xs={8}>
-          <CardHeader title={formatDate(row.startDateResv)} />
-          <CardContent>
-          <Typography variant="body1">{row.nom}</Typography>
-          <Typography variant="body1"><BsStars/> {row.nomService}</Typography>
-          <Typography variant="body1"><MdOutlineAccessTime/> {formatDuration(row.duree)} <span/> <FaMoneyBillWave/> {row.prix}D</Typography>
-
-          </CardContent>
-          <Grid container justifyContent="flex-end">
-            <Grid item>
-              <IconButton>
-              <button className="btnBlack" onClick={() => onDelete(row.reference)}><TbTrash/> Annuler</button>
-
-              </IconButton>
-            </Grid>
-            <Grid item>
-              <IconButton>
-            <button className="btnBlack" ><a href={`reservation/${row.nom}/${row.nomService}/${row.reference}`}><MdUpdate/> Deplacer</a></button>
-              </IconButton>
-            </Grid>
-          </Grid>
-        </Grid>
-      </Grid>
-    </Card><br/></React.Fragment>
-                                          ))}
-
-                            </div>
-                          </div>
-                          
-                        </div>
-                      </div>
-                  
+  <h3 className="mb-4">Mes rendez-vous </h3>
+  <div className="row"></div>
+  <div>
+    <div className="col-md-12">
+      <div className="form-groupProfil">
+        {resv
+          .sort((a, b) => new Date(b.startDateResv) - new Date(a.startDateResv)) // Tri des réservations par date de début décroissante
+          .map((row) => (
+            <React.Fragment key={row.reference}>
+              <Card className={classes.root} style={{ marginBottom: '20px' }}> {/* Ajout de l'espacement entre les cartes */}
+                <Grid container spacing={2}>
+                  <Grid item xs={4}>
+                    <img
+                      className={classes.media}
+                      alt='1'
+                      src={`data:image/png;base64,${Buffer.from(row.src.data).toString('base64')}`}
+                    />
+                  </Grid>
+                  <Grid item xs={8}>
+                    <CardHeader title={formatDate(row.startDateResv)} />
+                    <CardContent>
+                      <Typography variant="body1">{row.nom}</Typography>
+                      <Typography variant="body1"><BsStars /> {row.nomService}</Typography>
+                      <Typography variant="body1"><MdOutlineAccessTime /> {formatDuration(row.duree)} <span /> <FaMoneyBillWave /> {row.prix}D</Typography>
+                    </CardContent>
+                    {new Date(row.startDateResv) > new Date() && (
+                      <Grid container justifyContent="flex-end">
+                        <Grid item>
+                          <IconButton>
+                            <button className="btnBlack" onClick={() => onDelete(row.reference)}><TbTrash /> Annuler</button>
+                          </IconButton>
+                        </Grid>
+                        <Grid item>
+                          <IconButton>
+                            <button className="btnBlack" ><a href={`reservation/${row.nom}/${row.nomService}/${row.reference}`}><MdUpdate /> Deplacer</a></button>
+                          </IconButton>
+                        </Grid>
+                      </Grid>
+                    )}
+                  </Grid>
+                </Grid>
+              </Card>
+            </React.Fragment>
+          ))}
+      </div>
+    </div>
+  </div>
+</div>
                       <div className={`tab-pane fade ${activeTab === 'notification' ? 'show active' :
                         ''}`} id="notification" role="tabpanel" aria-labelledby="notification-tab">
                         <h3 className="mb-4">Notification Settings</h3>

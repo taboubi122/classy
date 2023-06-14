@@ -2,7 +2,10 @@ import PropTypes from 'prop-types';
 import { set, sub } from 'date-fns';
 import { noCase } from 'change-case';
 import { faker } from '@faker-js/faker';
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
+import axios from 'axios';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 // @mui
 import {
   Box,
@@ -25,61 +28,36 @@ import { fToNow } from '../../../utils/formatTime';
 // components
 import Iconify from '../../../components/iconify';
 import Scrollbar from '../../../components/scrollbar';
-
+import {GiConfirmed,GiCancel} from 'react-icons/gi'
+import { MdAccessTime, MdOutlineFeedback} from 'react-icons/md'
 // ----------------------------------------------------------------------
 
-const NOTIFICATIONS = [
-  {
-    id: faker.datatype.uuid(),
-    title: 'Your order is placed',
-    description: 'waiting for shipping',
-    avatar: null,
-    type: 'order_placed',
-    createdAt: set(new Date(), { hours: 10, minutes: 30 }),
-    isUnRead: true,
-  },
-  {
-    id: faker.datatype.uuid(),
-    title: faker.name.fullName(),
-    description: 'answered to your comment on the Minimal',
-    avatar: '/assets/images/avatars/avatar_2.jpg',
-    type: 'friend_interactive',
-    createdAt: sub(new Date(), { hours: 3, minutes: 30 }),
-    isUnRead: true,
-  },
-  {
-    id: faker.datatype.uuid(),
-    title: 'You have new message',
-    description: '5 unread messages',
-    avatar: null,
-    type: 'chat_message',
-    createdAt: sub(new Date(), { days: 1, hours: 3, minutes: 30 }),
-    isUnRead: false,
-  },
-  {
-    id: faker.datatype.uuid(),
-    title: 'You have new mail',
-    description: 'sent from Guido Padberg',
-    avatar: null,
-    type: 'mail',
-    createdAt: sub(new Date(), { days: 2, hours: 3, minutes: 30 }),
-    isUnRead: false,
-  },
-  {
-    id: faker.datatype.uuid(),
-    title: 'Delivery processing',
-    description: 'Your order is being shipped',
-    avatar: null,
-    type: 'order_shipped',
-    createdAt: sub(new Date(), { days: 3, hours: 3, minutes: 30 }),
-    isUnRead: false,
-  },
-];
 
-export default function NotificationsPopover() {
-  const [notifications, setNotifications] = useState(NOTIFICATIONS);
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  const formattedDate = format(date, "EEEE 'le' dd MMMM HH:mm", { locale: fr });
+  return formattedDate;
+}
 
-  const totalUnRead = notifications.filter((item) => item.isUnRead === true).length;
+export default function NotificationsPopover({isLogout}) {
+  const [client, setClient] = useState([]);
+  const [email, setEmail] = useState('');
+ 
+  const [notif, setNotif] = useState([]);
+  useEffect(() => {
+    setEmail(localStorage.getItem('email'));
+  }, []);
+useEffect(() => {
+  axios.get(`http://localhost:5000/api/getNotif/${email}`)
+    .then((response) => {
+      setNotif(response.data);
+    })
+    .catch((error) => {
+      console.error('Failed to fetch notifications:', error);
+    });
+}, [email]);
+
+  const totalUnRead = notif.filter((item) => item.etat === 0).length;
 
   const [open, setOpen] = useState(null);
 
@@ -90,15 +68,15 @@ export default function NotificationsPopover() {
   const handleClose = () => {
     setOpen(null);
   };
-
   const handleMarkAllAsRead = () => {
-    setNotifications(
-      notifications.map((notification) => ({
+    setNotif(
+      notif.map((notification) => ({
         ...notification,
-        isUnRead: false,
+        etat: false,
       }))
     );
   };
+
 
   return (
     <>
@@ -132,10 +110,10 @@ export default function NotificationsPopover() {
 
           {totalUnRead > 0 && (
             <Tooltip title=" Mark all as read">
-              <IconButton color="primary" onClick={handleMarkAllAsRead}>
-                <Iconify icon="eva:done-all-fill" />
-              </IconButton>
-            </Tooltip>
+            <IconButton color="primary" onClick={handleMarkAllAsRead}>
+              <Iconify icon="eva:done-all-fill" />
+            </IconButton>
+          </Tooltip>
           )}
         </Box>
 
@@ -150,51 +128,25 @@ export default function NotificationsPopover() {
               </ListSubheader>
             }
           >
-            {notifications.slice(0, 2).map((notification) => (
+            {notif.map((notification) => (
               <NotificationItem key={notification.id} notification={notification} />
             ))}
           </List>
 
-          <List
-            disablePadding
-            subheader={
-              <ListSubheader disableSticky sx={{ py: 1, px: 2.5, typography: 'overline' }}>
-                Before that
-              </ListSubheader>
-            }
-          >
-            {notifications.slice(2, 5).map((notification) => (
-              <NotificationItem key={notification.id} notification={notification} />
-            ))}
-          </List>
+        
         </Scrollbar>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
         <Box sx={{ p: 1 }}>
           <Button fullWidth disableRipple>
-            View All
+           voir plus
           </Button>
         </Box>
       </Popover>
     </>
   );
 }
-
-// ----------------------------------------------------------------------
-
-NotificationItem.propTypes = {
-  notification: PropTypes.shape({
-    createdAt: PropTypes.instanceOf(Date),
-    id: PropTypes.string,
-    isUnRead: PropTypes.bool,
-    title: PropTypes.string,
-    description: PropTypes.string,
-    type: PropTypes.string,
-    avatar: PropTypes.any,
-  }),
-};
-
 function NotificationItem({ notification }) {
   const { avatar, title } = renderContent(notification);
 
@@ -204,7 +156,7 @@ function NotificationItem({ notification }) {
         py: 1.5,
         px: 2.5,
         mt: '1px',
-        ...(notification.isUnRead && {
+        ...(notification.etat && {
           bgcolor: 'action.selected',
         }),
       }}
@@ -225,7 +177,8 @@ function NotificationItem({ notification }) {
             }}
           >
             <Iconify icon="eva:clock-outline" sx={{ mr: 0.5, width: 16, height: 16 }} />
-            {fToNow(notification.createdAt)}
+        
+           {formatDate(notification.confirmDate)}
           </Typography>
         }
       />
@@ -238,39 +191,39 @@ function NotificationItem({ notification }) {
 function renderContent(notification) {
   const title = (
     <Typography variant="subtitle2">
-      {notification.title}
+      {notification.type}
       <Typography component="span" variant="body2" sx={{ color: 'text.secondary' }}>
-        &nbsp; {noCase(notification.description)}
+        &nbsp; {notification.contenu}
       </Typography>
     </Typography>
   );
 
-  if (notification.type === 'order_placed') {
+  
+  if (notification.type === 'confirmation') {
     return {
-      avatar: <img alt={notification.title} src="/assets/icons/ic_notification_package.svg" />,
+      avatar: <GiConfirmed color='green' size={30}/>,
       title,
     };
   }
-  if (notification.type === 'order_shipped') {
+  if (notification.type === 'annulation') {
     return {
-      avatar: <img alt={notification.title} src="/assets/icons/ic_notification_shipping.svg" />,
+      avatar: <GiCancel  color='red' size={30}/>,
       title,
     };
   }
-  if (notification.type === 'mail') {
+  if (notification.type === 'rappel') {
     return {
-      avatar: <img alt={notification.title} src="/assets/icons/ic_notification_mail.svg" />,
+      avatar: <MdAccessTime  color='black' size={30}/>,
       title,
     };
   }
-  if (notification.type === 'chat_message') {
+  if (notification.type === 'acces') {
     return {
-      avatar: <img alt={notification.title} src="/assets/icons/ic_notification_chat.svg" />,
+      avatar: <MdOutlineFeedback color='black' size={30}/>,
       title,
     };
   }
   return {
-    avatar: notification.avatar ? <img alt={notification.title} src={notification.avatar} /> : null,
     title,
   };
 }
